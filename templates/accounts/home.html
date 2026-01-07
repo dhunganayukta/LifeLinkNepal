@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Accounts Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1>Admin / Account Dashboard</h1>
+  <p>Manage users, roles, and site settings here.</p>
+
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Manage Donors</h5>
+          <a href="{% url 'donors_home' %}" class="btn btn-success">Go</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Manage Hospitals</h5>
+          <a href="{% url 'hospitals_home' %}" class="btn btn-info">Go</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">View Blood Requests</h5>
+          <a href="{% url 'requests_home' %}" class="btn btn-danger">Go</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

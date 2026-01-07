@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - LifeLink Nepal{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-4 mb-4">Welcome to LifeLink Nepal</h1>
+    <p class="lead mb-5">Connecting blood donors with those in need across Nepal</p>
+    
+    <div class="row g-4 mt-4">
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Accounts</h5>
+                    <p class="card-text">Manage your account and profile</p>
+                    <a href="{% url 'accounts_home' %}" class="btn btn-primary">Go to Accounts</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Donors</h5>
+                    <p class="card-text">Register as a blood donor and save lives</p>
+                    <a href="{% url 'donors_home' %}" class="btn btn-success">Become a Donor</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Hospitals</h5>
+                    <p class="card-text">Hospital registration and management</p>
+                    <a href="{% url 'hospitals_home' %}" class="btn btn-info">View Hospitals</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Blood Requests</h5>
+                    <p class="card-text">Create or respond to urgent blood requests</p>
+                    <a href="{% url 'requests_home' %}" class="btn btn-danger">View Requests</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-5 p-4 bg-light rounded">
+    <h3>About LifeLink Nepal</h3>
+    <p>LifeLink Nepal is a platform dedicated to connecting blood donors with patients and hospitals in need. Our mission is to ensure that no one in Nepal faces difficulty in finding blood during emergencies.</p>
+</div>
+{% endblock %}

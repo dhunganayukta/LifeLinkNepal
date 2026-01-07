@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Hospital Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1>Hospital Dashboard</h1>
+  <p>Welcome, {{ user.username }}! Here you can view donors and manage blood requests.</p>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">View Donors</h5>
+          <a href="{% url 'donors_home' %}" class="btn btn-success">Go</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Blood Requests</h5>
+          <a href="{% url 'requests_home' %}" class="btn btn-danger">Go</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

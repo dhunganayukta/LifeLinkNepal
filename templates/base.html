@@ -1,0 +1,47 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}LifeLink Nepal{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+          <img src="{% static 'images/logo.png' %}" alt="LifeLink Nepal Logo" height="40" class="me-2">
+          <span>LifeLink</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if '/accounts' in request.path %}active{% endif %}" href="{% url 'accounts_home' %}">Accounts</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if '/donors' in request.path %}active{% endif %}" href="{% url 'donors_home' %}">Donors</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if '/hospitals' in request.path %}active{% endif %}" href="{% url 'hospitals_home' %}">Hospitals</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if '/requests' in request.path %}active{% endif %}" href="{% url 'requests_home' %}">Requests</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
