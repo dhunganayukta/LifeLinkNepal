@@ -3,55 +3,163 @@
 {% block title %}Home - LifeLink Nepal{% endblock %}
 
 {% block content %}
-<div class="text-center py-5">
-    <h1 class="display-4 mb-4">Welcome to LifeLink Nepal</h1>
-    <p class="lead mb-5">Connecting blood donors with those in need across Nepal</p>
-    
-    <div class="row g-4 mt-4">
-        <div class="col-md-3">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Accounts</h5>
-                    <p class="card-text">Manage your account and profile</p>
-                    <a href="{% url 'accounts_home' %}" class="btn btn-primary">Go to Accounts</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Donors</h5>
-                    <p class="card-text">Register as a blood donor and save lives</p>
-                    <a href="{% url 'donors_home' %}" class="btn btn-success">Become a Donor</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Hospitals</h5>
-                    <p class="card-text">Hospital registration and management</p>
-                    <a href="{% url 'hospitals_home' %}" class="btn btn-info">View Hospitals</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Blood Requests</h5>
-                    <p class="card-text">Create or respond to urgent blood requests</p>
-                    <a href="{% url 'requests_home' %}" class="btn btn-danger">View Requests</a>
-                </div>
-            </div>
-        </div>
-    </div>
+
+<!-- Hero Section -->
+<div class="text-center py-5 mb-5">
+  <h1 class="display-3 fw-bold mb-3" style="color: #dc3545;">
+    <i class="fas fa-heartbeat"></i> Welcome to <span style="color:#0d6efd;">LifeLink Nepal</span>
+  </h1>
+  <p class="lead mb-4" style="font-size: 1.3rem; color: #6c757d;">
+    Connecting blood donors, hospitals, and patients across Nepal
+  </p>
+  <div class="d-flex justify-content-center gap-3 mt-4">
+    <a href="{% url 'donors_home' %}" class="btn btn-danger btn-custom btn-lg">
+      <i class="fas fa-tint me-2"></i> Donate Blood
+    </a>
+    <a href="{% url 'requests_home' %}" class="btn btn-outline-primary btn-custom btn-lg">
+      <i class="fas fa-search me-2"></i> Find Blood
+    </a>
+  </div>
 </div>
 
-<div class="mt-5 p-4 bg-light rounded">
-    <h3>About LifeLink Nepal</h3>
-    <p>LifeLink Nepal is a platform dedicated to connecting blood donors with patients and hospitals in need. Our mission is to ensure that no one in Nepal faces difficulty in finding blood during emergencies.</p>
+
+<!-- Stats Section -->
+<div class="row mb-5 g-4">
+  <div class="col-md-3">
+    <div class="custom-card text-center p-4">
+      <i class="fas fa-users fa-3x text-primary mb-3"></i>
+      <h3 class="fw-bold">1000+</h3>
+      <p class="text-muted">Registered Donors</p>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="custom-card text-center p-4">
+      <i class="fas fa-hospital fa-3x mb-3" style="color:#0d6efd;"></i>
+      <h3 class="fw-bold">{{ hospitals.count }}</h3>
+      <p class="text-muted">Partner Hospitals</p>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="custom-card text-center p-4">
+      <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+      <h3 class="fw-bold">500+</h3>
+      <p class="text-muted">Lives Saved</p>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="custom-card text-center p-4">
+      <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+      <h3 class="fw-bold">24/7</h3>
+      <p class="text-muted">Available</p>
+    </div>
+  </div>
 </div>
+
+
+<!-- Main Feature Cards -->
+<div class="row g-4 mt-4 mb-5">
+  
+  <div class="col-md-6 col-lg-3">
+    <div class="custom-card h-100 text-center p-4">
+      <i class="fas fa-user-circle fa-4x text-primary mb-3"></i>
+      <h4 class="fw-bold">Accounts</h4>
+      <p class="text-muted">Manage your profile securely</p>
+      <a href="{% url 'accounts_home' %}" class="btn btn-primary btn-custom mt-3">
+        Go to Accounts
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="custom-card h-100 text-center p-4">
+      <i class="fas fa-hand-holding-heart fa-4x text-danger mb-3"></i>
+      <h4 class="fw-bold">Donors</h4>
+      <p class="text-muted">Become a blood donor</p>
+      <a href="{% url 'donors_home' %}" class="btn btn-danger btn-custom mt-3">
+        Become a Donor
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="custom-card h-100 text-center p-4">
+      <i class="fas fa-hospital fa-4x" style="color:#0d6efd;"></i>
+      <h4 class="fw-bold">Hospitals</h4>
+      <p class="text-muted">View partner hospitals</p>
+      <a href="{% url 'hospitals_home' %}" class="btn btn-primary btn-custom mt-3">
+        View Hospitals
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="custom-card h-100 text-center p-4">
+      <i class="fas fa-ambulance fa-4x text-danger mb-3"></i>
+      <h4 class="fw-bold">Blood Requests</h4>
+      <p class="text-muted">Request or provide blood</p>
+      <a href="{% url 'requests_home' %}" class="btn btn-danger btn-custom mt-3">
+        View Requests
+      </a>
+    </div>
+  </div>
+
+</div>
+
+
+
+<!-- Dynamic Hospital List -->
+<div class="custom-card p-5 mb-5">
+  <h3 class="fw-bold mb-4" style="color:#0d6efd;">
+    <i class="fas fa-hospital me-2"></i> Connected Hospitals
+  </h3>
+
+  {% if hospitals %}
+    <div class="row g-3">
+      {% for hospital in hospitals %}
+      <div class="col-md-4">
+        <div class="p-3 border rounded bg-light">
+          <h5 class="fw-bold">{{ hospital.name }}</h5>
+          <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-1"></i> {{ hospital.address }}</p>
+          <p class="text-muted mb-1"><i class="fas fa-phone me-1"></i> {{ hospital.phone }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No hospitals registered yet.</p>
+  {% endif %}
+</div>
+
+
+
+<!-- About -->
+<div class="custom-card p-5 mt-5">
+  <div class="row align-items-center">
+    <div class="col-md-8">
+      <h2 class="fw-bold mb-4 text-danger">
+        <i class="fas fa-info-circle me-2"></i> About LifeLink Nepal
+      </h2>
+      <p class="lead">LifeLink Nepal connects donors, hospitals and those in urgent need of blood.</p>
+      <p class="text-muted">We aim to ensure nobody in Nepal struggles to find blood during emergencies.</p>
+    </div>
+    <div class="col-md-4 text-center">
+      <i class="fas fa-heartbeat" style="font-size: 8rem; color: #dc3545; opacity: 0.25;"></i>
+    </div>
+  </div>
+</div>
+
+
+<!-- Call to Action -->
+<div class="text-center mt-5 p-5 custom-card"
+     style="background: linear-gradient(135deg, #dc3545 0%, #0d6efd 100%); color: white;">
+  <h2 class="fw-bold mb-3">Ready to Save a Life?</h2>
+  <p class="lead mb-4">Join thousands of donors making a difference every day</p>
+  <a href="{% url 'donors_home' %}" class="btn btn-light btn-custom btn-lg">
+    <i class="fas fa-user-plus me-2"></i> Register Now
+  </a>
+</div>
+
 {% endblock %}
