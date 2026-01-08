@@ -1,26 +1,255 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hospital Registration - Life Link Nepal{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2>Register</h2>
-    <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+<!-- Hero Banner -->
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="text-center text-white">
+            <h1 class="fw-bold mb-2">
+                <i class="bi bi-hospital me-2"></i>Hospital Registration
+            </h1>
+            <p class="mb-0">Join our network of healthcare partners</p>
         </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="info-card fade-in-up">
+                    <h3 class="fw-bold mb-4">
+                        <i class="bi bi-building-add text-danger me-2"></i>Hospital/Blood Bank Registration Form
+                    </h3>
+                    
+                    <form method="post" action="{% url 'hospital_register' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <h5 class="fw-bold mb-3 text-danger">Institution Information</h5>
+                        <div class="mb-3">
+                            <label for="hospital_name" class="form-label fw-semibold">Hospital/Blood Bank Name *</label>
+                            <input type="text" class="form-control" id="hospital_name" name="hospital_name" required placeholder="Enter official name">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="hospital_type" class="form-label fw-semibold">Type *</label>
+                                <select class="form-select" id="hospital_type" name="hospital_type" required>
+                                    <option value="">Select type</option>
+                                    <option value="government">Government Hospital</option>
+                                    <option value="private">Private Hospital</option>
+                                    <option value="blood_bank">Blood Bank</option>
+                                    <option value="clinic">Clinic</option>
+                                    <option value="medical_college">Medical College</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="registration_number" class="form-label fw-semibold">Registration Number *</label>
+                                <input type="text" class="form-control" id="registration_number" name="registration_number" required placeholder="Official reg. number">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label for="license_document" class="form-label fw-semibold">Upload License/Registration Document *</label>
+                            <input type="file" class="form-control" id="license_document" name="license_document" required accept=".pdf,.jpg,.jpeg,.png">
+                            <small class="text-muted">Accepted formats: PDF, JPG, PNG (Max 5MB)</small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-danger">Contact Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label fw-semibold">Official Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required placeholder="hospital@example.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="website" class="form-label fw-semibold">Website</label>
+                                <input type="url" class="form-control" id="website" name="website" placeholder="https://example.com">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="phone_primary" class="form-label fw-semibold">Primary Phone *</label>
+                                <input type="tel" class="form-control" id="phone_primary" name="phone_primary" required placeholder="+977-1-XXXXXXX">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone_emergency" class="form-label fw-semibold">Emergency Hotline *</label>
+                                <input type="tel" class="form-control" id="phone_emergency" name="phone_emergency" required placeholder="+977-XXXXXXXXXX">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-danger">Location Details</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="province" class="form-label fw-semibold">Province *</label>
+                                <select class="form-select" id="province" name="province" required>
+                                    <option value="">Select province</option>
+                                    <option value="Province 1">Province 1</option>
+                                    <option value="Madhesh">Madhesh Province</option>
+                                    <option value="Bagmati">Bagmati Province</option>
+                                    <option value="Gandaki">Gandaki Province</option>
+                                    <option value="Lumbini">Lumbini Province</option>
+                                    <option value="Karnali">Karnali Province</option>
+                                    <option value="Sudurpashchim">Sudurpashchim Province</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="district" class="form-label fw-semibold">District *</label>
+                                <input type="text" class="form-control" id="district" name="district" required placeholder="e.g., Kathmandu">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="municipality" class="form-label fw-semibold">Municipality *</label>
+                                <input type="text" class="form-control" id="municipality" name="municipality" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="ward" class="form-label fw-semibold">Ward Number *</label>
+                                <input type="number" class="form-control" id="ward" name="ward" required min="1">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label for="street_address" class="form-label fw-semibold">Street Address *</label>
+                            <input type="text" class="form-control" id="street_address" name="street_address" required placeholder="Enter complete address">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="latitude" class="form-label fw-semibold">Latitude (Optional)</label>
+                                <input type="text" class="form-control" id="latitude" name="latitude" placeholder="27.7172">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="longitude" class="form-label fw-semibold">Longitude (Optional)</label>
+                                <input type="text" class="form-control" id="longitude" name="longitude" placeholder="85.3240">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-danger">Facilities & Services</h5>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Available Services *</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="blood_storage" name="services" value="blood_storage">
+                                        <label class="form-check-label" for="blood_storage">Blood Storage Facility</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="blood_testing" name="services" value="blood_testing">
+                                        <label class="form-check-label" for="blood_testing">Blood Testing</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="blood_donation" name="services" value="blood_donation">
+                                        <label class="form-check-label" for="blood_donation">Blood Donation Camp</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="emergency_service" name="services" value="emergency_service">
+                                        <label class="form-check-label" for="emergency_service">24/7 Emergency Service</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="ambulance" name="services" value="ambulance">
+                                        <label class="form-check-label" for="ambulance">Ambulance Service</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="icu" name="services" value="icu">
+                                        <label class="form-check-label" for="icu">ICU Facility</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bed_capacity" class="form-label fw-semibold">Total Bed Capacity *</label>
+                            <input type="number" class="form-control" id="bed_capacity" name="bed_capacity" required placeholder="Number of beds" min="1">
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-danger">Primary Contact Person</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="contact_person_name" class="form-label fw-semibold">Full Name *</label>
+                                <input type="text" class="form-control" id="contact_person_name" name="contact_person_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="contact_person_designation" class="form-label fw-semibold">Designation *</label>
+                                <input type="text" class="form-control" id="contact_person_designation" name="contact_person_designation" required placeholder="e.g., Blood Bank Manager">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="contact_person_phone" class="form-label fw-semibold">Phone Number *</label>
+                                <input type="tel" class="form-control" id="contact_person_phone" name="contact_person_phone" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="contact_person_email" class="form-label fw-semibold">Email *</label>
+                                <input type="email" class="form-control" id="contact_person_email" name="contact_person_email" required>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-danger">Account Setup</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="username" class="form-label fw-semibold">Username *</label>
+                                <input type="text" class="form-control" id="username" name="username" required placeholder="Choose username">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="password" class="form-label fw-semibold">Password *</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I certify that all information provided is accurate and I have the authority to register this institution on Life Link Nepal platform
+                            </label>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <strong>Note:</strong> Your registration will be reviewed by our team within 24-48 hours. You'll receive a confirmation email once approved.
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3">
+                            <i class="bi bi-check-circle-fill me-2"></i>Submit Registration
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="password1" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password1" name="password1" required>
-        </div>
-        <div class="mb-3">
-            <label for="password2" class="form-label">Confirm Password</label>
-            <input type="password" class="form-control" id="password2" name="password2" required>       
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
-</div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary-red);
+        box-shadow: 0 0 0 0.2rem rgba(199, 30, 53, 0.15);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-red);
+        border-color: var(--primary-red);
+    }
+</style>
+{% endblock %}
 {% endblock %}

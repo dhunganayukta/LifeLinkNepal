@@ -1,9 +1,286 @@
-{% extends "base.html" %}   
-{% block content %}     
-<h2>Donor Registration</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Register</button>
-</form>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Donor Registration - Life Link Nepal{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="text-center text-white">
+            <h1 class="fw-bold mb-2">
+                <i class="bi bi-heart-fill me-2"></i>Become a Life Saver
+            </h1>
+            <p class="mb-0">Register as a blood donor and help save lives</p>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Registration Form -->
+            <div class="col-lg-8 mb-4">
+                <div class="info-card fade-in-up">
+                    <h3 class="fw-bold mb-4">
+                        <i class="bi bi-person-plus-fill text-danger me-2"></i>Donor Registration Form
+                    </h3>
+                    
+                    <form method="post" action="{% url 'donor_register' %}">
+                        {% csrf_token %}
+                        
+                        <h5 class="fw-bold mb-3 text-danger">Personal Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label fw-semibold">First Name *</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label fw-semibold">Last Name *</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="dob" class="form-label fw-semibold">Date of Birth *</label>
+                                <input type="date" class="form-control" id="dob" name="dob" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="gender" class="form-label fw-semibold">Gender *</label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="">Select</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="blood_group" class="form-label fw-semibold">Blood Group *</label>
+                                <select class="form-select" id="blood_group" name="blood_group" required>
+                                    <option value="">Select blood group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="weight" class="form-label fw-semibold">Weight (kg) *</label>
+                                <input type="number" class="form-control" id="weight" name="weight" required placeholder="Min. 50 kg" min="50">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-danger">Contact Information</h5>
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email Address *</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label fw-semibold">Primary Phone *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required placeholder="+977-XXXXXXXXXX">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="alternate_phone" class="form-label fw-semibold">Alternate Phone</label>
+                                <input type="tel" class="form-control" id="alternate_phone" name="alternate_phone" placeholder="Optional">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-danger">Address Details</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="province" class="form-label fw-semibold">Province *</label>
+                                <select class="form-select" id="province" name="province" required>
+                                    <option value="">Select province</option>
+                                    <option value="Province 1">Province 1</option>
+                                    <option value="Province 2">Madhesh Province</option>
+                                    <option value="Bagmati">Bagmati Province</option>
+                                    <option value="Gandaki">Gandaki Province</option>
+                                    <option value="Lumbini">Lumbini Province</option>
+                                    <option value="Karnali">Karnali Province</option>
+                                    <option value="Sudurpashchim">Sudurpashchim Province</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="district" class="form-label fw-semibold">District *</label>
+                                <input type="text" class="form-control" id="district" name="district" required>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="municipality" class="form-label fw-semibold">Municipality/VDC *</label>
+                                <input type="text" class="form-control" id="municipality" name="municipality" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="ward" class="form-label fw-semibold">Ward Number *</label>
+                                <input type="number" class="form-control" id="ward" name="ward" required min="1">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label for="locality" class="form-label fw-semibold">Locality/Tole *</label>
+                            <input type="text" class="form-control" id="locality" name="locality" required placeholder="e.g., Thamel, Baneshwor">
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-danger">Donation Preferences</h5>
+                        <div class="mb-3">
+                            <label for="last_donation" class="form-label fw-semibold">Last Donation Date</label>
+                            <input type="date" class="form-control" id="last_donation" name="last_donation">
+                            <small class="text-muted">Leave blank if first time donor</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Availability *</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="available_emergency" name="available_emergency" checked>
+                                <label class="form-check-label" for="available_emergency">
+                                    Available for emergency donations
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="available_scheduled" name="available_scheduled" checked>
+                                <label class="form-check-label" for="available_scheduled">
+                                    Available for scheduled donations
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Notification Preferences *</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notify_sms" name="notify_sms" checked>
+                                <label class="form-check-label" for="notify_sms">
+                                    SMS Notifications
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notify_email" name="notify_email" checked>
+                                <label class="form-check-label" for="notify_email">
+                                    Email Notifications
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3 text-danger">Health Declaration</h5>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Please confirm you meet the following requirements:
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="health1" required>
+                            <label class="form-check-label" for="health1">
+                                I am between 18-65 years of age
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="health2" required>
+                            <label class="form-check-label" for="health2">
+                                I weigh at least 50 kg (110 lbs)
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="health3" required>
+                            <label class="form-check-label" for="health3">
+                                I am in good general health
+                            </label>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="health4" required>
+                            <label class="form-check-label" for="health4">
+                                I have not donated blood in the last 3 months
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="consent" required>
+                            <label class="form-check-label" for="consent">
+                                I consent to Life Link Nepal storing my information and contacting me for blood donation requests
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3">
+                            <i class="bi bi-check-circle-fill me-2"></i>Complete Registration
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="info-card bg-danger bg-opacity-10 border-danger fade-in-up mb-4">
+                    <h5 class="fw-bold text-danger mb-3">
+                        <i class="bi bi-heart-pulse-fill me-2"></i>Why Donate Blood?
+                    </h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">✓ Save up to 3 lives with one donation</li>
+                        <li class="mb-2">✓ Free health screening</li>
+                        <li class="mb-2">✓ Reduces risk of heart disease</li>
+                        <li class="mb-2">✓ Burns calories</li>
+                        <li class="mb-0">✓ Feel good helping others</li>
+                    </ul>
+                </div>
+
+                <div class="info-card fade-in-up mb-4" style="animation-delay: 0.1s;">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-clipboard2-check-fill text-danger me-2"></i>Eligibility Criteria
+                    </h5>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-2">• Age: 18-65 years</li>
+                        <li class="mb-2">• Weight: Minimum 50 kg</li>
+                        <li class="mb-2">• Interval: 3 months between donations</li>
+                        <li class="mb-2">• Health: Good general health</li>
+                        <li class="mb-0">• No recent tattoos/piercings</li>
+                    </ul>
+                </div>
+
+                <div class="info-card bg-light fade-in-up" style="animation-delay: 0.2s;">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-question-circle-fill text-danger me-2"></i>Have Questions?
+                    </h5>
+                    <p class="small mb-3">Contact our donor support team</p>
+                    <a href="#" class="btn btn-outline-danger w-100 mb-2">
+                        <i class="bi bi-telephone-fill me-2"></i>Call Support
+                    </a>
+                    <a href="#" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-envelope-fill me-2"></i>Email Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary-red);
+        box-shadow: 0 0 0 0.2rem rgba(199, 30, 53, 0.15);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-red);
+        border-color: var(--primary-red);
+    }
+</style>
+{% endblock %}
 {% endblock %}

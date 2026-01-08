@@ -1,9 +1,15 @@
 from django.shortcuts import render
 
-# Create your views here.
+def emergency_request(request):
+    context = {}
 
-def blood_requests_home(request):
-    return render(request, 'blood_requests/home.html')
+    if request.method == 'POST':
+        context = {
+            'success': True,
+            'patient_name': request.POST.get('patient_name'),
+            'blood_type': request.POST.get('blood_type'),
+            'location': request.POST.get('location'),
+            'contact_info': request.POST.get('contact_info'),
+        }
 
-def emergency(request):
-    return render(request, 'blood_requests/emergency.html')
+    return render(request, 'blood_requests/emergency.html', context)

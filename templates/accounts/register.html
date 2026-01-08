@@ -1,9 +1,148 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - Life Link Nepal{% endblock %}
+
 {% block content %}
-<h2>Register Page</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Register</button>
-</form>
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+                <div class="info-card fade-in-up">
+                    <div class="text-center mb-4">
+                        <img src="{% static 'images/logo.jpeg' %}" alt="Logo" style="max-width: 100px;">
+                        <h2 class="fw-bold mt-3 mb-2">Create Account</h2>
+                        <p class="text-muted">Join Life Link Nepal and start saving lives</p>
+                    </div>
+
+                    <form method="post" action="{% url 'register' %}">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label fw-semibold">First Name *</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required placeholder="Enter first name">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label fw-semibold">Last Name *</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required placeholder="Enter last name">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label for="username" class="form-label fw-semibold">Username *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-person-fill text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control" id="username" name="username" required placeholder="Choose a username">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email Address *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-envelope-fill text-muted"></i>
+                                </span>
+                                <input type="email" class="form-control" id="email" name="email" required placeholder="your.email@example.com">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label fw-semibold">Phone Number *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-telephone-fill text-muted"></i>
+                                </span>
+                                <input type="tel" class="form-control" id="phone" name="phone" required placeholder="+977-XXXXXXXXXX">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label fw-semibold">Address *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-geo-alt-fill text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control" id="address" name="address" required placeholder="Enter your address">
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="password" class="form-label fw-semibold">Password *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="bi bi-lock-fill text-muted"></i>
+                                    </span>
+                                    <input type="password" class="form-control" id="password" name="password" required placeholder="Create password">
+                                </div>
+                                <small class="text-muted">Min. 8 characters with letters and numbers</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="confirm_password" class="form-label fw-semibold">Confirm Password *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="bi bi-lock-fill text-muted"></i>
+                                    </span>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required placeholder="Re-enter password">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label class="form-label fw-semibold">Register As *</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check flex-fill">
+                                    <input class="form-check-input" type="radio" name="user_type" id="donor" value="donor" checked>
+                                    <label class="form-check-label" for="donor">
+                                        <i class="bi bi-heart-fill text-danger me-1"></i>Blood Donor
+                                    </label>
+                                </div>
+                                <div class="form-check flex-fill">
+                                    <input class="form-check-input" type="radio" name="user_type" id="hospital" value="hospital">
+                                    <label class="form-check-label" for="hospital">
+                                        <i class="bi bi-hospital-fill text-primary me-1"></i>Hospital
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-danger">Terms & Conditions</a> and <a href="#" class="text-danger">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                            <i class="bi bi-person-plus-fill me-2"></i>Create Account
+                        </button>
+
+                        <div class="text-center">
+                            <p class="text-muted mb-0">
+                                Already have an account? 
+                                <a href="{% url 'login' %}" class="text-danger text-decoration-none fw-semibold">Login</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .form-control:focus,
+    .form-check-input:checked {
+        border-color: var(--primary-red);
+        box-shadow: 0 0 0 0.2rem rgba(199, 30, 53, 0.15);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-red);
+    }
+</style>
+{% endblock %}
 {% endblock %}

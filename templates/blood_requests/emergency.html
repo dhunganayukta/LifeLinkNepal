@@ -1,26 +1,243 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Emergency Blood Request - Life Link Nepal{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2>Register</h2>
-    <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+<!-- Hero Banner -->
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="text-center text-white">
+            <h1 class="fw-bold mb-2">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>Emergency Blood Request
+            </h1>
+            <p class="mb-0">Submit your urgent blood requirement and get instant matches</p>
         </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Request Form -->
+            <div class="col-lg-7 mb-4">
+                <div class="info-card fade-in-up">
+                    <h3 class="fw-bold mb-4">
+                        <i class="bi bi-clipboard2-plus-fill text-danger me-2"></i>Request Details
+                    </h3>
+                    
+                    <form method="post" action="{% url 'emergency_request' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="patient_name" class="form-label fw-semibold">Patient Name *</label>
+                            <input type="text" class="form-control" id="patient_name" name="patient_name" required placeholder="Enter patient's full name">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="age" class="form-label fw-semibold">Age *</label>
+                                <input type="number" class="form-control" id="age" name="age" required placeholder="Patient's age">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="gender" class="form-label fw-semibold">Gender *</label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="">Select gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="blood_type" class="form-label fw-semibold">Blood Type Required *</label>
+                                <select class="form-select" id="blood_type" name="blood_type" required>
+                                    <option value="">Select blood type</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="units" class="form-label fw-semibold">Units Needed *</label>
+                                <input type="number" class="form-control" id="units" name="units" required placeholder="Number of units" min="1">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label for="urgency" class="form-label fw-semibold">Urgency Level *</label>
+                            <select class="form-select" id="urgency" name="urgency" required>
+                                <option value="">Select urgency</option>
+                                <option value="critical">🔴 Critical (Within 2 hours)</option>
+                                <option value="urgent">🟠 Urgent (Within 12 hours)</option>
+                                <option value="normal">🟢 Normal (Within 24 hours)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="hospital" class="form-label fw-semibold">Hospital/Medical Center *</label>
+                            <input type="text" class="form-control" id="hospital" name="hospital" required placeholder="Enter hospital name">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="district" class="form-label fw-semibold">District *</label>
+                                <select class="form-select" id="district" name="district" required>
+                                    <option value="">Select district</option>
+                                    <option value="Kathmandu">Kathmandu</option>
+                                    <option value="Lalitpur">Lalitpur</option>
+                                    <option value="Bhaktapur">Bhaktapur</option>
+                                    <option value="Pokhara">Pokhara</option>
+                                    <option value="Chitwan">Chitwan</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="location" class="form-label fw-semibold">Specific Location *</label>
+                                <input type="text" class="form-control" id="location" name="location" required placeholder="Area/Address">
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label for="contact" class="form-label fw-semibold">Contact Number *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="bi bi-telephone-fill text-muted"></i>
+                                </span>
+                                <input type="tel" class="form-control" id="contact" name="contact" required placeholder="+977-XXXXXXXXXX">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="alternate_contact" class="form-label fw-semibold">Alternate Contact</label>
+                            <input type="tel" class="form-control" id="alternate_contact" name="alternate_contact" placeholder="Optional">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="reason" class="form-label fw-semibold">Reason/Medical Condition *</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" required placeholder="Brief description of medical condition"></textarea>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="verified" required>
+                            <label class="form-check-label" for="verified">
+                                I confirm that all the information provided is accurate and this is a genuine emergency
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3">
+                            <i class="bi bi-send-fill me-2"></i>Submit Emergency Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar Info -->
+            <div class="col-lg-5">
+                <div class="info-card bg-danger bg-opacity-10 border-danger fade-in-up mb-4">
+                    <h5 class="fw-bold text-danger mb-3">
+                        <i class="bi bi-info-circle-fill me-2"></i>Important Information
+                    </h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Verify all information before submitting
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Keep your phone accessible for donor calls
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Response time: 15-30 minutes typically
+                        </li>
+                        <li class="mb-0">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            You'll receive notifications via SMS/Email
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="info-card fade-in-up mb-4" style="animation-delay: 0.1s;">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-clock-history text-danger me-2"></i>What Happens Next?
+                    </h5>
+                    <div class="timeline">
+                        <div class="timeline-item mb-3">
+                            <div class="timeline-marker bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; font-size: 12px;">
+                                1
+                            </div>
+                            <div class="timeline-content ms-3">
+                                <h6 class="mb-1 fw-semibold">Instant Matching</h6>
+                                <small class="text-muted">System finds compatible donors nearby</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item mb-3">
+                            <div class="timeline-marker bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; font-size: 12px;">
+                                2
+                            </div>
+                            <div class="timeline-content ms-3">
+                                <h6 class="mb-1 fw-semibold">Donor Notification</h6>
+                                <small class="text-muted">Matching donors receive alerts</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item mb-3">
+                            <div class="timeline-marker bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; font-size: 12px;">
+                                3
+                            </div>
+                            <div class="timeline-content ms-3">
+                                <h6 class="mb-1 fw-semibold">Direct Contact</h6>
+                                <small class="text-muted">Donors contact you directly</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; font-size: 12px;">
+                                4
+                            </div>
+                            <div class="timeline-content ms-3">
+                                <h6 class="mb-1 fw-semibold">Life Saved</h6>
+                                <small class="text-muted">Donation completed successfully</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-light fade-in-up" style="animation-delay: 0.2s;">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-headset text-danger me-2"></i>Need Help?
+                    </h5>
+                    <p class="mb-3">Our support team is available 24/7 for emergency assistance</p>
+                    <a href="tel:+9771234567890" class="btn btn-outline-danger w-100 mb-2">
+                        <i class="bi bi-telephone-fill me-2"></i>Call Emergency Hotline
+                    </a>
+                    <a href="#" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-chat-dots-fill me-2"></i>Live Chat Support
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="password1" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password1" name="password1" required>
-        </div>
-        <div class="mb-3">
-            <label for="password2" class="form-label">Confirm Password</label>
-            <input type="password" class="form-control" id="password2" name="password2" required>       
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button> 
-    </form>
-</div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .timeline-item {
+        display: flex;
+        align-items: start;
+    }
+    
+    .form-select:focus,
+    .form-control:focus {
+        border-color: var(--primary-red);
+        box-shadow: 0 0 0 0.2rem rgba(199, 30, 53, 0.15);
+    }
+</style>
+{% endblock %}
 {% endblock %}

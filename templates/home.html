@@ -1,165 +1,240 @@
 {% extends 'base.html' %}
-
-{% block title %}Home - LifeLink Nepal{% endblock %}
+{% load static %}
 
 {% block content %}
-
 <!-- Hero Section -->
-<div class="text-center py-5 mb-5">
-  <h1 class="display-3 fw-bold mb-3" style="color: #dc3545;">
-    <i class="fas fa-heartbeat"></i> Welcome to <span style="color:#0d6efd;">LifeLink Nepal</span>
-  </h1>
-  <p class="lead mb-4" style="font-size: 1.3rem; color: #6c757d;">
-    Connecting blood donors, hospitals, and patients across Nepal
-  </p>
-  <div class="d-flex justify-content-center gap-3 mt-4">
-    <a href="{% url 'donors_home' %}" class="btn btn-danger btn-custom btn-lg">
-      <i class="fas fa-tint me-2"></i> Donate Blood
-    </a>
-    <a href="{% url 'requests_home' %}" class="btn btn-outline-primary btn-custom btn-lg">
-      <i class="fas fa-search me-2"></i> Find Blood
-    </a>
-  </div>
-</div>
-
-
-<!-- Stats Section -->
-<div class="row mb-5 g-4">
-  <div class="col-md-3">
-    <div class="custom-card text-center p-4">
-      <i class="fas fa-users fa-3x text-primary mb-3"></i>
-      <h3 class="fw-bold">1000+</h3>
-      <p class="text-muted">Registered Donors</p>
-    </div>
-  </div>
-
-  <div class="col-md-3">
-    <div class="custom-card text-center p-4">
-      <i class="fas fa-hospital fa-3x mb-3" style="color:#0d6efd;"></i>
-      <h3 class="fw-bold">{{ hospitals.count }}</h3>
-      <p class="text-muted">Partner Hospitals</p>
-    </div>
-  </div>
-
-  <div class="col-md-3">
-    <div class="custom-card text-center p-4">
-      <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-      <h3 class="fw-bold">500+</h3>
-      <p class="text-muted">Lives Saved</p>
-    </div>
-  </div>
-
-  <div class="col-md-3">
-    <div class="custom-card text-center p-4">
-      <i class="fas fa-clock fa-3x text-warning mb-3"></i>
-      <h3 class="fw-bold">24/7</h3>
-      <p class="text-muted">Available</p>
-    </div>
-  </div>
-</div>
-
-
-<!-- Main Feature Cards -->
-<div class="row g-4 mt-4 mb-5">
-  
-  <div class="col-md-6 col-lg-3">
-    <div class="custom-card h-100 text-center p-4">
-      <i class="fas fa-user-circle fa-4x text-primary mb-3"></i>
-      <h4 class="fw-bold">Accounts</h4>
-      <p class="text-muted">Manage your profile securely</p>
-      <a href="{% url 'accounts_home' %}" class="btn btn-primary btn-custom mt-3">
-        Go to Accounts
-      </a>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-3">
-    <div class="custom-card h-100 text-center p-4">
-      <i class="fas fa-hand-holding-heart fa-4x text-danger mb-3"></i>
-      <h4 class="fw-bold">Donors</h4>
-      <p class="text-muted">Become a blood donor</p>
-      <a href="{% url 'donors_home' %}" class="btn btn-danger btn-custom mt-3">
-        Become a Donor
-      </a>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-3">
-    <div class="custom-card h-100 text-center p-4">
-      <i class="fas fa-hospital fa-4x" style="color:#0d6efd;"></i>
-      <h4 class="fw-bold">Hospitals</h4>
-      <p class="text-muted">View partner hospitals</p>
-      <a href="{% url 'hospitals_home' %}" class="btn btn-primary btn-custom mt-3">
-        View Hospitals
-      </a>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-lg-3">
-    <div class="custom-card h-100 text-center p-4">
-      <i class="fas fa-ambulance fa-4x text-danger mb-3"></i>
-      <h4 class="fw-bold">Blood Requests</h4>
-      <p class="text-muted">Request or provide blood</p>
-      <a href="{% url 'requests_home' %}" class="btn btn-danger btn-custom mt-3">
-        View Requests
-      </a>
-    </div>
-  </div>
-
-</div>
-
-
-
-<!-- Dynamic Hospital List -->
-<div class="custom-card p-5 mb-5">
-  <h3 class="fw-bold mb-4" style="color:#0d6efd;">
-    <i class="fas fa-hospital me-2"></i> Connected Hospitals
-  </h3>
-
-  {% if hospitals %}
-    <div class="row g-3">
-      {% for hospital in hospitals %}
-      <div class="col-md-4">
-        <div class="p-3 border rounded bg-light">
-          <h5 class="fw-bold">{{ hospital.name }}</h5>
-          <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-1"></i> {{ hospital.address }}</p>
-          <p class="text-muted mb-1"><i class="fas fa-phone me-1"></i> {{ hospital.phone }}</p>
+<section class="hero-section py-5" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%); min-height: 600px;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-white fade-in-up">
+                <h1 class="display-4 fw-bold mb-4">Every Drop Saves a Life</h1>
+                <p class="lead mb-4">
+                    Life Link Nepal provides emergency blood access without relying on social media. 
+                    Connect with verified donors and hospitals instantly across Nepal.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/requests/emergency/" class="btn btn-light btn-lg px-4">
+                        <i class="bi bi-heart-pulse-fill me-2"></i>Request Blood
+                    </a>
+                    <a href="/donors/register/" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-person-plus-fill me-2"></i>Become a Donor
+                    </a>
+                </div>
+                <div class="mt-5 d-flex flex-wrap gap-4">
+                    <div>
+                        <h3 class="fw-bold mb-0">5000+</h3>
+                        <small>Registered Donors</small>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">1200+</h3>
+                        <small>Lives Saved</small>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">50+</h3>
+                        <small>Partner Hospitals</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center mt-5 mt-lg-0 fade-in-up">
+                <img src="{% static 'images/logo.jpeg' %}" alt="Life Link Nepal" class="img-fluid rounded-4 shadow-lg" style="max-width: 500px;">
+            </div>
         </div>
-      </div>
-      {% endfor %}
     </div>
-  {% else %}
-    <p class="text-muted">No hospitals registered yet.</p>
-  {% endif %}
-</div>
+</section>
 
-
-
-<!-- About -->
-<div class="custom-card p-5 mt-5">
-  <div class="row align-items-center">
-    <div class="col-md-8">
-      <h2 class="fw-bold mb-4 text-danger">
-        <i class="fas fa-info-circle me-2"></i> About LifeLink Nepal
-      </h2>
-      <p class="lead">LifeLink Nepal connects donors, hospitals and those in urgent need of blood.</p>
-      <p class="text-muted">We aim to ensure nobody in Nepal struggles to find blood during emergencies.</p>
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5 fade-in-up">
+            <h2 class="fw-bold mb-3">Why Choose Life Link Nepal?</h2>
+            <p class="text-muted">Fast, reliable, and secure blood donation platform</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 fade-in-up">
+                <div class="info-card text-center h-100">
+                    <div class="icon-wrapper mb-3">
+                        <i class="bi bi-lightning-charge-fill text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Instant Emergency Access</h5>
+                    <p class="text-muted">Get blood instantly without waiting for social media posts. Our platform connects you with available donors in real-time.</p>
+                </div>
+            </div>
+            <div class="col-md-4 fade-in-up" style="animation-delay: 0.1s;">
+                <div class="info-card text-center h-100">
+                    <div class="icon-wrapper mb-3">
+                        <i class="bi bi-shield-check text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Verified & Safe</h5>
+                    <p class="text-muted">All donors are verified. Connect with trusted donors and hospitals across Nepal with complete transparency.</p>
+                </div>
+            </div>
+            <div class="col-md-4 fade-in-up" style="animation-delay: 0.2s;">
+                <div class="info-card text-center h-100">
+                    <div class="icon-wrapper mb-3">
+                        <i class="bi bi-graph-up-arrow text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Track & Monitor</h5>
+                    <p class="text-muted">Track your donation history, see your impact, and monitor blood requests in your area through your dashboard.</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4 text-center">
-      <i class="fas fa-heartbeat" style="font-size: 8rem; color: #dc3545; opacity: 0.25;"></i>
+</section>
+
+<!-- How It Works -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5 fade-in-up">
+            <h2 class="fw-bold mb-3">How It Works</h2>
+            <p class="text-muted">Simple steps to save lives</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3 text-center fade-in-up">
+                <div class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <span class="fs-2 fw-bold">1</span>
+                </div>
+                <h5 class="fw-bold">Sign Up</h5>
+                <p class="text-muted">Register as a donor or requester with your basic information</p>
+            </div>
+            <div class="col-md-3 text-center fade-in-up" style="animation-delay: 0.1s;">
+                <div class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <span class="fs-2 fw-bold">2</span>
+                </div>
+                <h5 class="fw-bold">Search or Post</h5>
+                <p class="text-muted">Search for blood or post your emergency request</p>
+            </div>
+            <div class="col-md-3 text-center fade-in-up" style="animation-delay: 0.2s;">
+                <div class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <span class="fs-2 fw-bold">3</span>
+                </div>
+                <h5 class="fw-bold">Connect</h5>
+                <p class="text-muted">Get matched with nearby donors instantly</p>
+            </div>
+            <div class="col-md-3 text-center fade-in-up" style="animation-delay: 0.3s;">
+                <div class="rounded-circle bg-danger text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <span class="fs-2 fw-bold">4</span>
+                </div>
+                <h5 class="fw-bold">Save Lives</h5>
+                <p class="text-muted">Coordinate and complete the life-saving donation</p>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+</section>
 
+<!-- Blood Types Info -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5 fade-in-up">
+            <h2 class="fw-bold mb-3">Blood Types Information</h2>
+            <p class="text-muted">Know your blood type and who you can help</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            {% for blood_type in blood_types %}
 
-<!-- Call to Action -->
-<div class="text-center mt-5 p-5 custom-card"
-     style="background: linear-gradient(135deg, #dc3545 0%, #0d6efd 100%); color: white;">
-  <h2 class="fw-bold mb-3">Ready to Save a Life?</h2>
-  <p class="lead mb-4">Join thousands of donors making a difference every day</p>
-  <a href="{% url 'donors_home' %}" class="btn btn-light btn-custom btn-lg">
-    <i class="fas fa-user-plus me-2"></i> Register Now
-  </a>
-</div>
+            <div class="col-6 col-md-3 fade-in-up">
+                <div class="info-card text-center">
+                    <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <span class="fs-3 fw-bold text-danger">{{ blood_type }}</span>
+                    </div>
+                    <h6 class="fw-bold">Type {{ blood_type }}</h6>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
+<!-- CTA Section -->
+<section class="py-5" style="background: linear-gradient(135deg, #cf3f52ff 0%, #e53949 100%);">
+    <div class="container text-center text-white fade-in-up">
+        <h2 class="fw-bold mb-4">Ready to Make a Difference?</h2>
+        <p class="lead mb-4">Join thousands of donors who have already saved lives</p>
+        <a href="/donors/register/" class="btn btn-light btn-lg px-5">
+            <i class="bi bi-person-plus-fill me-2"></i>Register as Donor
+        </a>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5 fade-in-up">
+            <h2 class="fw-bold mb-3">What People Say</h2>
+            <p class="text-muted">Real stories from our community</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 fade-in-up">
+                <div class="info-card">
+                    <div class="mb-3">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                    </div>
+                    <p class="mb-3">"Life Link Nepal saved my father's life when we urgently needed O+ blood. Within 30 minutes, we found a donor nearby!"</p>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">RS</span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Ramesh Sharma</h6>
+                            <small class="text-muted">Kathmandu</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 fade-in-up" style="animation-delay: 0.1s;">
+                <div class="info-card">
+                    <div class="mb-3">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                    </div>
+                    <p class="mb-3">"As a regular donor, this platform makes it so easy to help people in need. I've donated 5 times through Life Link!"</p>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">PT</span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Priya Thapa</h6>
+                            <small class="text-muted">Pokhara</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 fade-in-up" style="animation-delay: 0.2s;">
+                <div class="info-card">
+                    <div class="mb-3">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
+                    </div>
+                    <p class="mb-3">"The hospital integration is brilliant. We can now coordinate blood donations much more efficiently than before."</p>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">DK</span>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Dr. Krishna</h6>
+                            <small class="text-muted">Grande Hospital</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+{% endblock %}
 {% endblock %}

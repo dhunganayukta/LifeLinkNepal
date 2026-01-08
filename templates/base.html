@@ -1,173 +1,377 @@
-<!doctype html>
 {% load static %}
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}LifeLink Nepal{% endblock %}</title>
-
-    <!-- Bootstrap & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Life Link Nepal - Connecting Donors, Saving Lives{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        /* Color Theme (matches your logo) */
         :root {
-            --red: #e63946;
-            --red-dark: #c92a35;
-            --blue: #1d3557;
-            --blue-light: #457b9d;
-            --background: #f7f9fc;
+            --primary-red: #c71e35;
+            --secondary-red: #e53949;
+            --dark-red: #9b1728;
+            --light-gray: #f8f9fa;
+            --dark-gray: #212529;
+            --text-muted: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background: var(--background);
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* NAVBAR */
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .navbar {
+            background-color: #2d2d2d !important;
+        }
+
+        body.dark-mode .card,
+        body.dark-mode .info-card {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .bg-light {
+            background-color: #1a1a1a !important;
+        }
+
+        body.dark-mode footer {
+            background-color: #2d2d2d !important;
+        }
+
+        /* Navbar */
         .navbar {
-            background: white;
             padding: 1rem 0;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background-color: white !important;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-red) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .navbar-brand img {
-            height: 70px !important;       /* BIGGER LOGO */
+            height: 40px;
             width: auto;
-            object-fit: contain;
         }
 
         .nav-link {
-            color: var(--blue) !important;
-            font-weight: 600;
-            border-radius: 8px;
-            padding: 0.5rem 1rem !important;
-            transition: 0.3s ease;
+            font-weight: 500;
+            color: var(--dark-gray) !important;
+            margin: 0 0.5rem;
+            transition: color 0.3s;
         }
 
         .nav-link:hover {
-            background: var(--blue-light);
-            color: white !important;
+            color: var(--primary-red) !important;
         }
 
-        .nav-link.active {
-            background: var(--red);
-            color: white !important;
+        .btn-primary {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            transition: all 0.3s;
         }
 
-        /* CARD STYLE */
-        .custom-card {
+        .btn-primary:hover {
+            background-color: var(--dark-red);
+            border-color: var(--dark-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(199, 30, 53, 0.3);
+        }
+
+        .btn-outline-light:hover {
+            background-color: white;
+            color: var(--primary-red) !important;
+        }
+
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .dark-mode-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-red);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        /* Cards */
+        .info-card {
             background: white;
-            border-radius: 18px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            transition: 0.3s ease;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
             border: none;
         }
 
-        .custom-card:hover {
-            transform: translateY(-8px);
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
         }
 
-        /* BUTTONS */
-        .btn-red {
-            background: var(--red);
-            color: white;
-            border-radius: 30px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-        }
-
-        .btn-red:hover {
-            background: var(--red-dark);
-            color: white;
-        }
-
-        .btn-blue {
-            background: var(--blue);
-            color: white;
-            border-radius: 30px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-        }
-
-        .btn-blue:hover {
-            background: var(--blue-light);
-        }
-
-        /* FOOTER */
+        /* Footer */
         footer {
-            background: white;
-            text-align: center;
-            padding: 1.5rem 0;
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 3rem 0 1rem;
             margin-top: 4rem;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: var(--secondary-red);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+            
+            h1.display-5 {
+                font-size: 2rem;
+            }
         }
     </style>
+
+    {% block extra_css %}{% endblock %}
 </head>
-
 <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{% static 'images/logo.jpeg' %}" alt="Logo">
+                <span>LifeLink Nepal</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/requests/emergency/">Emergency</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/donors/register/">Donors</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/donors/dashboard/">Dashboard</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/accounts/logout/">Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/accounts/login/">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary ms-2" href="/accounts/register/">Sign Up</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item ms-3">
+                        <label class="dark-mode-toggle">
+                            <input type="checkbox" id="darkModeToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg">
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+<footer class="background-color: #343a40; color: #f8f9fa;" class="pt-5 pb-3">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-            <img src="{% static 'images/logo.jpeg' %}" alt="LifeLink Nepal">
-        </a>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
-                        <i class="fas fa-home me-1"></i> Home
+        <div class="row">
+            <!-- About -->
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Life Link Nepal</h5>
+                <p>Connecting blood donors with those in need across Nepal. Every drop counts, every donation saves lives.</p>
+                <div class="social-links mt-3">
+                    <a href="https://www.facebook.com/LifeLinkNepal" target="_blank" class="me-3" style="color:#3b5998;">
+                        <i class="bi bi-facebook fs-4"></i>
                     </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link {% if '/accounts' in request.path %}active{% endif %}" href="{% url 'accounts_home' %}">
-                        <i class="fas fa-user me-1"></i> Accounts
+                    <a href="https://twitter.com/LifeLinkNepal" target="_blank" class="me-3" style="color:#1DA1F2;">
+                        <i class="bi bi-twitter fs-4"></i>
                     </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link {% if '/donors' in request.path %}active{% endif %}" href="{% url 'donors_home' %}">
-                        <i class="fas fa-hand-holding-heart me-1"></i> Donors
+                    <a href="https://www.instagram.com/LifeLinkNepal" target="_blank" class="me-3" style="color:#C13584;">
+                        <i class="bi bi-instagram fs-4"></i>
                     </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link {% if '/hospitals' in request.path %}active{% endif %}" href="{% url 'hospitals_home' %}">
-                        <i class="fas fa-hospital me-1"></i> Hospitals
+                    <a href="https://www.linkedin.com/company/lifelinknepal" target="_blank" style="color:#0077B5;">
+                        <i class="bi bi-linkedin fs-4"></i>
                     </a>
-                </li>
+                </div>
+            </div>
 
-                <li class="nav-item">
-                    <a class="nav-link {% if '/requests' in request.path %}active{% endif %}" href="{% url 'requests_home' %}">
-                        <i class="fas fa-heartbeat me-1"></i> Requests
-                    </a>
-                </li>
+            <!-- Quick Links -->
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'home' %}" class="text-white text-decoration-none">Home</a></li>
+                    <li><a href="{% url 'emergency_request' %}" class="text-white text-decoration-none">Request Blood</a></li>
+                    <li><a href="{% url 'donor_register' %}" class="text-white text-decoration-none">Become a Donor</a></li>
+                    <li><a href="{% url 'about' %}" class="text-white text-decoration-none">About Us</a></li>
+                    <li><a href="{% url 'contact' %}" class="text-white text-decoration-none">Contact</a></li>
+                </ul>
+            </div>
 
-            </ul>
+            <!-- Contact Info -->
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Contact Info</h5>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-geo-alt me-2"></i> Kathmandu, Nepal</li>
+                    <li><i class="bi bi-telephone me-2"></i> +01-57894567</li>
+                    <li><i class="bi bi-envelope me-2"></i> info@lifelinknepal.com.np</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr style="border-color: rgba(255,255,255,0.2)">
+
+        <div class="text-center py-3">
+            <p class="mb-0">© 2026 Life Link Nepal • Saving Lives Across Nepal</p>
         </div>
     </div>
-</nav>
-
-<div class="container my-4">
-    {% block content %}{% endblock %}
-</div>
-
-<!-- FOOTER -->
-<footer>
-    <p class="text-muted mb-0">
-        © 2026 LifeLink Nepal. Saving lives, one donation at a time.
-    </p>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Dark Mode Script -->
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.checked = true;
+        }
+
+        darkModeToggle.addEventListener('change', () => {
+            if (darkModeToggle.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

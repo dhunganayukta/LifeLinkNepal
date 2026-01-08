@@ -17,12 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import render
+from . import views
 
-def home(request):
-    return render(request, 'home.html')  # uses the home.html template
+
+
+
+  # uses the home.html template
 
 urlpatterns = [
-    path('', home, name='home'),  # root URL
+    path('', views.home, name='home'),
+    path('about/', views.about, name='about'),
+    path('contact/', views.contact, name='contact'),
+  
+  
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('donors/', include('donors.urls')),

@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Donor Dashboard - Life Link Nepal{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center text-white">
+            <div>
+                <h2 class="fw-bold mb-1">Welcome back, {{ user.first_name }}!</h2>
+                <p class="mb-0">Thank you for being a life saver</p>
+            </div>
+            <div class="text-end">
+                <div class="bg-white text-danger rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <div>
+                        <div class="fs-3 fw-bold">{{ donor.blood_group }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Stats Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="info-card text-center bg-danger bg-opacity-10 fade-in-up">
+                            <i class="bi bi-droplet-fill text-danger" style="font-size: 2.5rem;"></i>
+                            <h3 class="fw-bold mt-2 mb-0">{{ donor.total_donations|default:"0" }}</h3>
+                            <p class="text-muted mb-0">Total Donations</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-card text-center bg-success bg-opacity-10 fade-in-up" style="animation-delay: 0.1s;">
+                            <i class="bi bi-heart-pulse-fill text-success" style="font-size: 2.5rem;"></i>
+                            <h3 class="fw-bold mt-2 mb-0">{{ donor.lives_saved|default:"0" }}</h3>
+                            <p class="text-muted mb-0">Lives Saved</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-card text-center bg-primary bg-opacity-10 fade-in-up" style="animation-delay: 0.2s;">
+                            <i class="bi bi-trophy-fill text-primary" style="font-size: 2.5rem;"></i>
+                            <h3 class="fw-bold mt-2 mb-0">{{ donor.badges|default:"0" }}</h3>
+                            <p class="text-muted mb-0">Badges Earned</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Requests -->
+                <div class="info-card mb-4 fade-in-up">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold mb-0">
+                            <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                            Emergency Requests Nearby
+                        </h4>
+                        <a href="#" class="text-decoration-none">View All</a>
+                    </div>
+
+                    <div class="list-group list-group-flush">
+                        <!-- Request Item 1 -->
+                        <div class="list-group-item border rounded mb-2">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="badge bg-danger me-2">CRITICAL</span>
+                                        <h6 class="mb-0 fw-bold">Need A+ Blood Urgently</h6>
+                                    </div>
+                                    <p class="mb-2 text-muted small">Patient: Ram Bahadur • Age: 45 • Units: 2</p>
+                                    <p class="mb-2">
+                                        <i class="bi bi-hospital me-1"></i>Grande International Hospital
+                                        <span class="mx-2">•</span>
+                                        <i class="bi bi-geo-alt me-1"></i>Kathmandu, Dhapasi
+                                    </p>
+                                    <p class="text-muted small mb-0">
+                                        <i class="bi bi-clock me-1"></i>Posted 25 minutes ago
+                                    </p>
+                                </div>
+                                <div class="ms-3">
+                                    <button class="btn btn-danger btn-sm mb-2 w-100">
+                                        <i class="bi bi-telephone-fill me-1"></i>Call
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm w-100">Details</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Request Item 2 -->
+                        <div class="list-group-item border rounded mb-2">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="badge bg-warning me-2">URGENT</span>
+                                        <h6 class="mb-0 fw-bold">A+ Blood Required</h6>
+                                    </div>
+                                    <p class="mb-2 text-muted small">Patient: Sita Devi • Age: 32 • Units: 1</p>
+                                    <p class="mb-2">
+                                        <i class="bi bi-hospital me-1"></i>Bir Hospital
+                                        <span class="mx-2">•</span>
+                                        <i class="bi bi-geo-alt me-1"></i>Kathmandu, Mahaboudha
+                                    </p>
+                                    <p class="text-muted small mb-0">
+                                        <i class="bi bi-clock me-1"></i>Posted 2 hours ago
+                                    </p>
+                                </div>
+                                <div class="ms-3">
+                                    <button class="btn btn-danger btn-sm mb-2 w-100">
+                                        <i class="bi bi-telephone-fill me-1"></i>Call
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm w-100">Details</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- No requests message (comment out when there are requests) -->
+                        <!-- <div class="text-center py-4">
+                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2 mb-0">No emergency requests at the moment</p>
+                        </div> -->
+                    </div>
+                </div>
+
+                <!-- Donation History -->
+                <div class="info-card fade-in-up">
+                    <h4 class="fw-bold mb-3">
+                        <i class="bi bi-clock-history text-danger me-2"></i>
+                        Recent Donation History
+                    </h4>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Hospital</th>
+                                    <th>Units</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Dec 15, 2025</td>
+                                    <td>Grande International</td>
+                                    <td>1 unit</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Sep 10, 2025</td>
+                                    <td>Bir Hospital</td>
+                                    <td>1 unit</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Jun 5, 2025</td>
+                                    <td>Manmohan Hospital</td>
+                                    <td>1 unit</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Profile Card -->
+                <div class="info-card text-center fade-in-up mb-4">
+                    <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                        <i class="bi bi-person-fill text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1">{{ user.first_name }} {{ user.last_name }}</h5>
+                    <p class="text-muted mb-2">Blood Group: <span class="text-danger fw-bold">{{ donor.blood_group }}</span></p>
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-geo-alt-fill"></i> {{ donor.district }}, {{ donor.province }}
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-outline-danger flex-fill">
+                            <i class="bi bi-pencil-fill me-1"></i>Edit Profile
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary flex-fill">
+                            <i class="bi bi-gear-fill me-1"></i>Settings
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Eligibility Status -->
+                <div class="info-card fade-in-up mb-4" style="animation-delay: 0.1s;">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-clipboard2-pulse text-danger me-2"></i>
+                        Donation Eligibility
+                    </h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Current Status:</span>
+                        <span class="badge bg-success fs-6">Eligible</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small">Last Donation:</span>
+                        <span class="small fw-semibold">Dec 15, 2025</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small">Next Eligible Date:</span>
+                        <span class="small fw-semibold text-success">Mar 15, 2026</span>
+                    </div>
+                    <div class="progress mt-3" style="height: 8px;">
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: 70%"></div>
+                    </div>
+                    <p class="text-muted small text-center mt-2 mb-0">30 days remaining</p>
+                </div>
+
+                <!-- Achievement Badges -->
+                <div class="info-card fade-in-up mb-4" style="animation-delay: 0.2s;">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-award text-warning me-2"></i>
+                        Achievement Badges
+                    </h5>
+                    <div class="d-flex flex-wrap gap-3 justify-content-center">
+                        <div class="text-center">
+                            <div class="bg-warning bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="bi bi-star-fill text-warning fs-4"></i>
+                            </div>
+                            <p class="small mb-0 mt-1">First Timer</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-primary bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="bi bi-heart-fill text-primary fs-4"></i>
+                            </div>
+                            <p class="small mb-0 mt-1">Life Saver</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-success bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="bi bi-trophy-fill text-success fs-4"></i>
+                            </div>
+                            <p class="small mb-0 mt-1">Hero</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="info-card bg-light fade-in-up" style="animation-delay: 0.3s;">
+                    <h5 class="fw-bold mb-3">Quick Actions</h5>
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-danger">
+                            <i class="bi bi-calendar-check me-2"></i>Schedule Donation
+                        </a>
+                        <a href="#" class="btn btn-outline-danger">
+                            <i class="bi bi-search me-2"></i>Find Blood Banks
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="bi bi-share me-2"></i>Share Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .list-group-item {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .list-group-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+{% endblock %}

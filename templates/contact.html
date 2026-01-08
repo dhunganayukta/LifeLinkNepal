@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="fw-bold text-danger">Get in Touch</h1>
+                <p class="lead text-muted">Have questions about our platform or want to partner with us? We'd love to hear from you.</p>
+                
+                <div class="alert alert-warning border-0 shadow-sm d-inline-block mt-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Emergency?</strong> Please use our <a href="/requests/emergency/" class="alert-link">Emergency Request Form</a> for immediate blood needs.
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-5">
+            <div class="col-lg-4">
+                <div class="d-flex mb-4">
+                    <div class="bg-white shadow-sm rounded p-3 me-3 text-danger">
+                        <i class="bi bi-geo-alt-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h5>Our Location</h5>
+                        <p class="text-muted">Kathmandu, Nepal<br>Bagmati Province</p>
+                    </div>
+                </div>
+
+                <div class="d-flex mb-4">
+                    <div class="bg-white shadow-sm rounded p-3 me-3 text-danger">
+                        <i class="bi bi-envelope-at-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h5>Email Us</h5>
+                        <p class="text-muted">support@lifelinknepal.com.np<br>info@lifelinknepal.com.np</p>
+                    </div>
+                </div>
+
+                <div class="d-flex mb-4">
+                    <div class="bg-white shadow-sm rounded p-3 me-3 text-danger">
+                        <i class="bi bi-telephone-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h5>Call Us</h5>
+                        <p class="text-muted">01-5789081<br>+977-9862890129</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm p-4 p-md-5">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Your Name</label>
+                                <input type="text" class="form-control" placeholder="Enter your name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Email Address</label>
+                                <input type="email" class="form-control" placeholder="name@example.com" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Subject</label>
+                                <select class="form-select">
+                                    <option selected>General Inquiry</option>
+                                    <option>Partnership with Hospital</option>
+                                    <option>Volunteer Opportunities</option>
+                                    <option>Technical Issue</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Message</label>
+                                <textarea class="form-control" rows="5" placeholder="How can we help you?" required></textarea>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-danger btn-lg w-100">Send Message</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-0">
+    <div class="container-fluid p-0">
+        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 300px;">
+            <p><i class="bi bi-map me-2"></i> [Interactive Map of Kathmandu will be displayed here]</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hospital Dashboard - Life Link Nepal{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
+            <div class="mb-3 mb-md-0">
+                <h2 class="fw-bold mb-1">{{ hospital.name }}</h2>
+                <p class="mb-0">
+                    <i class="bi bi-geo-alt-fill me-1"></i>{{ hospital.district }}, {{ hospital.province }}
+                </p>
+            </div>
+            <div class="text-end">
+                <button class="btn btn-light btn-lg">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Post Blood Request
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Stats Overview -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3 col-6">
+                        <div class="info-card text-center bg-danger bg-opacity-10 fade-in-up">
+                            <i class="bi bi-clipboard2-pulse-fill text-danger fs-1"></i>
+                            <h4 class="fw-bold mt-2 mb-0">{{ stats.active_requests|default:"12" }}</h4>
+                            <p class="text-muted small mb-0">Active Requests</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="info-card text-center bg-success bg-opacity-10 fade-in-up" style="animation-delay: 0.1s;">
+                            <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                            <h4 class="fw-bold mt-2 mb-0">{{ stats.fulfilled|default:"85" }}</h4>
+                            <p class="text-muted small mb-0">Fulfilled</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="info-card text-center bg-primary bg-opacity-10 fade-in-up" style="animation-delay: 0.2s;">
+                            <i class="bi bi-people-fill text-primary fs-1"></i>
+                            <h4 class="fw-bold mt-2 mb-0">{{ stats.donors|default:"234" }}</h4>
+                            <p class="text-muted small mb-0">Registered Donors</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="info-card text-center bg-warning bg-opacity-10 fade-in-up" style="animation-delay: 0.3s;">
+                            <i class="bi bi-droplet-half text-warning fs-1"></i>
+                            <h4 class="fw-bold mt-2 mb-0">{{ stats.units|default:"156" }}</h4>
+                            <p class="text-muted small mb-0">Units Collected</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Blood Requests -->
+                <div class="info-card mb-4 fade-in-up">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold mb-0">
+                            <i class="bi bi-list-check text-danger me-2"></i>
+                            Active Blood Requests
+                        </h4>
+                        <button class="btn btn-sm btn-danger">
+                            <i class="bi bi-plus-circle me-1"></i>New Request
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Blood Type</th>
+                                    <th>Units</th>
+                                    <th>Urgency</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>Ram Bahadur</strong>
+                                            <br><small class="text-muted">ID: P12345</small>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-danger fs-6">A+</span></td>
+                                    <td>2 units</td>
+                                    <td><span class="badge bg-danger">Critical</span></td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger">View</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>Sita Devi</strong>
+                                            <br><small class="text-muted">ID: P12346</small>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-danger fs-6">O+</span></td>
+                                    <td>1 unit</td>
+                                    <td><span class="badge bg-warning">Urgent</span></td>
+                                    <td><span class="badge bg-info">In Progress</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger">View</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>Krishna Sharma</strong>
+                                            <br><small class="text-muted">ID: P12347</small>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-danger fs-6">B+</span></td>
+                                    <td>1 unit</td>
+                                    <td><span class="badge bg-success">Normal</span></td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger">View</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="#" class="text-decoration-none">View All Requests →</a>
+                    </div>
+                </div>
+
+                <!-- Blood Inventory -->
+                <div class="info-card fade-in-up">
+                    <h4 class="fw-bold mb-3">
+                        <i class="bi bi-droplet-fill text-danger me-2"></i>
+                        Blood Inventory Status
+                    </h4>
+
+                    <div class="row g-3">
+                        <div class="col-md-3 col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="fs-3 fw-bold text-danger">A+</div>
+                                <div class="progress mt-2 mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: 75%"></div>
+                                </div>
+                                <small class="text-muted">15 units</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="fs-3 fw-bold text-danger">A-</div>
+                                <div class="progress mt-2 mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 40%"></div>
+                                </div>
+                                <small class="text-muted">8 units</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="fs-3 fw-bold text-danger">B+</div>
+                                <div class="progress mt-2 mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: 80%"></div>
+                                </div>
+                                <small class="text-muted">16 units</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="fs-3 fw-bold text-danger">B-</div>
+                                <div class="progress mt-2 mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-danger" style="width: 20%"></div>
+                                </div>
+                                <small class="text-muted">4 units</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="fs-3 fw-bold text-danger">AB+</div>
+                                <div class="progress mt-2 mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 50%"></div>
+                                </div>
+                                <small class="text-muted">10 units</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="fs-3 fw-bold text-danger">AB-</div>
+                                <div class="progress mt-2 mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-danger" style="width: 15%"></div>
+                                </div>
+                                <small class="text-muted">3 units</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="fs-3 fw-bold text-danger">O+</div>
+                                <div class="progress mt-2 mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: 90%"></div>
+                                </div>
+                                <small class="text-muted">18 units</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="fs-3 fw-bold text-danger">O-</div>
+                                <div class="progress mt-2 mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 35%"></div>
+                                </div>
+                                <small class="text-muted">7 units</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Low Stock Alert:</strong> B-, AB- blood types are running low. Consider organizing a donation camp.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Hospital Info Card -->
+                <div class="info-card text-center fade-in-up mb-4">
+                    <div class="bg-danger bg-opacity-10 rounded-3 p-4 mb-3">
+                        <i class="bi bi-hospital-fill text-danger" style="font-size: 4rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">{{ hospital.name }}</h5>
+                    <p class="text-muted small mb-2">{{ hospital.type }}</p>
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-geo-alt-fill"></i> {{ hospital.address }}
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-danger">
+                            <i class="bi bi-pencil-fill me-1"></i>Edit Profile
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="info-card fade-in-up mb-4" style="animation-delay: 0.1s;">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-graph-up text-danger me-2"></i>
+                        This Month
+                    </h5>
+                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                        <span>Total Requests</span>
+                        <span class="fw-bold">28</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                        <span>Fulfilled</span>
+                        <span class="fw-bold text-success">24</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                        <span>Success Rate</span>
+                        <span class="fw-bold text-success">85.7%</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Avg. Response Time</span>
+                        <span class="fw-bold">42 min</span>
+                    </div>
+                </div>
+
+                <!-- Recent Donors -->
+                <div class="info-card fade-in-up mb-4" style="animation-delay: 0.2s;">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-people-fill text-danger me-2"></i>
+                        Recent Donors
+                    </h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <span class="fw-bold text-danger">A+</span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">Rajesh Thapa</h6>
+                                    <small class="text-muted">2 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <span class="fw-bold text-danger">O+</span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">Maya Gurung</h6>
+                                    <small class="text-muted">5 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <span class="fw-bold text-danger">B+</span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">Suresh Rai</h6>
+                                    <small class="text-muted">1 day ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="text-decoration-none d-block text-center mt-2">View All →</a>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="info-card bg-light fade-in-up" style="animation-delay: 0.3s;">
+                    <h5 class="fw-bold mb-3">Quick Actions</h5>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-danger">
+                            <i class="bi bi-megaphone me-2"></i>Post Blood Request
+                        </button>
+                        <button class="btn btn-outline-danger">
+                            <i class="bi bi-calendar-event me-2"></i>Schedule Camp
+                        </button>
+                        <button class="btn btn-outline-secondary">
+                            <i class="bi bi-file-earmark-text me-2"></i>Generate Report
+                        </button>
+                        <button class="btn btn-outline-secondary">
+                            <i class="bi bi-bell me-2"></i>Send Notifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(199, 30, 53, 0.05);
+    }
+</style>
+{% endblock %}
+{% endblock %}
