@@ -1,0 +1,550 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Donor Dashboard - Life Link Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Removed the min-height hack - no longer needed without footer */
+    
+    .dashboard-header {
+        background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);
+        padding: 2rem 0;
+        box-shadow: 0 4px 15px rgba(199, 30, 53, 0.2);
+    }
+    
+    .blood-badge {
+        width: 90px;
+        height: 90px;
+        background: white;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .blood-badge .blood-type {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #c71e35;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+        height: 100%;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(199, 30, 53, 0.15);
+    }
+    
+    .stat-card {
+        text-align: center;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, currentColor, transparent);
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0.5rem 0;
+    }
+    
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .emergency-badge {
+        animation: blink 1.5s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 50%, 100% { opacity: 1; }
+        25%, 75% { opacity: 0.6; }
+    }
+    
+    .request-card {
+        border-left: 4px solid #c71e35;
+        transition: all 0.3s ease;
+        background: #fff;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .request-card:hover {
+        background: #fef5f7;
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(199, 30, 53, 0.15);
+    }
+    
+    .priority-critical { border-left-color: #dc3545; }
+    .priority-high { border-left-color: #ffc107; }
+    .priority-medium { border-left-color: #17a2b8; }
+    .priority-low { border-left-color: #6c757d; }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #c71e35, #e53949);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 5px 20px rgba(199, 30, 53, 0.3);
+    }
+    
+    .profile-avatar i {
+        font-size: 4rem;
+        color: white;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1.25rem;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    .empty-state {
+        padding: 3rem 2rem;
+        text-align: center;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        opacity: 0.3;
+        margin-bottom: 1rem;
+    }
+    
+    .notification-item {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        transition: background 0.2s;
+    }
+    
+    .notification-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+    
+    .distance-badge {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .alert-location {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .blood-badge {
+            width: 70px;
+            height: 70px;
+        }
+        .blood-badge .blood-type {
+            font-size: 1.5rem;
+        }
+        .stat-number {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<section class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="text-white fw-bold mb-2">
+                    Welcome back, {{ donor.full_name }}! 👋
+                </h2>
+                <p class="text-white-50 mb-0">
+                    <i class="bi bi-geo-alt-fill me-1"></i>
+                    {{ donor.address }}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="blood-badge">
+                    <div class="blood-type">{{ donor.blood_type }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Dashboard -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <!-- Location Warning -->
+        {% if show_location_warning %}
+        <div class="alert-location">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill text-warning fs-3 me-3"></i>
+                <div>
+                    <strong>Location Not Set!</strong>
+                    <p class="mb-0 small">Please update your location to see nearby blood requests and hospitals.</p>
+                </div>
+                <a href="{% url 'edit_profile' %}" class="btn btn-warning btn-sm ms-auto">Update Location</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row g-4">
+            <!-- Left Column - Main Content -->
+            <div class="col-lg-8">
+                <!-- Statistics Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="info-card stat-card">
+                            <i class="bi bi-droplet-fill text-danger stat-icon"></i>
+                            <div class="stat-number text-danger">{{ stats.total_donations }}</div>
+                            <p class="stat-label mb-0">Donations</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-card stat-card">
+                            <i class="bi bi-hospital text-primary stat-icon"></i>
+                            <div class="stat-number text-primary">{{ stats.nearby_requests_count }}</div>
+                            <p class="stat-label mb-0">Nearby Requests</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-card stat-card">
+                            <i class="bi bi-check-circle text-success stat-icon"></i>
+                            <div class="stat-number text-success">{{ stats.compatible_requests_count }}</div>
+                            <p class="stat-label mb-0">Compatible</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-card stat-card">
+                            <i class="bi bi-exclamation-triangle text-warning stat-icon"></i>
+                            <div class="stat-number text-warning">{{ stats.critical_requests_count }}</div>
+                            <p class="stat-label mb-0">Critical</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Blood Requests (Algorithm-Ranked) -->
+                <div class="info-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-exclamation-triangle-fill text-danger me-2 emergency-badge"></i>
+                            Emergency Requests Nearby
+                        </h5>
+                        {% if request_data %}
+                            <span class="badge bg-danger">{{ request_data|length }} Active</span>
+                        {% endif %}
+                    </div>
+
+                    {% if request_data %}
+                        <div class="vstack gap-2">
+                            {% for item in request_data %}
+                                <div class="request-card priority-{{ item.priority_level }}">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <!-- Priority & Blood Type Badges -->
+                                            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                                <span class="badge bg-{{ item.priority_badge }}">
+                                                    {{ item.priority_level|upper }}
+                                                </span>
+                                                <span class="badge bg-dark">{{ item.request.blood_type }}</span>
+                                                <span class="badge bg-secondary">
+                                                    <i class="{{ item.urgency_icon }}"></i>
+                                                    {{ item.request.urgency_level|upper }}
+                                                </span>
+                                                {% if item.distance %}
+                                                    <span class="distance-badge">
+                                                        <i class="bi bi-geo-alt-fill"></i> {{ item.distance }} km
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Patient & Hospital Info -->
+                                            <h6 class="fw-bold mb-1">
+                                                Patient: {{ item.request.patient_name }}
+                                                <span class="text-muted small">(Age {{ item.request.patient_age }})</span>
+                                            </h6>
+                                            
+                                            <p class="mb-1 small">
+                                                <i class="bi bi-hospital me-1"></i>
+                                                <strong>{{ item.hospital_name }}</strong>
+                                            </p>
+                                            
+                                            <p class="mb-1 small text-muted">
+                                                <i class="bi bi-geo-alt me-1"></i>{{ item.hospital_address }}
+                                            </p>
+                                            
+                                            <p class="mb-0 small text-muted">
+                                                <i class="bi bi-clock me-1"></i>
+                                                Posted {{ item.hours_waiting }} hours ago
+                                                <span class="mx-2">•</span>
+                                                Units needed: {{ item.request.units_required }}
+                                                <span class="mx-2">•</span>
+                                                <span class="text-info">{{ item.blood_type_match }}</span>
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mt-3 mt-md-0">
+                                            <div class="d-grid gap-2">
+                                                <a href="tel:{{ item.hospital_phone }}" class="btn btn-danger btn-sm">
+                                                    <i class="bi bi-telephone-fill me-1"></i>Call Hospital
+                                                </a>
+                                                <a href="{% url 'view_blood_request_detail' item.request.id %}" class="btn btn-outline-danger btn-sm">
+                                                    View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- View All Requests Link -->
+                        {% if stats.compatible_requests_count > request_data|length %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'find_nearby_hospitals' %}" class="btn btn-outline-primary">
+                                View All {{ stats.compatible_requests_count }} Compatible Requests
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <p class="mb-0 fw-semibold">No emergency requests at the moment</p>
+                            <small class="text-muted">
+                                {% if donor.is_available %}
+                                    You'll be notified when someone needs {{ donor.blood_type }} blood
+                                {% else %}
+                                    Set your status to "Available" to receive notifications
+                                {% endif %}
+                            </small>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Donation History -->
+                <div class="info-card">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-clock-history text-primary me-2"></i>
+                        Your Donation History
+                    </h5>
+                    {% if history %}
+                        <div class="list-group list-group-flush">
+                            {% for donation in history %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1 fw-semibold">
+                                                <i class="bi bi-hospital me-1 text-danger"></i>
+                                                {{ donation.hospital.hospital_name }}
+                                            </h6>
+                                            <p class="mb-1 small text-muted">
+                                                Units donated: {{ donation.units_donated }}
+                                            </p>
+                                            <small class="text-muted">
+                                                <i class="bi bi-calendar me-1"></i>
+                                                {{ donation.date_donated|date:"F j, Y" }}
+                                            </small>
+                                        </div>
+                                        <span class="badge bg-success">Completed</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="bi bi-clipboard-data"></i>
+                            <p class="mb-0">No donation history yet</p>
+                            <small class="text-muted">Your life-saving donations will appear here</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Column - Sidebar -->
+            <div class="col-lg-4">
+                <!-- Profile Card -->
+                <div class="info-card text-center mb-4">
+                    <div class="profile-avatar mb-3">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1">{{ donor.full_name }}</h5>
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-droplet-fill text-danger me-1"></i>
+                        Blood Type: <strong class="text-danger">{{ donor.blood_type }}</strong>
+                    </p>
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-telephone-fill me-1"></i>{{ donor.phone }}
+                    </p>
+                    
+                    <!-- Availability Toggle -->
+                    <form method="POST" action="{% url 'update_availability' %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="form-check form-switch d-flex justify-content-center align-items-center gap-2">
+                            <input class="form-check-input" type="checkbox" id="availabilityToggle" 
+                                   {% if donor.is_available %}checked{% endif %}
+                                   onchange="this.form.submit()">
+                            <label class="form-check-label" for="availabilityToggle">
+                                {% if donor.is_available %}
+                                    <span class="badge bg-success">Available</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Unavailable</span>
+                                {% endif %}
+                            </label>
+                        </div>
+                    </form>
+                    
+                    <div class="d-grid">
+                        <a href="{% url 'edit_profile' %}" class="btn btn-danger">
+                            <i class="bi bi-pencil-fill me-1"></i>Edit Profile
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Donation Eligibility -->
+                <div class="info-card mb-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="bi bi-clipboard2-pulse text-danger me-2"></i>
+                        Donation Eligibility
+                    </h6>
+                    <div class="mb-3">
+                        <span class="status-badge {% if stats.can_donate_now %}bg-success{% else %}bg-secondary{% endif %} w-100 d-block text-center">
+                            {% if stats.can_donate_now %}
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                Eligible to Donate
+                            {% else %}
+                                <i class="bi bi-x-circle-fill me-1"></i>
+                                Not Eligible Yet
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% if donor.last_donation_date %}
+                        <div class="small">
+                            <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                                <span class="text-muted">Last Donation:</span>
+                                <strong>{{ donor.last_donation_date|date:"M d, Y" }}</strong>
+                            </div>
+                            {% if not stats.can_donate_now %}
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Days Until Eligible:</span>
+                                <strong class="text-primary">{{ stats.days_until_eligible }} days</strong>
+                            </div>
+                            {% else %}
+                            <div class="text-center text-success">
+                                <i class="bi bi-heart-fill me-1"></i>
+                                You can donate now!
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0 text-center">
+                            <i class="bi bi-info-circle me-1"></i>
+                            You haven't donated yet. Be a hero today!
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Notifications -->
+                <div class="info-card mb-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="bi bi-bell-fill text-danger me-2"></i>
+                        Notifications
+                        {% if notifications %}
+                            <span class="badge bg-danger rounded-pill">{{ notifications|length }}</span>
+                        {% endif %}
+                    </h6>
+                    {% if notifications %}
+                        <div class="notifications-list" style="max-height: 300px; overflow-y: auto;">
+                            {% for notif in notifications %}
+                                <div class="notification-item">
+                                    <p class="mb-1 small">{{ notif.message }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">{{ notif.created_at|timesince }} ago</small>
+                                        {% if notif.blood_request %}
+                                        <a href="{% url 'view_blood_request_detail' notif.blood_request.id %}" 
+                                           class="btn btn-sm btn-outline-danger">
+                                            View
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0 text-center">
+                            <i class="bi bi-inbox"></i><br>
+                            No new notifications
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="info-card">
+                    <h6 class="fw-bold mb-3">Quick Actions</h6>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'find_nearby_hospitals' %}" class="btn btn-outline-danger">
+                            <i class="bi bi-search me-2"></i>Find Nearby Hospitals
+                        </a>
+                        <a href="{% url 'donation_history' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-clock-history me-2"></i>View Full History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<!-- No footer on donor dashboard -->
+{% endblock %}

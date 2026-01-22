@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Browse Donors - Life Link Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+    }
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    body.dark-mode .info-card {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
+            <div>
+                <h2 class="fw-bold mb-1">
+                    <i class="bi bi-people-fill me-2"></i>Browse Donors
+                </h2>
+                <p class="mb-0">
+                    <i class="bi bi-geo-alt-fill me-1"></i>{{ hospital.address }}
+                </p>
+            </div>
+            <a href="{% url 'hospital_dashboard' %}" class="btn btn-light">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Filters Section -->
+<section class="py-3 bg-light">
+    <div class="container">
+        <form method="GET" action="{% url 'hospital_donors' %}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">
+                    <i class="bi bi-droplet-fill text-danger me-1"></i>Blood Type
+                </label>
+                <select name="blood_type" class="form-select">
+                    <option value="">All Blood Types</option>
+                    <option value="A+" {% if blood_type_filter == 'A+' %}selected{% endif %}>A+</option>
+                    <option value="A-" {% if blood_type_filter == 'A-' %}selected{% endif %}>A-</option>
+                    <option value="B+" {% if blood_type_filter == 'B+' %}selected{% endif %}>B+</option>
+                    <option value="B-" {% if blood_type_filter == 'B-' %}selected{% endif %}>B-</option>
+                    <option value="O+" {% if blood_type_filter == 'O+' %}selected{% endif %}>O+</option>
+                    <option value="O-" {% if blood_type_filter == 'O-' %}selected{% endif %}>O-</option>
+                    <option value="AB+" {% if blood_type_filter == 'AB+' %}selected{% endif %}>AB+</option>
+                    <option value="AB-" {% if blood_type_filter == 'AB-' %}selected{% endif %}>AB-</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">
+                    <i class="bi bi-arrows-expand text-primary me-1"></i>Max Distance (km)
+                </label>
+                <input type="number" name="max_distance" class="form-control" 
+                       value="{{ max_distance }}" min="1" max="200" step="5">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="bi bi-funnel-fill me-1"></i>Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        {% if donor_list %}
+            <!-- Results Count -->
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                Found <strong>{{ donor_list|length }}</strong> donors 
+                {% if blood_type_filter %}matching <strong>{{ blood_type_filter }}</strong>{% endif %}
+                within <strong>{{ max_distance }}km</strong>
+            </div>
+
+            <div class="row g-4">
+                {% for item in donor_list %}
+                {% with donor=item.donor distance=item.distance %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="info-card fade-in-up h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="fw-bold">{{ donor.full_name }}</h5>
+                                {% if donor.is_available %}
+                                    <span class="badge bg-success">Available</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Unavailable</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Donor Info -->
+                            <p class="mb-1">
+                                <i class="bi bi-droplet-fill text-danger me-1"></i>
+                                <span class="badge bg-danger">{{ donor.blood_type }}</span>
+                            </p>
+                            <p class="mb-1">
+                                <i class="bi bi-geo-alt-fill text-primary me-1"></i>
+                                {{ donor.address|truncatewords:5 }}
+                            </p>
+                            {% if distance %}
+                            <p class="mb-1">
+                                <i class="bi bi-arrows-expand text-success me-1"></i>
+                                Distance: <strong>{{ distance }} km</strong>
+                            </p>
+                            {% endif %}
+                            <p class="mb-1">
+                                <i class="bi bi-telephone-fill text-warning me-1"></i>
+                                {{ donor.phone }}
+                            </p>
+                            <p class="mb-3">
+                                <i class="bi bi-star-fill text-info me-1"></i>
+                                Donations: <strong>{{ donor.donation_count|default:0 }}</strong>
+                            </p>
+
+                            {% if donor.last_donation_date %}
+                            <div class="alert alert-light py-2 mb-3">
+                                <small>
+                                    <i class="bi bi-calendar-check"></i> 
+                                    Last: {{ donor.last_donation_date|date:"M d, Y" }}
+                                </small>
+                            </div>
+                            {% endif %}
+
+                            <!-- Actions -->
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'view_donor_detail' donor.id %}" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-person-lines-fill me-1"></i>View Profile
+                                </a>
+                                <a href="{% url 'notify_donor' donor.id %}" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-bell-fill me-1"></i>Send Notification
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-people-fill text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">No Donors Found</h4>
+                <p class="text-muted">
+                    {% if blood_type_filter or max_distance != 50 %}
+                        Try adjusting your filters or expanding the search radius
+                    {% else %}
+                        No donors are currently available in your area
+                    {% endif %}
+                </p>
+                <a href="{% url 'hospital_donors' %}" class="btn btn-primary mt-3">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>Clear Filters
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

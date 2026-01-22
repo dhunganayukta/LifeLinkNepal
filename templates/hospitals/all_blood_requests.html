@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Blood Requests - Life Link Nepal{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
+            <div>
+                <h2 class="fw-bold mb-1">
+                    <i class="bi bi-list-ul me-2"></i>All Blood Requests
+                </h2>
+                <p class="mb-0">Ranked by priority using AI algorithms</p>
+            </div>
+            <div>
+                <a href="{% url 'create_blood_request' %}" class="btn btn-light me-2">
+                    <i class="bi bi-plus-circle me-1"></i>New Request
+                </a>
+                <a href="{% url 'hospital_dashboard' %}" class="btn btn-outline-light">
+                    <i class="bi bi-arrow-left me-1"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        {% if ranked_requests %}
+            <!-- Filter Tabs -->
+            <ul class="nav nav-pills mb-4">
+                <li class="nav-item">
+                    <a class="nav-link active" href="?status=all">All ({{ ranked_requests|length }})</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?status=pending">Pending</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?status=fulfilled">Fulfilled</a>
+                </li>
+            </ul>
+
+            <!-- Requests Table -->
+            <div class="info-card">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Blood Type</th>
+                                <th>Units</th>
+                                <th>Urgency</th>
+                                <th>Priority Score</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in ranked_requests %}
+                            <tr class="
+                                {% if item.priority_level == 'critical' %}table-danger
+                                {% elif item.priority_level == 'high' %}table-warning
+                                {% endif %}">
+                                <td>
+                                    <strong>{{ item.request.patient_name }}</strong><br>
+                                    <small class="text-muted">{{ item.request.patient_age|default:"N/A" }} yrs</small>
+                                </td>
+                                <td><span class="badge bg-danger fs-6">{{ item.request.blood_type }}</span></td>
+                                <td>{{ item.request.units_needed }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if item.request.urgency_level == 'critical' %}bg-danger
+                                        {% elif item.request.urgency_level == 'urgent' %}bg-warning text-dark
+                                        {% else %}bg-success{% endif %}">
+                                        {{ item.request.urgency_level|upper }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if item.priority_level == 'critical' %}bg-danger
+                                        {% elif item.priority_level == 'high' %}bg-warning text-dark
+                                        {% else %}bg-info{% endif %}">
+                                        {{ item.priority_score|floatformat:0 }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if item.request.status == 'fulfilled' %}bg-success
+                                        {% elif item.request.status == 'pending' %}bg-warning text-dark
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ item.request.status|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>{{ item.request.created_at|date:"M d, Y" }}</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'view_blood_request' item.request.id %}" 
+                                           class="btn btn-outline-primary" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        {% if item.request.status == 'pending' %}
+                                        <a href="{% url 'mark_fulfilled' item.request.id %}" 
+                                           class="btn btn-outline-success" title="Mark Fulfilled">
+                                            <i class="bi bi-check-circle"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">No Blood Requests Yet</h4>
+                <a href="{% url 'create_blood_request' %}" class="btn btn-danger mt-3">
+                    <i class="bi bi-plus-circle me-1"></i>Create First Request
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    body.dark-mode .info-card {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+    }
+</style>
+{% endblock %}
+{% endblock %}

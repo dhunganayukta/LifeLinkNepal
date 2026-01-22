@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}New Blood Request - Life Link Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #c71e35;
+        box-shadow: 0 0 0 0.25rem rgba(199, 30, 53, 0.15);
+    }
+
+    .text-danger {
+        color: #c71e35 !important;
+    }
+
+    /* Dark mode support */
+    body.dark-mode .info-card {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .form-label {
+        color: #e0e0e0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
+            <div>
+                <h2 class="fw-bold mb-1">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Create Blood Request
+                </h2>
+                <p class="mb-0">Fill in the details to request blood</p>
+            </div>
+            <a href="{% url 'hospital_dashboard' %}" class="btn btn-light">
+                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="info-card">
+                    <h4 class="fw-bold mb-4">
+                        <i class="bi bi-clipboard-pulse text-danger me-2"></i>
+                        Patient & Request Details
+                    </h4>
+
+                    <form method="POST" action="{% url 'create_blood_request' %}">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <!-- Patient Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-person-fill text-danger me-1"></i>
+                                    Patient Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" name="patient_name" class="form-control" 
+                                       placeholder="Enter patient name" required>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    <i class="bi bi-calendar-check text-danger me-1"></i>
+                                    Age <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" name="patient_age" class="form-control" 
+                                       placeholder="Age" min="0" max="120" required>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    <i class="bi bi-gender-ambiguous text-danger me-1"></i>
+                                    Gender
+                                </label>
+                                <select name="gender" class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Blood Request Details -->
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="bi bi-droplet-fill text-danger me-1"></i>
+                                    Blood Type <span class="text-danger">*</span>
+                                </label>
+                                <select name="blood_type" class="form-select" required>
+                                    <option value="">Select Blood Type</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="bi bi-hash text-danger me-1"></i>
+                                    Units Needed <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" name="units_needed" class="form-control" 
+                                       placeholder="Number of units" min="1" max="10" value="1" required>
+                                <small class="text-muted">1 unit = 450ml</small>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>
+                                    Urgency Level <span class="text-danger">*</span>
+                                </label>
+                                <select name="urgency_level" class="form-select" required>
+                                    <option value="">Select Urgency</option>
+                                    <option value="critical" class="text-danger">🔴 Critical - Life Threatening</option>
+                                    <option value="urgent" class="text-warning">🟡 Urgent - Within 24 Hours</option>
+                                    <option value="normal" class="text-success">🟢 Normal - Within 48 Hours</option>
+                                </select>
+                            </div>
+
+                            <!-- Medical Condition (Optional) -->
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="bi bi-file-medical text-danger me-1"></i>
+                                    Medical Condition / Reason
+                                </label>
+                                <textarea name="condition" class="form-control" rows="2" 
+                                          placeholder="Brief description of patient's condition (optional)"></textarea>
+                            </div>
+
+                            <!-- Additional Notes -->
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="bi bi-chat-square-text text-danger me-1"></i>
+                                    Additional Notes
+                                </label>
+                                <textarea name="notes" class="form-control" rows="3" 
+                                          placeholder="Any special requirements or instructions (optional)"></textarea>
+                            </div>
+
+                            <!-- Info Alert -->
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    <strong>What happens next?</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li>Our algorithms will find the best matching donors</li>
+                                        <li>Top donors will receive SMS/Call alerts immediately</li>
+                                        <li>You'll be notified when donors respond</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="col-12">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <a href="{% url 'hospital_dashboard' %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-x-circle me-1"></i>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-megaphone-fill me-1"></i>Create Request & Notify Donors
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Algorithm Info Card -->
+                <div class="info-card mt-4 bg-light">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-cpu text-danger me-2"></i>
+                        AI-Powered Donor Matching
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-heart-pulse-fill text-danger fs-1"></i>
+                            <h6 class="mt-2">Blood Compatibility</h6>
+                            <small class="text-muted">Filters compatible donors</small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-geo-alt-fill text-success fs-1"></i>
+                            <h6 class="mt-2">Haversine Distance</h6>
+                            <small class="text-muted">Finds nearby donors</small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-star-fill text-warning fs-1"></i>
+                            <h6 class="mt-2">MCDM Ranking</h6>
+                            <small class="text-muted">Ranks best matches</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

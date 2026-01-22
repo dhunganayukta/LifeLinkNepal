@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ donor.full_name }} - Donor Profile{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
+            <div>
+                <h2 class="fw-bold mb-1">
+                    <i class="bi bi-person-fill me-2"></i>Donor Profile
+                </h2>
+                <p class="mb-0">Detailed information</p>
+            </div>
+            <a href="{% url 'hospital_donors' %}" class="btn btn-light">
+                <i class="bi bi-arrow-left me-2"></i>Back to Donors
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Donor Info Card -->
+            <div class="col-lg-4">
+                <div class="info-card text-center mb-4">
+                    <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 100px; height: 100px;">
+                        <i class="bi bi-person-fill text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="fw-bold">{{ donor.full_name }}</h4>
+                    <p class="text-muted">{{ donor.age }} years old</p>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-danger" style="font-size: 1.5rem; padding: 0.5rem 1rem;">
+                            {{ donor.blood_type }}
+                        </span>
+                    </div>
+
+                    {% if donor.is_available %}
+                        <span class="badge bg-success fs-6 mb-3">
+                            <i class="bi bi-check-circle me-1"></i>Available to Donate
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary fs-6 mb-3">
+                            <i class="bi bi-x-circle me-1"></i>Currently Unavailable
+                        </span>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{% url 'notify_donor' donor.id %}" class="btn btn-danger">
+                            <i class="bi bi-bell-fill me-1"></i>Send Notification
+                        </a>
+                        <a href="tel:{{ donor.phone }}" class="btn btn-outline-danger">
+                            <i class="bi bi-telephone-fill me-1"></i>Call Donor
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="info-card">
+                    <h5 class="fw-bold mb-3">Donation Stats</h5>
+                    <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                        <span>Total Donations</span>
+                        <strong>{{ donor.donation_count|default:0 }}</strong>
+                    </div>
+                    {% if donor.last_donation_date %}
+                    <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                        <span>Last Donation</span>
+                        <strong>{{ donor.last_donation_date|date:"M d, Y" }}</strong>
+                    </div>
+                    {% endif %}
+                    {% if distance %}
+                    <div class="d-flex justify-content-between">
+                        <span>Distance from Hospital</span>
+                        <strong>{{ distance }} km</strong>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Detailed Information -->
+            <div class="col-lg-8">
+                <!-- Contact Information -->
+                <div class="info-card mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-telephone-fill text-danger me-2"></i>Contact Information
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Phone Number</label>
+                            <p class="fw-bold mb-0">{{ donor.phone }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Email</label>
+                            <p class="fw-bold mb-0">{{ donor.user.email }}</p>
+                        </div>
+                        <div class="col-12">
+                            <label class="text-muted small">Address</label>
+                            <p class="fw-bold mb-0">{{ donor.address }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Information -->
+                <div class="info-card mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-heart-pulse-fill text-danger me-2"></i>Health Information
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Blood Type</label>
+                            <p class="mb-0">
+                                <span class="badge bg-danger fs-6">{{ donor.blood_type }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Age</label>
+                            <p class="fw-bold mb-0">{{ donor.age }} years</p>
+                        </div>
+                        {% if donor.weight %}
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Weight</label>
+                            <p class="fw-bold mb-0">{{ donor.weight }} kg</p>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted small">Eligibility</label>
+                            <p class="mb-0">
+                                {% if donor.can_donate %}
+                                    <span class="badge bg-success">Eligible to Donate</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Not Eligible (90-day wait)</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% if donor.medical_conditions %}
+                        <div class="col-12">
+                            <label class="text-muted small">Medical Conditions</label>
+                            <p class="mb-0">{{ donor.medical_conditions }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Donation History -->
+                <div class="info-card">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-clock-history text-danger me-2"></i>Donation History
+                    </h5>
+                    {% if donor.donation_history.all %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Hospital</th>
+                                        <th>Units</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for donation in donor.donation_history.all %}
+                                    <tr>
+                                        <td>{{ donation.date_donated|date:"M d, Y" }}</td>
+                                        <td>{{ donation.hospital.hospital_name|default:"N/A" }}</td>
+                                        <td>{{ donation.units_donated }} unit(s)</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">No donation history available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    body.dark-mode .info-card {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+    }
+</style>
+{% endblock %}

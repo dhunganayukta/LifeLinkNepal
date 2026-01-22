@@ -1,0 +1,176 @@
+<!-- hospital_profile.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hospital Profile - {{ hospital.hospital_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
+            <div>
+                <h2 class="fw-bold mb-1">Hospital Profile</h2>
+                <p class="mb-0">View and manage your hospital information</p>
+            </div>
+            <div>
+                <a href="{% url 'edit_hospital_profile' %}" class="btn btn-light me-2">
+                    <i class="bi bi-pencil-fill me-1"></i>Edit Profile
+                </a>
+                <a href="{% url 'hospital_dashboard' %}" class="btn btn-outline-light">
+                    <i class="bi bi-arrow-left me-1"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="info-card">
+                    <div class="text-center mb-4">
+                        <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 100px; height: 100px;">
+                            <i class="bi bi-hospital-fill text-danger" style="font-size: 3rem;"></i>
+                        </div>
+                        <h3 class="fw-bold">{{ hospital.hospital_name }}</h3>
+                        {% if hospital.is_verified %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-patch-check-fill me-1"></i>Verified
+                            </span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-hourglass-split me-1"></i>Pending Verification
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Hospital Name</label>
+                            <p class="fw-bold">{{ hospital.hospital_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Phone Number</label>
+                            <p class="fw-bold">{{ hospital.phone }}</p>
+                        </div>
+                        <div class="col-12">
+                            <label class="text-muted small">Address</label>
+                            <p class="fw-bold">{{ hospital.address }}</p>
+                        </div>
+                        {% if hospital.license_number %}
+                        <div class="col-md-6">
+                            <label class="text-muted small">License Number</label>
+                            <p class="fw-bold">{{ hospital.license_number }}</p>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-6">
+                            <label class="text-muted small">Account Created</label>
+                            <p class="fw-bold">{{ hospital.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+</style>
+{% endblock %}
+{% endblock %}
+
+
+<!-- edit_hospital_profile.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile - {{ hospital.hospital_name }}{% endblock %}
+
+{% block content %}
+<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
+            <div>
+                <h2 class="fw-bold mb-1">Edit Hospital Profile</h2>
+                <p class="mb-0">Update your hospital information</p>
+            </div>
+            <a href="{% url 'hospital_profile' %}" class="btn btn-light">
+                <i class="bi bi-arrow-left me-2"></i>Back
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="info-card">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-hospital-fill text-danger me-1"></i>Hospital Name
+                                </label>
+                                <input type="text" name="hospital_name" class="form-control" 
+                                       value="{{ hospital.hospital_name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-telephone-fill text-danger me-1"></i>Phone Number
+                                </label>
+                                <input type="tel" name="phone" class="form-control" 
+                                       value="{{ hospital.phone }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-envelope-fill text-danger me-1"></i>Email
+                                </label>
+                                <input type="email" class="form-control" 
+                                       value="{{ hospital.user.email }}" disabled>
+                                <small class="text-muted">Contact admin to change email</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>Address
+                                </label>
+                                <textarea name="address" class="form-control" rows="3" required>{{ hospital.address }}</textarea>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <a href="{% url 'hospital_profile' %}" class="btn btn-outline-secondary">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-save-fill me-1"></i>Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+</style>
+{% endblock %}
