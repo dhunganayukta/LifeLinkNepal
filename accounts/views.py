@@ -1,168 +1,175 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
-from django.contrib import messages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import AuthenticationFailed
 
 from donors.models import DonorProfile
-from donors.forms import DonorRegisterForm
 from hospitals.models import HospitalProfile
-from accounts.decorators import user_type_required
+from accounts.decorators import role_required
 
-CustomUser = get_user_model()
+User = get_user_model()
 
 # -----------------------------
-# REGISTER VIEW
+# HELPER: JWT TOKEN GENERATOR
 # -----------------------------
+def get_tokens_for_user(user):
+    """
+    Generate JWT tokens and embed role in payload
+    """
+    refresh = RefreshToken.for_user(user)
+    refresh['user_type'] = user.user_type
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
+# -----------------------------
+# REGISTER API
+# -----------------------------
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def register(request):
-    user_type = request.GET.get('type') or request.POST.get('user_type')
-    
-    # Validate user type early
-    if user_type not in ['donor', 'hospital']:
-        messages.error(request, 'Please select a valid registration type.')
-        return redirect('home')
+    """
+    Registers donor or hospital and returns JWT tokens
+    """
+    user_type = request.data.get('user_type')
+    username = request.data.get('username')
+    password = request.data.get('password')
+    email = request.data.get('email')
 
-    if request.method == 'POST':
-        if user_type == 'donor':
-            form = DonorRegisterForm(request.POST)
-            if form.is_valid():
-                user = form.save()
-                login(request, user)
-                messages.success(request, "Welcome! Your donor account has been created successfully.")
-                return redirect('donor_dashboard')
-            else:
-                # Display form errors
-                for field, errors in form.errors.items():
-                    for error in errors:
-                        if field == '__all__':
-                            messages.error(request, error)
-                        else:
-                            messages.error(request, f"{field.replace('_', ' ').title()}: {error}")
-                # Return form with errors
-                return render(request, 'accounts/register.html', {
-                    'form': form,
-                    'user_type': user_type
-                })
-        
-        elif user_type == 'hospital':
-            # Get form data
-            username = request.POST.get('username')
-            password1 = request.POST.get('password1')
-            password2 = request.POST.get('password2')
-            email = request.POST.get('email')
-            hospital_name = request.POST.get('hospital_name')
-            phone = request.POST.get('phone')
-            address = request.POST.get('address')
-            
-            # Validate required fields
-            if not all([username, password1, password2, email, hospital_name, phone, address]):
-                messages.error(request, "All fields are required.")
-                return render(request, 'accounts/register.html', {'user_type': user_type})
-            
-            # Validate passwords match
-            if password1 != password2:
-                messages.error(request, "Passwords do not match.")
-                return render(request, 'accounts/register.html', {'user_type': user_type})
-            
-            # Check if username already exists
-            if CustomUser.objects.filter(username=username).exists():
-                messages.error(request, "Username already exists.")
-                return render(request, 'accounts/register.html', {'user_type': user_type})
-            
-            # Check if email already exists
-            if CustomUser.objects.filter(email=email).exists():
-                messages.error(request, "Email already registered.")
-                return render(request, 'accounts/register.html', {'user_type': user_type})
-            
-            try:
-                # Create user
-                user = CustomUser.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password1,
-                    user_type='hospital'
-                )
-                
-                # Create hospital profile
-                HospitalProfile.objects.create(
-                    user=user,
-                    hospital_name=hospital_name,
-                    phone=phone,
-                    address=address
-                )
-                
-                login(request, user)
-                messages.success(request, f"Welcome! {hospital_name} has been registered successfully.")
-                return redirect('hospital_dashboard')
-                
-            except Exception as e:
-                messages.error(request, f"Registration failed: {str(e)}")
-                return render(request, 'accounts/register.html', {'user_type': user_type})
-    
-    # GET request - show empty form
-    form = DonorRegisterForm() if user_type == 'donor' else None
-    return render(request, 'accounts/register.html', {
-        'form': form,
-        'user_type': user_type
+    # Basic validation
+    if user_type not in ['donor', 'hospital']:
+        return Response({"error": "Invalid user type"}, status=status.HTTP_400_BAD_REQUEST)
+    if not all([username, password, email]):
+        return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
+    if User.objects.filter(username=username).exists():
+        return Response({"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
+    if User.objects.filter(email=email).exists():
+        return Response({"error": "Email already registered"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Create user
+    user = User.objects.create_user(
+        username=username,
+        email=email,
+        password=password,
+        user_type=user_type
+    )
+
+    # Create profile
+    if user_type == 'donor':
+        DonorProfile.objects.create(user=user)
+    else:
+        hospital_name = request.data.get('hospital_name')
+        phone = request.data.get('phone')
+        address = request.data.get('address')
+        if not all([hospital_name, phone, address]):
+            user.delete()
+            return Response({"error": "All hospital fields are required"}, status=status.HTTP_400_BAD_REQUEST)
+        HospitalProfile.objects.create(
+            user=user,
+            hospital_name=hospital_name,
+            phone=phone,
+            address=address
+        )
+
+    tokens = get_tokens_for_user(user)
+
+    return Response({
+        "message": "Registration successful",
+        "tokens": tokens,
+        "user_type": user.user_type
+    }, status=status.HTTP_201_CREATED)
+
+# -----------------------------
+# LOGIN API
+# -----------------------------
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login(request):
+    """
+    JWT login with account lock after 5 failed attempts
+    """
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    user = User.objects.filter(username=username).first()
+
+    if not user:
+        raise AuthenticationFailed("Invalid credentials")
+
+    if user.is_locked:
+        raise AuthenticationFailed("Account locked due to multiple failed attempts")
+
+    # Check password
+    user_auth = authenticate(username=username, password=password)
+    if user_auth is None:
+        # Increment failed attempts
+        user.failed_attempts += 1
+        if user.failed_attempts >= 5:
+            user.is_locked = True
+        user.save()
+        raise AuthenticationFailed("Invalid credentials")
+
+    # Reset failed attempts
+    user.failed_attempts = 0
+    user.save()
+
+    tokens = get_tokens_for_user(user)
+
+    return Response({
+        "message": "Login successful",
+        "tokens": tokens,
+        "user_type": user.user_type
     })
 
-
 # -----------------------------
-# LOGIN VIEW
+# DONOR DASHBOARD API
 # -----------------------------
-def user_login(request):
-    # Redirect if already logged in
-    if request.user.is_authenticated:
-        if request.user.user_type == 'donor':
-            return redirect('donor_dashboard')
-        elif request.user.user_type == 'hospital':
-            return redirect('hospital_dashboard')
-        else:
-            return redirect('home')
-
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        
-        # Authenticate user
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-            
-            # Redirect based on user type
-            if user.user_type == 'donor':
-                messages.success(request, f"Welcome back, {user.username}!")
-                return redirect('donor_dashboard')
-            elif user.user_type == 'hospital':
-                messages.success(request, f"Welcome back, {user.username}!")
-                return redirect('hospital_dashboard')
-            else:
-                messages.error(request, "Account type not recognized. Please contact support.")
-                logout(request)
-                return redirect('login')
-        else:
-            messages.error(request, "Invalid username or password. Please try again.")
-            return redirect('login')
-
-    return render(request, 'accounts/login.html')
-
-
-# -----------------------------
-# LOGOUT VIEW
-# -----------------------------
-def user_logout(request):
-    logout(request)
-    messages.success(request, "You have been logged out successfully.")
-    return redirect('login')
-
-
-# -----------------------------
-# DASHBOARD VIEWS
-# -----------------------------
-@user_type_required('donor')
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@role_required('donor')
 def donor_dashboard(request):
-    return render(request, 'donors/dashboard.html')
+    donor_profile = getattr(request.user, 'donorprofile', None)
+    if not donor_profile:
+        return Response({"error": "Donor profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
-@user_type_required('hospital')
+    return Response({
+        "username": request.user.username,
+        "blood_group": donor_profile.blood_group,
+        "last_donation": donor_profile.last_donation,
+        "total_units": donor_profile.total_units_donated,
+        "donations_history": [
+            {
+                "hospital": d.hospital.hospital_name,
+                "date": d.date,
+                "units": d.units
+            } for d in donor_profile.donations.all()
+        ]
+    })
+
+# -----------------------------
+# HOSPITAL DASHBOARD API
+# -----------------------------
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@role_required('hospital')
 def hospital_dashboard(request):
-    return render(request, 'hospitals/dashboard.html')
+    hospital_profile = getattr(request.user, 'hospitalprofile', None)
+    if not hospital_profile:
+        return Response({"error": "Hospital profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response({
+        "username": request.user.username,
+        "hospital_name": hospital_profile.hospital_name,
+        "blood_requests_sent": hospital_profile.requests_sent.count(),
+        "top_donors": [
+            {
+                "username": d.donor.user.username,
+                "blood_group": d.donor.blood_group,
+                "donated_at": d.date
+            } for d in hospital_profile.highest_donors()
+        ]
+    })

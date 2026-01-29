@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from accounts.decorators import user_type_required
+from accounts.decorators import role_required
 from .models import BloodRequest, HospitalProfile
 from donors.models import DonorProfile, Notification
 from algorithms.blood_compatibility import get_compatible_donors, is_compatible
@@ -14,7 +14,7 @@ from algorithms.priority import run_priority_algorithm
 # ============================================
 # DASHBOARD
 # ============================================
-@user_type_required('hospital')
+@role_required('hospital')
 def hospital_dashboard(request):
     """
     Hospital dashboard showing their blood requests ranked by priority
@@ -49,7 +49,7 @@ def hospital_dashboard(request):
 # ============================================
 # BLOOD REQUEST MANAGEMENT
 # ============================================
-@user_type_required('hospital')
+@role_required('hospital')
 def create_blood_request(request):
     """
     Create a new blood request and automatically notify matching donors
@@ -176,7 +176,7 @@ def create_blood_request(request):
     })
 
 
-@user_type_required('hospital')
+@role_required('hospital')
 def all_blood_requests(request):
     """View all blood requests for this hospital"""
     hospital_profile = request.user.hospitalprofile
@@ -195,7 +195,7 @@ def all_blood_requests(request):
     return render(request, 'hospitals/all_blood_requests.html', context)
 
 
-@user_type_required('hospital')
+@role_required('hospital')
 def view_blood_request(request, request_id):
     """View details of a specific blood request and matching donors"""
     blood_request = get_object_or_404(
@@ -256,7 +256,7 @@ def view_blood_request(request, request_id):
     return render(request, 'hospitals/blood_request.html', context)
 
 
-@user_type_required('hospital')
+@role_required('hospital')
 def mark_fulfilled(request, request_id):
     """Mark a blood request as fulfilled"""
     blood_request = get_object_or_404(
@@ -272,7 +272,7 @@ def mark_fulfilled(request, request_id):
     return redirect('hospital_dashboard')
 
 
-@user_type_required('hospital')
+@role_required('hospital')
 def cancel_request(request, request_id):
     """Cancel a blood request"""
     blood_request = get_object_or_404(
@@ -291,7 +291,7 @@ def cancel_request(request, request_id):
 # ============================================
 # DONOR MANAGEMENT
 # ============================================
-@user_type_required('hospital')
+@role_required('hospital')
 def hospital_donors(request):
     """Browse all available donors with filtering"""
     hospital_profile = request.user.hospitalprofile
@@ -349,7 +349,7 @@ def hospital_donors(request):
     return render(request, 'hospitals/hospital_donors.html', context)
 
 
-@user_type_required('hospital')
+@role_required('hospital')
 def view_donor_detail(request, donor_id):
     """View detailed information about a specific donor"""
     donor = get_object_or_404(DonorProfile, id=donor_id)
@@ -374,7 +374,7 @@ def view_donor_detail(request, donor_id):
     return render(request, 'donors/view_donor_detail.html', context)
 
 
-@user_type_required('hospital')
+@role_required('hospital')
 def notify_donor(request, donor_id):
     """Send notification to a specific donor"""
     donor = get_object_or_404(DonorProfile, id=donor_id)
@@ -407,7 +407,7 @@ def notify_donor(request, donor_id):
 # ============================================
 # HOSPITAL PROFILE
 # ============================================
-@user_type_required('hospital')
+@role_required('hospital')
 def hospital_profile(request):
     """View hospital profile"""
     hospital_profile = request.user.hospitalprofile
@@ -419,7 +419,7 @@ def hospital_profile(request):
     return render(request, 'hospitals/hospital_profile.html', context)
 
 
-@user_type_required('hospital')
+@role_required('hospital')
 def edit_hospital_profile(request):
     """Edit hospital profile"""
     hospital_profile = request.user.hospitalprofile

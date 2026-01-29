@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from accounts.decorators import user_type_required
+from accounts.decorators import role_required
 from donors.models import DonorProfile, Notification
 from hospitals.models import BloodRequest
 from algorithms.blood_compatibility import get_compatible_donors, is_compatible
@@ -10,7 +10,7 @@ from algorithms.haversine import haversine_distance
 from algorithms.priority import run_priority_algorithm
 
 
-@user_type_required('donor')
+@role_required('donor')
 def donor_dashboard(request):
     """
     Enhanced Donor Dashboard with Algorithm Integration
@@ -124,7 +124,7 @@ def donor_dashboard(request):
     return render(request, 'donors/donor_dashboard.html', context)
 
 
-@user_type_required('donor')
+@role_required('donor')
 def view_blood_request_detail(request, request_id):
     """
     Detailed view of a specific blood request with route calculation
@@ -162,7 +162,7 @@ def view_blood_request_detail(request, request_id):
     return render(request, 'donors/request_detail.html', context)
 
 
-@user_type_required('donor')
+@role_required('donor')
 def accept_blood_request(request, request_id):
     """
     Donor accepts a blood request
@@ -209,7 +209,7 @@ def accept_blood_request(request, request_id):
     return redirect('donor_dashboard')
 
 
-@user_type_required('donor')
+@role_required('donor')
 def decline_blood_request(request, request_id):
     """
     Donor declines a blood request
@@ -240,7 +240,7 @@ def decline_blood_request(request, request_id):
     return redirect('donor_dashboard')
 
 
-@user_type_required('donor')
+@role_required('donor')
 def update_availability(request):
     """
     Toggle donor availability status
@@ -257,7 +257,7 @@ def update_availability(request):
     return redirect('donor_dashboard')
 
 
-@user_type_required('donor')
+@role_required('donor')
 def find_nearby_hospitals(request):
     """
     Show all hospitals within donor's area with their current blood needs
@@ -384,7 +384,7 @@ def send_hospital_notification(hospital, donor, blood_request):
     # TODO: Implement SMS/Email notification
     print(f"Notification to {hospital.hospital_name}: {message}")
 
-@user_type_required('donor')
+@role_required('donor')
 def edit_profile(request):
     """
     Edit donor profile with location update
@@ -417,7 +417,7 @@ def edit_profile(request):
     return render(request, 'donors/edit_profile.html', context)
 
 
-@user_type_required('donor')
+@role_required('donor')
 def donation_history(request):
     """
     Full donation history page with statistics
@@ -452,7 +452,7 @@ def donation_history(request):
     }
     
     return render(request, 'donors/donation_history.html', context)
-@user_type_required('donor')
+@role_required('donor')
 def mark_notification_read(request, notification_id):
     """
     Mark a single notification as read
@@ -470,7 +470,7 @@ def mark_notification_read(request, notification_id):
     
     return redirect('donor_dashboard')
 
-@user_type_required('donor')
+@role_required('donor')
 def mark_all_notifications_read(request):
     """
     Mark all notifications as read
