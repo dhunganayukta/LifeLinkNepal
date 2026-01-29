@@ -471,10 +471,10 @@
                     Verified donors are notified instantly to save lives during emergencies.
                 </p>
                 <div class="d-flex flex-wrap gap-3 mb-4 mt-4">
-                    <a href="{% url 'register' %}?type=donor" class="btn btn-primary-custom btn-lg">
+                    <a href="{% url 'accounts:register_page' %}?type=donor" class="btn btn-primary-custom btn-lg">
                         <i class="bi bi-person-plus-fill me-2"></i>Become a Donor
                     </a>
-                    <a href="{% url 'register' %}?type=hospital" class="btn btn-outline-light btn-lg">
+                    <a href="{% url 'accounts:register_page' %}?type=hospital" class="btn btn-outline-light btn-lg">
                         <i class="bi bi-building me-2"></i>Register Hospital
                     </a>
                 </div>
@@ -725,16 +725,10 @@
 <section class="cta-section py-5 text-white position-relative">
     <div class="container text-center position-relative" style="z-index: 1;">
         <div class="fade-in-up">
-            <h2 class="display-4 fw-bold mb-4">Ready to Save Lives?</h2>
+            <h2 class="display-4 fw-bold mb-4"> Are you Ready to Save Lives?</h2>
             <p class="lead mb-4">Join thousands of donors making a difference across Nepal</p>
-            <div class="d-flex flex-wrap gap-3 justify-content-center">
-                <a href="{% url 'register' %}?type=donor" class="btn btn-primary-custom btn-lg">
-                    <i class="bi bi-heart-fill me-2"></i>Register as Donor
-                </a>
-                <a href="{% url 'register' %}?type=hospital" class="btn btn-outline-light btn-lg">
-                    <i class="bi bi-hospital me-2"></i>Register Hospital
-                </a>
-            </div>
+
+            
         </div>
     </div>
 </section>

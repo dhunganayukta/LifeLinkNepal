@@ -100,26 +100,3 @@ class DonorNotification(models.Model):
         ordering = ['-sent_at']
 
 
-class DonorResponse(models.Model):
-    """Track donor responses to blood requests"""
-    STATUS_CHOICES = [
-        ('accepted', 'Accepted'),
-        ('declined', 'Declined'),
-        ('completed', 'Donation Completed'),
-    ]
-    
-    # Use string reference to avoid circular import
-    donor = models.ForeignKey('donors.DonorProfile', on_delete=models.CASCADE, related_name='hospital_responses')
-    blood_request = models.ForeignKey(BloodRequest, on_delete=models.CASCADE, related_name='donor_responses')
-    
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-    response_notes = models.TextField(blank=True)
-    
-    responded_at = models.DateTimeField(auto_now_add=True)
-    donation_completed_at = models.DateTimeField(null=True, blank=True)
-    
-    def __str__(self):
-        return f"{self.donor.full_name} - {self.status}"
-    
-    class Meta:
-        ordering = ['-responded_at']

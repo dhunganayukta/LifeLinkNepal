@@ -1,137 +1,426 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Notify {{ donor.full_name }}{% endblock %}
+{% block title %}Notify {{ donor.full_name }} - LifeLink Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
+    :root {
+        --lifelink-red: #E63946;
+        --lifelink-blue: #1D70B8;
+        --lifelink-gradient: linear-gradient(135deg, #1D70B8 0%, #E63946 100%);
+    }
+    
+    body {
+        background-color: #F8F9FA;
+    }
+    
+    /* ==================== PAGE HEADER ==================== */
+    .page-header {
+        background: var(--lifelink-gradient);
+        padding: 2.5rem 0;
+        box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* ==================== INFO CARDS ==================== */
     .info-card {
         background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(230, 57, 70, 0.1);
+        animation: slideUp 0.5s ease-out;
     }
-    body.dark-mode .info-card {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* ==================== DONOR INFO BOX ==================== */
+    .donor-info-box {
+        background: linear-gradient(135deg, rgba(230, 57, 70, 0.05), rgba(29, 112, 184, 0.05));
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid var(--lifelink-red);
+    }
+    
+    .donor-avatar {
+        width: 70px;
+        height: 70px;
+        background: var(--lifelink-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+    }
+    
+    .donor-avatar i {
+        font-size: 2.5rem;
+        color: white;
+    }
+    
+    /* ==================== FORM STYLING ==================== */
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .form-label i {
+        color: var(--lifelink-red);
+        margin-right: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e8e8e8;
+        padding: 0.85rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--lifelink-red);
+        box-shadow: 0 0 0 0.25rem rgba(230, 57, 70, 0.1);
+    }
+    
+    /* ==================== URGENCY SELECT ==================== */
+    .urgency-select {
+        font-weight: 600;
+    }
+    
+    .urgency-select option[value="critical"] {
+        background-color: #DC3545;
+        color: white;
+    }
+    
+    .urgency-select option[value="urgent"] {
+        background-color: #FFC107;
+    }
+    
+    /* ==================== BUTTONS ==================== */
+    .btn-send {
+        background: var(--lifelink-gradient);
+        border: none;
+        color: white;
+        font-weight: 700;
+        padding: 1rem 2.5rem;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-send:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(230, 57, 70, 0.4);
+        color: white;
+    }
+    
+    /* ==================== INFO BOXES ==================== */
+    .info-box {
+        background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+        border-left: 4px solid var(--lifelink-blue);
+        border-radius: 12px;
+        padding: 1.25rem;
+    }
+    
+    .info-box ul {
+        margin-bottom: 0;
+        padding-left: 1.25rem;
+    }
+    
+    .info-box li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-box li:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* ==================== SECTION HEADERS ==================== */
+    .section-header {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .section-header i {
+        color: var(--lifelink-red);
+        font-size: 1.5rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Header -->
-<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+<!-- ==================== PAGE HEADER ==================== -->
+<section class="page-header">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
-            <div>
-                <h2 class="fw-bold mb-1">
-                    <i class="bi bi-bell-fill me-2"></i>Send Notification
-                </h2>
-                <p class="mb-0">Notify {{ donor.full_name }} about blood request</p>
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="page-title">
+                    <i class="bi bi-bell-fill me-3"></i>Send Notification
+                </h1>
+                <p class="text-white-50 mb-0">Notify {{ donor.full_name }} about an urgent blood request</p>
             </div>
-            <a href="{% url 'hospital_donors' %}" class="btn btn-light">
-                <i class="bi bi-arrow-left me-2"></i>Back
-            </a>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{% url 'hospital_donors' %}" class="btn btn-light btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Back
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
+<!-- ==================== MAIN CONTENT ==================== -->
 <section class="py-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <!-- Donor Info -->
+            <div class="col-lg-9">
+                <!-- Donor Information Card -->
                 <div class="info-card mb-4">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" 
-                             style="width: 60px; height: 60px;">
-                            <i class="bi bi-person-fill text-danger fs-3"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-0">{{ donor.full_name }}</h5>
-                            <p class="text-muted mb-0">
-                                <span class="badge bg-danger">{{ donor.blood_type }}</span>
-                                <span class="ms-2">{{ donor.phone }}</span>
-                            </p>
+                    <h5 class="section-header">
+                        <i class="bi bi-person-circle"></i>
+                        Donor Information
+                    </h5>
+                    <div class="donor-info-box">
+                        <div class="d-flex align-items-center">
+                            <div class="donor-avatar me-3">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h4 class="fw-bold mb-1">{{ donor.full_name }}</h4>
+                                <p class="text-muted mb-2">
+                                    <span class="badge bg-danger fs-6">{{ donor.blood_type }}</span>
+                                    <span class="mx-2">•</span>
+                                    <i class="bi bi-telephone-fill me-1"></i>{{ donor.phone }}
+                                    <span class="mx-2">•</span>
+                                    <i class="bi bi-envelope-fill me-1"></i>{{ donor.user.email }}
+                                </p>
+                                <p class="mb-0 small">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                    {{ donor.address }}
+                                </p>
+                            </div>
+                            <div>
+                                {% if donor.is_available %}
+                                    <span class="badge bg-success fs-6">
+                                        <i class="bi bi-check-circle-fill me-1"></i>
+                                        Available
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary fs-6">
+                                        <i class="bi bi-x-circle-fill me-1"></i>
+                                        Unavailable
+                                    </span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Notification Form -->
                 <div class="info-card">
-                    <h5 class="fw-bold mb-4">Blood Request Details</h5>
+                    <h5 class="section-header">
+                        <i class="bi bi-file-earmark-medical"></i>
+                        Blood Request Details
+                    </h5>
+                    
                     <form method="POST">
                         {% csrf_token %}
                         
                         <div class="row g-3">
+                            <!-- Blood Type -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">
-                                    <i class="bi bi-droplet-fill text-danger me-1"></i>Blood Type Needed
+                                <label class="form-label">
+                                    <i class="bi bi-droplet-fill"></i>
+                                    Blood Type Needed
                                 </label>
                                 <select name="blood_type" class="form-select" required>
                                     <option value="">Select Blood Type</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
+                                    <option value="A+" {% if donor.blood_type == 'A+' %}selected{% endif %}>A+</option>
+                                    <option value="A-" {% if donor.blood_type == 'A-' %}selected{% endif %}>A-</option>
+                                    <option value="B+" {% if donor.blood_type == 'B+' %}selected{% endif %}>B+</option>
+                                    <option value="B-" {% if donor.blood_type == 'B-' %}selected{% endif %}>B-</option>
+                                    <option value="O+" {% if donor.blood_type == 'O+' %}selected{% endif %}>O+</option>
+                                    <option value="O-" {% if donor.blood_type == 'O-' %}selected{% endif %}>O-</option>
+                                    <option value="AB+" {% if donor.blood_type == 'AB+' %}selected{% endif %}>AB+</option>
+                                    <option value="AB-" {% if donor.blood_type == 'AB-' %}selected{% endif %}>AB-</option>
                                 </select>
+                                <small class="text-muted d-block mt-1">
+                                    Donor's blood type: <strong>{{ donor.blood_type }}</strong>
+                                </small>
                             </div>
 
+                            <!-- Units Needed -->
                             <div class="col-md-3">
-                                <label class="form-label fw-bold">
-                                    <i class="bi bi-hash text-danger me-1"></i>Units Needed
+                                <label class="form-label">
+                                    <i class="bi bi-hash"></i>
+                                    Units Required
                                 </label>
                                 <input type="number" name="units_needed" class="form-control" 
-                                       value="1" min="1" max="5" required>
+                                       value="1" min="1" max="10" required>
+                                <small class="text-muted d-block mt-1">1-10 units</small>
                             </div>
 
+                            <!-- Urgency Level -->
                             <div class="col-md-3">
-                                <label class="form-label fw-bold">
-                                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>Urgency
+                                <label class="form-label">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    Urgency Level
                                 </label>
-                                <select name="urgency" class="form-select" required>
+                                <select name="urgency" class="form-select urgency-select" required>
                                     <option value="normal">Normal</option>
-                                    <option value="urgent">Urgent</option>
+                                    <option value="urgent" selected>Urgent</option>
                                     <option value="critical">Critical</option>
                                 </select>
                             </div>
 
-                            <div class="col-12">
-                                <label class="form-label fw-bold">
-                                    <i class="bi bi-chat-square-text text-danger me-1"></i>Additional Message
+                            <!-- Patient Name -->
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-person"></i>
+                                    Patient Name
                                 </label>
-                                <textarea name="message" class="form-control" rows="4" 
-                                          placeholder="Enter any additional information for the donor..."></textarea>
+                                <input type="text" name="patient_name" class="form-control" 
+                                       placeholder="Enter patient name" required>
                             </div>
 
+                            <!-- Patient Age -->
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    <i class="bi bi-calendar"></i>
+                                    Patient Age
+                                </label>
+                                <input type="number" name="patient_age" class="form-control" 
+                                       placeholder="Age" min="1" max="120" required>
+                            </div>
+
+                            <!-- Contact Number -->
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    <i class="bi bi-telephone"></i>
+                                    Contact Number
+                                </label>
+                                <input type="tel" name="contact_number" class="form-control" 
+                                       placeholder="9841234567" pattern="[0-9]{10}" required>
+                            </div>
+
+                            <!-- Reason/Condition -->
                             <div class="col-12">
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle-fill me-2"></i>
-                                    <strong>Note:</strong> The donor will receive:
-                                    <ul class="mb-0 mt-2">
-                                        <li>SMS notification to {{ donor.phone }}</li>
-                                        <li>In-app notification on their dashboard</li>
-                                        <li>Email notification (if enabled)</li>
-                                    </ul>
+                                <label class="form-label">
+                                    <i class="bi bi-file-text"></i>
+                                    Reason/Medical Condition
+                                </label>
+                                <input type="text" name="reason" class="form-control" 
+                                       placeholder="e.g., Surgery, Accident, Anemia" required>
+                            </div>
+
+                            <!-- Additional Message -->
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="bi bi-chat-square-text"></i>
+                                    Additional Message (Optional)
+                                </label>
+                                <textarea name="message" class="form-control" rows="4" 
+                                          placeholder="Any special instructions or additional information for the donor..."></textarea>
+                                <small class="text-muted d-block mt-1">
+                                    This message will be sent along with the blood request details
+                                </small>
+                            </div>
+
+                            <!-- Info Box -->
+                            <div class="col-12">
+                                <div class="info-box">
+                                    <div class="d-flex">
+                                        <i class="bi bi-info-circle-fill text-primary fs-4 me-3"></i>
+                                        <div>
+                                            <strong>Notification Delivery</strong>
+                                            <p class="mb-2 mt-1">The donor will receive notifications via:</p>
+                                            <ul class="small">
+                                                <li><strong>SMS:</strong> Immediate text message to {{ donor.phone }}</li>
+                                                <li><strong>In-App:</strong> Dashboard notification with full details</li>
+                                                <li><strong>Email:</strong> Detailed request sent to {{ donor.user.email }}</li>
+                                            </ul>
+                                            <p class="mb-0 small text-primary">
+                                                <i class="bi bi-clock me-1"></i>
+                                                Expected delivery time: Within 2-5 minutes
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
+                            <!-- Donor Status Warning -->
+                            {% if not donor.is_available %}
                             <div class="col-12">
-                                <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{% url 'hospital_donors' %}" class="btn btn-outline-secondary">
-                                        <i class="bi bi-x-circle me-1"></i>Cancel
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    <strong>Note:</strong> This donor is currently marked as unavailable. 
+                                    They may not respond immediately to your request.
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Action Buttons -->
+                            <div class="col-12">
+                                <div class="d-flex gap-3 justify-content-end mt-3">
+                                    <a href="{% url 'hospital_donors' %}" class="btn btn-outline-secondary btn-lg">
+                                        <i class="bi bi-x-circle me-2"></i>Cancel
                                     </a>
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="bi bi-send-fill me-1"></i>Send Notification
+                                    <button type="submit" class="btn btn-send">
+                                        <i class="bi bi-send-fill me-2"></i>Send Notification
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </form>
+                </div>
+
+                <!-- Best Practices -->
+                <div class="alert alert-info mt-4">
+                    <h6 class="alert-heading">
+                        <i class="bi bi-lightbulb-fill me-2"></i>
+                        Best Practices
+                    </h6>
+                    <ul class="mb-0 small">
+                        <li>Ensure all patient information is accurate before sending</li>
+                        <li>Select the appropriate urgency level based on medical need</li>
+                        <li>Include specific details in the additional message if needed</li>
+                        <li>Follow up with a phone call for critical cases</li>
+                    </ul>
                 </div>
             </div>
         </div>

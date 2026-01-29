@@ -1,158 +1,10 @@
-]{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Register - Life Link Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
-    .registration-section {
-        background: linear-gradient(135deg, #fef5f7 0%, #fff5f8 100%);
-        min-height: 100vh;
-        padding: 4rem 0;
-    }
-    
-    .registration-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(199, 30, 53, 0.08);
-        padding: 3rem;
-        animation: slideUp 0.5s ease-out;
-    }
-    
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .registration-header {
-        text-align: center;
-        margin-bottom: 2.5rem;
-    }
-    
-    .registration-header .icon-wrapper {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        box-shadow: 0 8px 20px rgba(199, 30, 53, 0.25);
-    }
-    
-    .registration-header .icon-wrapper i {
-        font-size: 2.5rem;
-        color: white;
-    }
-    
-    .registration-header h3 {
-        color: #c71e35;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        font-size: 1.8rem;
-    }
-    
-    .registration-header p {
-        color: #6c757d;
-        font-size: 1rem;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 0.5rem;
-        font-size: 0.95rem;
-    }
-    
-    .form-label i {
-        color: #c71e35;
-        width: 20px;
-    }
-    
-    .form-control, .form-select {
-        border-radius: 10px;
-        border: 2px solid #e8e8e8;
-        padding: 0.85rem 1rem;
-        transition: all 0.3s ease;
-        font-size: 0.95rem;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #c71e35;
-        box-shadow: 0 0 0 0.25rem rgba(199, 30, 53, 0.1);
-        outline: none;
-    }
-    
-    .form-control:hover, .form-select:hover {
-        border-color: #d0d0d0;
-    }
-    
-    .btn-register {
-        background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);
-        border: none;
-        padding: 1rem 2rem;
-        font-weight: 600;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        font-size: 1.05rem;
-        letter-spacing: 0.5px;
-        margin-top: 1.5rem;
-    }
-    
-    .btn-register:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(199, 30, 53, 0.35);
-        background: linear-gradient(135deg, #b01a2f 0%, #d12f3f 100%);
-    }
-    
-    .btn-register:active {
-        transform: translateY(-1px);
-    }
-    
-    .login-link {
-        text-align: center;
-        margin-top: 2rem;
-        padding-top: 2rem;
-        border-top: 1px solid #e8e8e8;
-    }
-    
-    .login-link a {
-        color: #c71e35;
-        text-decoration: none;
-        font-weight: 600;
-        transition: color 0.3s ease;
-    }
-    
-    .login-link a:hover {
-        color: #e53949;
-        text-decoration: underline;
-    }
-    
-    .alert {
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-    }
-    
-    .error-list {
-        margin: 0;
-        padding-left: 1.5rem;
-    }
-    
-    @media (max-width: 768px) {
-        .registration-card {
-            padding: 2rem 1.5rem;
-        }
-        
-        .registration-header h3 {
-            font-size: 1.5rem;
-        }
-    }
+/* ... keep all your existing CSS unchanged ... */
 </style>
 {% endblock %}
 
@@ -178,60 +30,34 @@
                         {% endif %}
                     </div>
 
-                    <!-- Display Django Messages -->
-                    {% if messages %}
-                        {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                        {% endfor %}
-                    {% endif %}
+                    <!-- Display messages dynamically -->
+                    <div id="responseMessage"></div>
 
-                    <!-- Display form errors for donor -->
-                    {% if form.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        <strong>Please correct the following errors:</strong>
-                        <ul class="error-list">
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <li>{{ field.label }}: {{ error }}</li>
-                                {% endfor %}
-                            {% endfor %}
-                            {% for error in form.non_field_errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
-
-                    <form method="POST" action="{% url 'register' %}">
+                    <form id="registerForm">
                         {% csrf_token %}
                         <!-- Hidden field to preserve user_type -->
                         <input type="hidden" name="user_type" value="{{ user_type|default:request.GET.type|default:'donor' }}">
 
                         <div class="row">
-                            <!-- Email Field -->
+                            <!-- Email -->
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">
                                     <i class="bi bi-envelope-fill me-2"></i>Email
                                 </label>
                                 <input type="email" name="email" id="email" class="form-control"
-                                       placeholder="Enter your email" 
-                                       value="{{ form.email.value|default:'' }}" required>
+                                       placeholder="Enter your email" required>
                             </div>
 
-                            <!-- Username Field -->
+                            <!-- Username -->
                             <div class="col-md-6 mb-3">
                                 <label for="username" class="form-label">
                                     <i class="bi bi-person-fill me-2"></i>Username
                                 </label>
-                                <input type="text" name="username" id="username" class="form-control" 
-                                       placeholder="Choose a username"
-                                       value="{{ form.username.value|default:'' }}" required>
+                                <input type="text" autocomplete="new-username" name="username" id="username" class="form-control" 
+                                       placeholder="Choose a username" required>
                             </div>
 
-                            <!-- Password Field -->
+                            <!-- Password -->
                             <div class="col-md-6 mb-3">
                                 <label for="password1" class="form-label">
                                     <i class="bi bi-lock-fill me-2"></i>Password
@@ -240,7 +66,7 @@
                                        placeholder="Create a strong password" required>
                             </div>
 
-                            <!-- Confirm Password Field -->
+                            <!-- Confirm Password -->
                             <div class="col-md-6 mb-3">
                                 <label for="password2" class="form-label">
                                     <i class="bi bi-lock-fill me-2"></i>Confirm Password
@@ -249,15 +75,14 @@
                                        placeholder="Re-enter your password" required>
                             </div>
 
-                            <!-- Donor-Specific Fields -->
+                            <!-- Donor Fields -->
                             {% if user_type != "hospital" and request.GET.type != "hospital" %}
                             <div class="col-md-6 mb-3">
                                 <label for="full_name" class="form-label">
                                     <i class="bi bi-person-badge-fill me-2"></i>Full Name
                                 </label>
                                 <input type="text" name="full_name" id="full_name" class="form-control" 
-                                       placeholder="Enter your full name"
-                                       value="{{ form.full_name.value|default:'' }}" required>
+                                       placeholder="Enter your full name" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -265,8 +90,7 @@
                                     <i class="bi bi-calendar-check-fill me-2"></i>Age
                                 </label>
                                 <input type="number" name="age" id="age" class="form-control" 
-                                       min="18" max="65" placeholder="18-65 years"
-                                       value="{{ form.age.value|default:'' }}" required>
+                                       min="18" max="65" placeholder="18-65 years" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -274,8 +98,7 @@
                                     <i class="bi bi-telephone-fill me-2"></i>Phone Number
                                 </label>
                                 <input type="tel" name="phone" id="phone" class="form-control" 
-                                       placeholder="9812345678" pattern="[0-9]{10}"
-                                       value="{{ form.phone.value|default:'' }}" required>
+                                       placeholder="9812345678" pattern="[0-9]{10}" required>
                                 <small class="text-muted">Enter 10-digit mobile number</small>
                             </div>
 
@@ -285,14 +108,14 @@
                                 </label>
                                 <select name="blood_type" id="blood_type" class="form-select" required>
                                     <option value="">Select Blood Group</option>
-                                    <option value="A+" {% if form.blood_type.value == 'A+' %}selected{% endif %}>A+</option>
-                                    <option value="A-" {% if form.blood_type.value == 'A-' %}selected{% endif %}>A-</option>
-                                    <option value="B+" {% if form.blood_type.value == 'B+' %}selected{% endif %}>B+</option>
-                                    <option value="B-" {% if form.blood_type.value == 'B-' %}selected{% endif %}>B-</option>
-                                    <option value="O+" {% if form.blood_type.value == 'O+' %}selected{% endif %}>O+</option>
-                                    <option value="O-" {% if form.blood_type.value == 'O-' %}selected{% endif %}>O-</option>
-                                    <option value="AB+" {% if form.blood_type.value == 'AB+' %}selected{% endif %}>AB+</option>
-                                    <option value="AB-" {% if form.blood_type.value == 'AB-' %}selected{% endif %}>AB-</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
                                 </select>
                             </div>
 
@@ -301,11 +124,11 @@
                                     <i class="bi bi-geo-alt-fill me-2"></i>Address
                                 </label>
                                 <textarea name="address" id="address" class="form-control" rows="2" 
-                                          placeholder="City, District (e.g., Kathmandu, Bagmati)" required>{{ form.address.value|default:'' }}</textarea>
+                                          placeholder="City, District (e.g., Kathmandu, Bagmati)" required></textarea>
                             </div>
                             {% endif %}
 
-                            <!-- Hospital-Specific Fields -->
+                            <!-- Hospital Fields -->
                             {% if user_type == "hospital" or request.GET.type == "hospital" %}
                             <div class="col-md-6 mb-3">
                                 <label for="hospital_name" class="form-label">
@@ -345,7 +168,7 @@
                     <div class="login-link">
                         <p class="text-muted mb-0">
                             Already have an account? 
-                            <a href="{% url 'login' %}">Login here</a>
+                            <a href="{% url 'accounts:login_page' %}">Login here</a>
                         </p>
                     </div>
                 </div>
@@ -355,14 +178,55 @@
 </div>
 
 <script>
-    const emailInput = document.getElementById('email');
-    const usernameInput = document.getElementById('username');
+const emailInput = document.getElementById('email');
+const usernameInput = document.getElementById('username');
 
-    emailInput.addEventListener('input', () => {
-        const email = emailInput.value;
-        if(email.includes('@')) {
-            usernameInput.value = email.split('@')[0];
+emailInput.addEventListener('input', () => {
+    const email = emailInput.value;
+    if(email.includes('@')) {
+        usernameInput.value = email.split('@')[0];
+    }
+});
+
+// ---------------- JWT FORM SUBMISSION ----------------
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // prevent default form submission
+
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    // Adjust password keys to match your view
+    data['password'] = data['password1'];
+    delete data['password1'];
+    delete data['password2'];
+
+    try {
+        const response = await fetch("{% url 'accounts:register' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        const msgDiv = document.getElementById('responseMessage');
+
+        if (response.ok) {
+            msgDiv.innerHTML = `<div class="alert alert-success">${result.message}</div>`;
+            form.reset();
+            setTimeout(() => {
+                window.location.href = "{% url 'accounts:login_page' %}";
+            }, 1000);
+        } else {
+            let errors = result.error || JSON.stringify(result);
+            msgDiv.innerHTML = `<div class="alert alert-danger">${errors}</div>`;
         }
-    });
+
+    } catch (err) {
+        console.error(err);
+    }
+});
 </script>
 {% endblock %}

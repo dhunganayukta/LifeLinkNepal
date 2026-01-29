@@ -7,12 +7,14 @@ def run_priority_algorithm(blood_requests):
     Priority Algorithm: Ranks blood requests by urgency, time waiting, units needed, and blood rarity
     Returns a list of dicts with request data and priority info
     """
-    if not blood_requests or blood_requests.count() == 0:
+    # Accept either a queryset or a plain list; normalize to list
+    requests_list = list(blood_requests) if blood_requests is not None else []
+    if len(requests_list) == 0:
         return []
     
     ranked_list = []
     
-    for request in blood_requests:
+    for request in requests_list:
         # Calculate individual scores
         urgency_score = calculate_urgency_score(request.urgency_level)
         time_score = calculate_time_score(request.created_at)

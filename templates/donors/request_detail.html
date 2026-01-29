@@ -1,0 +1,789 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blood Request Detail - LifeLink Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --lifelink-red: #E63946;
+        --lifelink-blue: #1D70B8;
+        --lifelink-dark-blue: #003A70;
+        --lifelink-light-red: #FFE5E8;
+        --lifelink-gradient: linear-gradient(135deg, #1D70B8 0%, #E63946 100%);
+    }
+    
+    body {
+        background-color: #F8F9FA;
+    }
+    
+    /* ==================== PAGE HEADER ==================== */
+    .page-header {
+        background: var(--lifelink-gradient);
+        padding: 3rem 0;
+        box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* ==================== MAIN CARD ==================== */
+    .detail-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-top: -3rem;
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* ==================== URGENCY BANNER ==================== */
+    .urgency-banner {
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 600;
+        animation: pulse-glow 2s infinite;
+    }
+    
+    @keyframes pulse-glow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.9; }
+    }
+    
+    .urgency-critical {
+        background: linear-gradient(135deg, #DC3545, #C82333);
+        color: white;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    }
+    
+    .urgency-urgent {
+        background: linear-gradient(135deg, #FFC107, #FFB300);
+        color: #000;
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+    }
+    
+    .urgency-normal {
+        background: linear-gradient(135deg, #17A2B8, #138496);
+        color: white;
+        box-shadow: 0 4px 15px rgba(23, 162, 184, 0.4);
+    }
+    
+    .urgency-icon {
+        font-size: 3rem;
+        animation: blink 1.5s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 50%, 100% { opacity: 1; }
+        25%, 75% { opacity: 0.6; }
+    }
+    
+    /* ==================== BLOOD TYPE DISPLAY ==================== */
+    .blood-type-display {
+        width: 140px;
+        height: 140px;
+        background: var(--lifelink-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 30px rgba(230, 57, 70, 0.4);
+        position: relative;
+        margin: 0 auto 2rem;
+    }
+    
+    .blood-type-display::before {
+        content: '';
+        position: absolute;
+        inset: -10px;
+        border-radius: 50%;
+        background: var(--lifelink-gradient);
+        opacity: 0.2;
+        animation: pulse-ring 2s infinite;
+    }
+    
+    @keyframes pulse-ring {
+        0%, 100% { transform: scale(1); opacity: 0.2; }
+        50% { transform: scale(1.1); opacity: 0; }
+    }
+    
+    .blood-type-text {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* ==================== INFO SECTIONS ==================== */
+    .info-section {
+        background: #F8F9FA;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--lifelink-red);
+    }
+    
+    .info-section h5 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .info-section h5 i {
+        color: var(--lifelink-red);
+        font-size: 1.5rem;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        color: #6c757d;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .info-label i {
+        color: var(--lifelink-red);
+    }
+    
+    .info-value {
+        color: #2c3e50;
+        font-weight: 700;
+    }
+    
+    /* ==================== ELIGIBILITY STATUS ==================== */
+    .eligibility-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .eligible-status {
+        background: linear-gradient(135deg, #D4EDDA, #C3E6CB);
+        color: #155724;
+        padding: 1.5rem;
+        border-radius: 12px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        box-shadow: 0 4px 12px rgba(21, 87, 36, 0.2);
+    }
+    
+    .ineligible-status {
+        background: linear-gradient(135deg, #F8D7DA, #F5C6CB);
+        color: #721C24;
+        padding: 1.5rem;
+        border-radius: 12px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        box-shadow: 0 4px 12px rgba(114, 28, 36, 0.2);
+    }
+    
+    .status-icon {
+        font-size: 2.5rem;
+    }
+    
+    /* ==================== ACTION BUTTONS ==================== */
+    .action-section {
+        background: var(--lifelink-light-red);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-accept {
+        background: linear-gradient(135deg, #28A745, #20C997);
+        border: none;
+        color: white;
+        font-weight: 700;
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-accept:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+        color: white;
+    }
+    
+    .btn-decline {
+        background: white;
+        border: 2px solid #DC3545;
+        color: #DC3545;
+        font-weight: 700;
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-decline:hover {
+        background: #DC3545;
+        color: white;
+        transform: translateY(-3px);
+    }
+    
+    .btn-back {
+        background: white;
+        border: 2px solid var(--lifelink-blue);
+        color: var(--lifelink-blue);
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-back:hover {
+        background: var(--lifelink-blue);
+        color: white;
+    }
+    
+    /* ==================== PRIORITY BADGE ==================== */
+    .priority-badge {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* ==================== DISTANCE BADGE ==================== */
+    .distance-badge {
+        background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+        color: var(--lifelink-blue);
+        padding: 0.5rem 1.25rem;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 8px rgba(29, 112, 184, 0.2);
+    }
+    
+    /* ==================== MODAL STYLING ==================== */
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .modal-header {
+        background: var(--lifelink-gradient);
+        color: white;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
+    }
+    
+    .modal-title {
+        font-weight: 700;
+    }
+    
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.75rem;
+        }
+        
+        .detail-card {
+            padding: 1.5rem;
+        }
+        
+        .blood-type-display {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .blood-type-text {
+            font-size: 2.5rem;
+        }
+        
+        .priority-badge {
+            position: static;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        
+        .btn-accept, .btn-decline {
+            width: 100%;
+            margin-bottom: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ==================== PAGE HEADER ==================== -->
+<section class="page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="page-title">
+                    <i class="bi bi-droplet-fill me-3"></i>
+                    Blood Request Details
+                </h1>
+                <p class="text-white-50 mb-0">
+                    <i class="bi bi-calendar3 me-2"></i>
+                    Posted: {{ blood_request.date_requested|date:"F j, Y - g:i A" }}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{% url 'donor_dashboard' %}" class="btn btn-back btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Back
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<section class="py-5">
+    <div class="container">
+        <div class="detail-card">
+            
+            <!-- Priority Badge -->
+            <span class="priority-badge bg-{% if blood_request.urgency_level == 'critical' %}danger{% elif blood_request.urgency_level == 'urgent' %}warning{% else %}info{% endif %}">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                {{ blood_request.urgency_level|upper }} PRIORITY
+            </span>
+            
+            <!-- Urgency Banner -->
+            <div class="urgency-banner urgency-{{ blood_request.urgency_level }}">
+                <i class="bi bi-exclamation-triangle-fill urgency-icon"></i>
+                <div class="flex-grow-1">
+                    <h4 class="mb-1 fw-bold">
+                        {% if blood_request.urgency_level == 'critical' %}
+                            CRITICAL - Immediate Blood Needed!
+                        {% elif blood_request.urgency_level == 'urgent' %}
+                            URGENT - Blood Needed Soon
+                        {% else %}
+                            Blood Request Active
+                        {% endif %}
+                    </h4>
+                    <p class="mb-0">
+                        This patient urgently needs your help. Every minute counts!
+                    </p>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-lg-8">
+                    <!-- Blood Type Display -->
+                    <div class="text-center mb-4">
+                        <div class="blood-type-display">
+                            <div class="blood-type-text">{{ blood_request.blood_type }}</div>
+                        </div>
+                        <h5 class="text-muted">Blood Type Required</h5>
+                        <p class="text-muted small">
+                            Your blood type: <strong class="text-danger fs-5">{{ donor_blood_type }}</strong>
+                            {% if donor_blood_type == blood_request.blood_type %}
+                                <span class="badge bg-success ms-2">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Exact Match
+                                </span>
+                            {% else %}
+                                <span class="badge bg-info ms-2">
+                                    <i class="bi bi-check-circle"></i>
+                                    Compatible
+                                </span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <!-- Patient Information -->
+                    <div class="info-section">
+                        <h5>
+                            <i class="bi bi-person-fill"></i>
+                            Patient Information
+                        </h5>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-person"></i>
+                                Patient Name
+                            </span>
+                            <span class="info-value">{{ blood_request.patient_name }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-calendar"></i>
+                                Age
+                            </span>
+                            <span class="info-value">{{ blood_request.patient_age }} years</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-droplet-fill"></i>
+                                Blood Type Needed
+                            </span>
+                            <span class="info-value text-danger">{{ blood_request.blood_type }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-droplet-half"></i>
+                                Units Required
+                            </span>
+                            <span class="info-value">{{ blood_request.units_required }} unit{{ blood_request.units_required|pluralize }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Hospital Information -->
+                    <div class="info-section">
+                        <h5>
+                            <i class="bi bi-hospital-fill"></i>
+                            Hospital Information
+                        </h5>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-building"></i>
+                                Hospital Name
+                            </span>
+                            <span class="info-value">{{ hospital.hospital_name }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-geo-alt"></i>
+                                Address
+                            </span>
+                            <span class="info-value">{{ hospital.address }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-telephone"></i>
+                                Phone
+                            </span>
+                            <span class="info-value">
+                                <a href="tel:{{ hospital.phone }}" class="text-decoration-none text-danger fw-bold">
+                                    {{ hospital.phone }}
+                                </a>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-envelope"></i>
+                                Email
+                            </span>
+                            <span class="info-value">
+                                <a href="mailto:{{ hospital.email }}" class="text-decoration-none">
+                                    {{ hospital.email }}
+                                </a>
+                            </span>
+                        </div>
+                        {% if distance %}
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-pin-map"></i>
+                                Distance
+                            </span>
+                            <span class="info-value">
+                                <span class="distance-badge">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                    {{ distance }} km from you
+                                </span>
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Additional Details -->
+                    {% if blood_request.reason %}
+                    <div class="info-section">
+                        <h5>
+                            <i class="bi bi-file-text-fill"></i>
+                            Additional Information
+                        </h5>
+                        <p class="mb-0 text-muted">{{ blood_request.reason }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Right Column -->
+                <div class="col-lg-4 mt-4 mt-lg-0">
+                    <!-- Eligibility Status -->
+                    <div class="eligibility-card">
+                        <h5 class="fw-bold mb-3">Your Eligibility Status</h5>
+                        {% if is_eligible %}
+                            <div class="eligible-status">
+                                <i class="bi bi-check-circle-fill status-icon"></i>
+                                <span>You're Eligible!</span>
+                            </div>
+                            <p class="text-muted small mt-3 mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                You meet all requirements to donate for this request
+                            </p>
+                        {% else %}
+                            <div class="ineligible-status">
+                                <i class="bi bi-x-circle-fill status-icon"></i>
+                                <span>Not Eligible</span>
+                            </div>
+                            <p class="text-muted small mt-3 mb-0">
+                                {% if not can_donate %}
+                                    <i class="bi bi-clock me-1"></i>
+                                    You need to wait before your next donation
+                                {% else %}
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    You don't meet the eligibility criteria
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="info-section">
+                        <h5>
+                            <i class="bi bi-graph-up-arrow"></i>
+                            Request Statistics
+                        </h5>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-clock"></i>
+                                Posted
+                            </span>
+                            <span class="info-value">
+                                {{ blood_request.date_requested|timesince }} ago
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-activity"></i>
+                                Status
+                            </span>
+                            <span class="badge bg-{% if blood_request.status == 'pending' %}warning{% elif blood_request.status == 'fulfilled' %}success{% else %}secondary{% endif %}">
+                                {{ blood_request.status|upper }}
+                            </span>
+                        </div>
+                        {% if priority_score %}
+                        <div class="info-row">
+                            <span class="info-label">
+                                <i class="bi bi-star-fill"></i>
+                                Priority Score
+                            </span>
+                            <span class="info-value text-danger">{{ priority_score }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Emergency Contact -->
+                    <div class="alert alert-danger" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-telephone-fill me-2"></i>
+                            Emergency Contact
+                        </h6>
+                        <p class="small mb-2">Call hospital directly for urgent coordination:</p>
+                        <a href="tel:{{ hospital.phone }}" class="btn btn-danger btn-sm w-100">
+                            <i class="bi bi-telephone-fill me-2"></i>
+                            {{ hospital.phone }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            {% if is_eligible and blood_request.status == 'pending' %}
+            <div class="action-section">
+                <h5 class="fw-bold mb-4 text-center">
+                    <i class="bi bi-hand-thumbs-up me-2"></i>
+                    Ready to Save a Life?
+                </h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-accept w-100" data-bs-toggle="modal" data-bs-target="#acceptModal">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            Accept Request
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-decline w-100" data-bs-toggle="modal" data-bs-target="#declineModal">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            Decline Request
+                        </button>
+                    </div>
+                </div>
+                <p class="text-center text-muted small mt-3 mb-0">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Your contact information will be shared with the hospital upon acceptance
+                </p>
+            </div>
+            {% elif not is_eligible %}
+            <div class="alert alert-warning text-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>You're not eligible for this request at this time.</strong>
+                <p class="mb-0 small mt-2">Please check back later or explore other requests.</p>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong>This request is no longer active.</strong>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- ==================== ACCEPT MODAL ==================== -->
+<div class="modal fade" id="acceptModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    Confirm Acceptance
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'accept_blood_request' blood_request.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-success">
+                        <i class="bi bi-heart-fill me-2"></i>
+                        <strong>Thank you for being a hero!</strong>
+                    </div>
+                    <p class="mb-3">By accepting this request, you confirm that:</p>
+                    <ul class="small">
+                        <li>You are available to donate blood for this patient</li>
+                        <li>Your contact details will be shared with {{ hospital.hospital_name }}</li>
+                        <li>You will coordinate directly with the hospital</li>
+                        <li>You meet all health requirements for blood donation</li>
+                    </ul>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Additional Notes (Optional)</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Any special notes or preferred contact time..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Confirm Acceptance
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DECLINE MODAL ==================== -->
+<div class="modal fade" id="declineModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <h5 class="modal-title text-white">
+                    <i class="bi bi-x-circle-fill me-2"></i>
+                    Decline Request
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'decline_blood_request' blood_request.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p class="mb-3">We understand. Please let us know why (optional):</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Reason for Declining</label>
+                        <select class="form-select mb-2" name="reason">
+                            <option value="">Select a reason...</option>
+                            <option value="Too far">Location too far</option>
+                            <option value="Not available">Not available at this time</option>
+                            <option value="Health reasons">Health reasons</option>
+                            <option value="Recently donated">Recently donated blood</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <textarea class="form-control" name="additional_notes" rows="2" placeholder="Additional details (optional)..."></textarea>
+                    </div>
+                    <div class="alert alert-info small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Don't worry - the next eligible donor will be automatically notified.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-circle-fill me-2"></i>
+                        Confirm Decline
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-dismiss alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert:not(.alert-danger):not(.alert-info)');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    });
+</script>
+{% endblock %}

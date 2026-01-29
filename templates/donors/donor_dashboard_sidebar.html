@@ -1,0 +1,26 @@
+<!-- Partial: donor_dashboard_sidebar.html -->
+<div class="dashboard-sidebar">
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="card-title">Your Profile</h6>
+            <p class="mb-1"><strong>{{ donor.full_name }}</strong></p>
+            <p class="small text-muted">Blood Type: {{ donor.blood_type }}</p>
+            <p class="small text-muted">Last Donation: {% if donor.last_donation_date %}{{ donor.last_donation_date|date:"M d, Y" }}{% else %}Never{% endif %}</p>
+            <a href="{% url 'edit_profile' %}" class="btn btn-outline-secondary btn-sm mt-2">Edit Profile</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h6 class="card-title">Notifications</h6>
+            {% if notifications %}
+                <ul class="list-unstyled small">
+                    {% for n in notifications|slice:":5" %}
+                        <li class="mb-2">{{ n.blood_request.hospital.hospital_name }} • {{ n.sent_at|date:"M d" }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted small">No notifications</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

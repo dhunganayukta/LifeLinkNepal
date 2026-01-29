@@ -13,11 +13,10 @@ def rank_donors_mcdm(donors, hospital_lat, hospital_lon, distances, required_blo
     4. Days since last donation (maximize)
     """
     
-    # FIX: Handle empty donor list
-    if not donors or donors.count() == 0:
+    # FIX: Handle empty donor list and accept querysets or lists
+    donor_list = list(donors) if donors is not None else []
+    if len(donor_list) == 0:
         return []
-    
-    donor_list = list(donors)
     
     # FIX: Handle single donor
     if len(donor_list) == 1:

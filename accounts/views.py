@@ -1,11 +1,13 @@
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate, get_user_model, login as auth_login
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import AuthenticationFailed
-
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout as auth_logout
+from django.views.decorators.csrf import csrf_exempt
 from donors.models import DonorProfile
 from hospitals.models import HospitalProfile
 from accounts.decorators import role_required
@@ -26,6 +28,18 @@ def get_tokens_for_user(user):
         'access': str(refresh.access_token),
     }
 
+def register_page(request):
+    """
+    Renders the registration page
+    """
+    return render(request, 'accounts/register.html')
+
+def login_page(request):
+    """
+    Renders the login page
+    """
+    return render(request, 'accounts/login.html')
+
 # -----------------------------
 # REGISTER API
 # -----------------------------
@@ -35,22 +49,54 @@ def register(request):
     """
     Registers donor or hospital and returns JWT tokens
     """
+
     user_type = request.data.get('user_type')
     username = request.data.get('username')
     password = request.data.get('password')
     email = request.data.get('email')
 
-    # Basic validation
+    # -----------------------------
+    # BASIC USER VALIDATION
+    # -----------------------------
     if user_type not in ['donor', 'hospital']:
-        return Response({"error": "Invalid user type"}, status=status.HTTP_400_BAD_REQUEST)
-    if not all([username, password, email]):
-        return Response({"error": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
-    if User.objects.filter(username=username).exists():
-        return Response({"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
-    if User.objects.filter(email=email).exists():
-        return Response({"error": "Email already registered"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Invalid user type"}, status=400)
 
-    # Create user
+    if not all([username, password, email]):
+        return Response({"error": "Username, email and password are required"}, status=400)
+
+    if User.objects.filter(username=username).exists():
+        return Response({"error": "Username already exists"}, status=400)
+
+    if User.objects.filter(email=email).exists():
+        return Response({"error": "Email already registered"}, status=400)
+
+    # -----------------------------
+    # DONOR VALIDATION (BEFORE USER CREATION)
+    # -----------------------------
+    if user_type == 'donor':
+        donor_required = ['full_name', 'age', 'phone', 'blood_type', 'address']
+        for field in donor_required:
+            if not request.data.get(field):
+                return Response(
+                    {"error": f"{field} is required for donor registration"},
+                    status=400
+                )
+
+    # -----------------------------
+    # HOSPITAL VALIDATION
+    # -----------------------------
+    if user_type == 'hospital':
+        hospital_required = ['hospital_name', 'phone', 'address']
+        for field in hospital_required:
+            if not request.data.get(field):
+                return Response(
+                    {"error": f"{field} is required for hospital registration"},
+                    status=400
+                )
+
+    # -----------------------------
+    # CREATE USER
+    # -----------------------------
     user = User.objects.create_user(
         username=username,
         email=email,
@@ -58,30 +104,43 @@ def register(request):
         user_type=user_type
     )
 
-    # Create profile
+    # -----------------------------
+    # CREATE PROFILE
+    # -----------------------------
     if user_type == 'donor':
-        DonorProfile.objects.create(user=user)
-    else:
-        hospital_name = request.data.get('hospital_name')
-        phone = request.data.get('phone')
-        address = request.data.get('address')
-        if not all([hospital_name, phone, address]):
-            user.delete()
-            return Response({"error": "All hospital fields are required"}, status=status.HTTP_400_BAD_REQUEST)
-        HospitalProfile.objects.create(
+        DonorProfile.objects.create(
             user=user,
-            hospital_name=hospital_name,
-            phone=phone,
-            address=address
+            full_name=request.data['full_name'],
+            age=int(request.data['age']),
+            phone=request.data['phone'],
+            blood_type=request.data['blood_type'],
+            address=request.data['address'],
+            weight=request.data.get('weight'),
+            medical_conditions=request.data.get('medical_conditions', '')
         )
 
+    else:  # hospital
+        HospitalProfile.objects.create(
+            user=user,
+            hospital_name=request.data['hospital_name'],
+            phone=request.data['phone'],
+            address=request.data['address']
+        )
+
+    # -----------------------------
+    # JWT TOKENS
+    # -----------------------------
     tokens = get_tokens_for_user(user)
 
-    return Response({
-        "message": "Registration successful",
-        "tokens": tokens,
-        "user_type": user.user_type
-    }, status=status.HTTP_201_CREATED)
+    return Response(
+        {
+            "message": "Registration successful",
+            "tokens": tokens,
+            "user_type": user.user_type
+        },
+        status=status.HTTP_201_CREATED
+    )
+
 
 # -----------------------------
 # LOGIN API
@@ -117,12 +176,27 @@ def login(request):
     user.failed_attempts = 0
     user.save()
 
-    tokens = get_tokens_for_user(user)
+    # Use the authenticated user object for tokens/session
+    tokens = get_tokens_for_user(user_auth)
+
+    # Store tokens in the Django session so browser-based flows can access them
+    if hasattr(request, 'session'):
+        request.session['access_token'] = tokens.get('access')
+        request.session['refresh_token'] = tokens.get('refresh')
+        # Optional: set session expiry to match access token lifetime if desired
+        # request.session.set_expiry(60 * 60)  # e.g. 1 hour
+
+    # Also log the user into Django's session framework (for template-based views)
+    try:
+        auth_login(request, user_auth)
+    except Exception:
+        # If session login fails for any reason, continue — tokens are still returned
+        pass
 
     return Response({
         "message": "Login successful",
         "tokens": tokens,
-        "user_type": user.user_type
+        "user_type": user_auth.user_type
     })
 
 # -----------------------------
@@ -173,3 +247,22 @@ def hospital_dashboard(request):
             } for d in hospital_profile.highest_donors()
         ]
     })
+# -----------------------------
+# TEMPLATE LOGIN PAGE
+# -----------------------------
+def login_page(request):
+    """
+    Renders a login page for browser users
+    """
+    return render(request, 'accounts/login.html')
+
+
+# -----------------------------
+# TEMPLATE LOGOUT
+# -----------------------------
+def logout_view(request):
+    """
+    Logs out the user from the session
+    """
+    auth_logout(request)
+    return redirect('home')

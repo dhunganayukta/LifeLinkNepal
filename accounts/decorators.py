@@ -26,7 +26,7 @@ def role_required(required_role):
                     raise NotAuthenticated("Authentication required")
                 else:
                     messages.error(request, "Please log in to access this page.")
-                    return redirect('login')  # Update to your login URL name
+                    return redirect('accounts:login_page')  # Update to your login URL name
 
             # Check role/user_type
             if user.user_type != required_role:

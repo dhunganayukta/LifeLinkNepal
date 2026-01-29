@@ -1,0 +1,19 @@
+<!-- Partial: donor_dashboard_history.html -->
+<div class="dashboard-history">
+    <h5 class="mb-3">Donation History</h5>
+    {% if history and history|length > 0 %}
+    <ul class="list-group list-group-flush">
+        {% for h in history|slice:":5" %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{% if h.hospital %}{{ h.hospital.hospital_name }}{% else %}Unknown Hospital{% endif %}</strong>
+                <div class="small text-muted">{{ h.date_donated|date:"M d, Y" }}</div>
+            </div>
+            <span class="badge bg-danger">{{ h.units_donated }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-muted">No recent donations yet.</p>
+    {% endif %}
+</div>

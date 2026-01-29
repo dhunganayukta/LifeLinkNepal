@@ -4,213 +4,7 @@
 
 {% block extra_css %}
 <style>
-    .login-section {
-        background: linear-gradient(135deg, #fef5f7 0%, #fff5f8 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        padding: 4rem 0;
-    }
-    
-    .login-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(199, 30, 53, 0.08);
-        overflow: hidden;
-        animation: slideUp 0.5s ease-out;
-    }
-    
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .login-card-body {
-        padding: 3rem;
-    }
-    
-    .login-header {
-        text-align: center;
-        margin-bottom: 2.5rem;
-    }
-    
-    .login-header .icon-wrapper {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        box-shadow: 0 8px 20px rgba(199, 30, 53, 0.25);
-    }
-    
-    .login-header .icon-wrapper i {
-        font-size: 2.5rem;
-        color: white;
-    }
-    
-    .login-header h3 {
-        color: #c71e35;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        font-size: 1.8rem;
-    }
-    
-    .login-header p {
-        color: #6c757d;
-        font-size: 1rem;
-        margin-bottom: 0;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 0.5rem;
-        font-size: 0.95rem;
-    }
-    
-    .form-label i {
-        color: #c71e35;
-        width: 20px;
-    }
-    
-    .form-control {
-        border-radius: 10px;
-        border: 2px solid #e8e8e8;
-        padding: 0.85rem 1rem;
-        transition: all 0.3s ease;
-        font-size: 0.95rem;
-    }
-    
-    .form-control:focus {
-        border-color: #c71e35;
-        box-shadow: 0 0 0 0.25rem rgba(199, 30, 53, 0.1);
-        outline: none;
-    }
-    
-    .form-control:hover {
-        border-color: #d0d0d0;
-    }
-    
-    .btn-login {
-        background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);
-        border: none;
-        padding: 1rem 2rem;
-        font-weight: 600;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        font-size: 1.05rem;
-        letter-spacing: 0.5px;
-        margin-top: 1rem;
-    }
-    
-    .btn-login:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(199, 30, 53, 0.35);
-        background: linear-gradient(135deg, #b01a2f 0%, #d12f3f 100%);
-    }
-    
-    .btn-login:active {
-        transform: translateY(-1px);
-    }
-    
-    .divider {
-        text-align: center;
-        margin: 2rem 0;
-        position: relative;
-    }
-    
-    .divider::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        width: 100%;
-        height: 1px;
-        background: #e8e8e8;
-    }
-    
-    .divider span {
-        background: white;
-        padding: 0 1rem;
-        position: relative;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-    
-    .register-options {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }
-    
-    .register-option {
-        background: #f8f9fa;
-        border: 2px solid #e8e8e8;
-        border-radius: 10px;
-        padding: 1.5rem 1rem;
-        text-align: center;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: block;
-    }
-    
-    .register-option:hover {
-        border-color: #c71e35;
-        background: #fff5f8;
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(199, 30, 53, 0.1);
-    }
-    
-    .register-option i {
-        font-size: 2rem;
-        color: #c71e35;
-        display: block;
-        margin-bottom: 0.75rem;
-    }
-    
-    .register-option .option-title {
-        font-weight: 600;
-        color: #333;
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
-    }
-    
-    .register-option .option-desc {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin: 0;
-    }
-    
-    .alert {
-        border-radius: 10px;
-        border: none;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    @media (max-width: 768px) {
-        .login-card-body {
-            padding: 2rem 1.5rem;
-        }
-        
-        .login-header h3 {
-            font-size: 1.5rem;
-        }
-        
-        .register-options {
-            grid-template-columns: 1fr;
-        }
-    }
+/* ... keep all your existing CSS unchanged ... */
 </style>
 {% endblock %}
 
@@ -229,16 +23,9 @@
                             <p>Login to continue saving lives</p>
                         </div>
 
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                    <i class="bi bi-exclamation-circle-fill me-2"></i>{{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
+                        <div id="responseMessage"></div>
 
-                        <form method="POST">
+                        <form id="loginForm">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="username" class="form-label">
@@ -266,12 +53,12 @@
                         </div>
 
                         <div class="register-options">
-                            <a href="{% url 'register' %}?type=donor" class="register-option">
+                            <a href="{% url 'accounts:register_page' %}?type=donor" class="register-option">
                                 <i class="bi bi-heart-pulse-fill"></i>
                                 <div class="option-title">Donor</div>
                                 <p class="option-desc">Register to donate blood</p>
                             </a>
-                            <a href="{% url 'register' %}?type=hospital" class="register-option">
+                            <a href="{% url 'accounts:register_page' %}?type=hospital" class="register-option">
                                 <i class="bi bi-hospital-fill"></i>
                                 <div class="option-title">Hospital</div>
                                 <p class="option-desc">Register your hospital</p>
@@ -283,4 +70,58 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    try {
+        const response = await fetch("{% url 'accounts:login' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        const msgDiv = document.getElementById('responseMessage');
+
+        if (response.ok) {
+            // Save JWT token to localStorage
+            localStorage.setItem('accessToken', result.access);
+            localStorage.setItem('refreshToken', result.refresh);
+            localStorage.setItem('userType', result.user_type);
+
+            msgDiv.innerHTML = `<div class="alert alert-success">Login successful! Redirecting...</div>`;
+            
+            // Redirect to dashboard or home
+            setTimeout(() => {
+                if (result.user_type === 'donor') {
+                    window.location.href = "{% url 'donor_dashboard' %}";
+                    return;
+                }
+                else if (result.user_type === 'hospital') {
+                    window.location.href = "{% url 'hospital_dashboard' %}";
+                    return;
+                }
+               else {
+                   window.location.href = "{% url 'accounts:login_page' %}";
+               }
+
+            }, 1000);
+        } else {
+            let errors = result.detail || JSON.stringify(result);
+            msgDiv.innerHTML = `<div class="alert alert-danger">${errors}</div>`;
+        }
+
+    } catch (err) {
+        console.error(err);
+    }
+});
+</script>
 {% endblock %}

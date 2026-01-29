@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'lifelink',
     'donors',
     'hospitals',
     'algorithms',
@@ -159,3 +160,5 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # At the bottom of settings.py
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+

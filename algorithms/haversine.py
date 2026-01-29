@@ -7,8 +7,10 @@ import math
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """
-    Calculate the great circle distance between two points 
-    on the earth (specified in decimal degrees)
+   Calculate straight-line distance between two points.
+    Note: This is "as the crow flies" distance, not road distance.
+    Actual travel distance may be 20-50% longer depending on roads.
+
     
     Args:
         lat1, lon1: Latitude and longitude of point 1 (hospital)

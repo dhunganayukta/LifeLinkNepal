@@ -3,144 +3,431 @@
 
 {% block title %}{{ donor.full_name }} - Donor Profile{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --lifelink-red: #E63946;
+        --lifelink-blue: #1D70B8;
+        --lifelink-gradient: linear-gradient(135deg, #1D70B8 0%, #E63946 100%);
+    }
+    
+    body {
+        background-color: #F8F9FA;
+    }
+    
+    /* ==================== PAGE HEADER ==================== */
+    .page-header {
+        background: var(--lifelink-gradient);
+        padding: 2.5rem 0;
+        box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.25rem;
+    }
+    
+    /* ==================== INFO CARDS ==================== */
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(230, 57, 70, 0.1);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(230, 57, 70, 0.15);
+    }
+    
+    /* ==================== PROFILE AVATAR ==================== */
+    .profile-avatar {
+        width: 130px;
+        height: 130px;
+        background: var(--lifelink-gradient);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 30px rgba(230, 57, 70, 0.3);
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .profile-avatar::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        background: var(--lifelink-gradient);
+        opacity: 0.2;
+        animation: pulse-ring 2s infinite;
+    }
+    
+    @keyframes pulse-ring {
+        0%, 100% { transform: scale(1); opacity: 0.2; }
+        50% { transform: scale(1.1); opacity: 0; }
+    }
+    
+    .profile-avatar i {
+        font-size: 4.5rem;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* ==================== BLOOD TYPE BADGE ==================== */
+    .blood-type-badge {
+        font-size: 2rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 900;
+        box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+    }
+    
+    /* ==================== STATUS BADGES ==================== */
+    .status-badge {
+        padding: 0.6rem 1.25rem;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* ==================== ACTION BUTTONS ==================== */
+    .btn-lifelink-primary {
+        background: var(--lifelink-gradient);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-lifelink-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
+        color: white;
+    }
+    
+    .btn-danger {
+        background-color: var(--lifelink-red);
+        border-color: var(--lifelink-red);
+        font-weight: 600;
+    }
+    
+    .btn-danger:hover {
+        background-color: #CC2936;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-danger {
+        color: var(--lifelink-red);
+        border-color: var(--lifelink-red);
+        font-weight: 600;
+    }
+    
+    .btn-outline-danger:hover {
+        background-color: var(--lifelink-red);
+        color: white;
+    }
+    
+    /* ==================== INFO SECTIONS ==================== */
+    .section-title {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-title i {
+        color: var(--lifelink-red);
+        font-size: 1.5rem;
+    }
+    
+    .info-row {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .info-value {
+        color: #2c3e50;
+        font-weight: 700;
+    }
+    
+    /* ==================== TABLE STYLING ==================== */
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table thead {
+        background: var(--lifelink-gradient);
+        color: white;
+    }
+    
+    .table thead th {
+        border: none;
+        font-weight: 600;
+        padding: 1rem;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(230, 57, 70, 0.05);
+    }
+    
+    /* ==================== STAT CARD ==================== */
+    .stat-item {
+        padding: 1rem;
+        text-align: center;
+        border-right: 1px solid #e9ecef;
+    }
+    
+    .stat-item:last-child {
+        border-right: none;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--lifelink-red);
+        line-height: 1;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .profile-avatar i {
+            font-size: 3.5rem;
+        }
+        
+        .blood-type-badge {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Header -->
-<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
+<!-- ==================== PAGE HEADER ==================== -->
+<section class="page-header">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
-            <div>
-                <h2 class="fw-bold mb-1">
-                    <i class="bi bi-person-fill me-2"></i>Donor Profile
-                </h2>
-                <p class="mb-0">Detailed information</p>
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="page-title">
+                    <i class="bi bi-person-fill me-3"></i>Donor Profile
+                </h1>
+                <p class="text-white-50 mb-0">Detailed information about this donor</p>
             </div>
-            <a href="{% url 'hospital_donors' %}" class="btn btn-light">
-                <i class="bi bi-arrow-left me-2"></i>Back to Donors
-            </a>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{% url 'hospital_donors' %}" class="btn btn-light btn-lg">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Donors
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
+<!-- ==================== MAIN CONTENT ==================== -->
 <section class="py-5">
     <div class="container">
-        <div class="row">
-            <!-- Donor Info Card -->
+        <div class="row g-4">
+            <!-- Left Column - Profile Card -->
             <div class="col-lg-4">
+                <!-- Profile Summary -->
                 <div class="info-card text-center mb-4">
-                    <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
-                         style="width: 100px; height: 100px;">
-                        <i class="bi bi-person-fill text-danger" style="font-size: 3rem;"></i>
+                    <div class="profile-avatar">
+                        <i class="bi bi-person-fill"></i>
                     </div>
-                    <h4 class="fw-bold">{{ donor.full_name }}</h4>
-                    <p class="text-muted">{{ donor.age }} years old</p>
+                    
+                    <h3 class="fw-bold mb-2">{{ donor.full_name }}</h3>
+                    <p class="text-muted mb-3">{{ donor.age }} years old</p>
                     
                     <div class="mb-3">
-                        <span class="badge bg-danger" style="font-size: 1.5rem; padding: 0.5rem 1rem;">
+                        <span class="blood-type-badge bg-danger">
                             {{ donor.blood_type }}
                         </span>
                     </div>
 
-                    {% if donor.is_available %}
-                        <span class="badge bg-success fs-6 mb-3">
-                            <i class="bi bi-check-circle me-1"></i>Available to Donate
-                        </span>
-                    {% else %}
-                        <span class="badge bg-secondary fs-6 mb-3">
-                            <i class="bi bi-x-circle me-1"></i>Currently Unavailable
-                        </span>
-                    {% endif %}
+                    <div class="mb-4">
+                        {% if donor.is_available %}
+                            <span class="status-badge bg-success">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Available to Donate
+                            </span>
+                        {% else %}
+                            <span class="status-badge bg-secondary">
+                                <i class="bi bi-x-circle-fill"></i>
+                                Currently Unavailable
+                            </span>
+                        {% endif %}
+                    </div>
 
-                    <div class="d-grid gap-2 mt-3">
+                    <div class="d-grid gap-2">
                         <a href="{% url 'notify_donor' donor.id %}" class="btn btn-danger">
-                            <i class="bi bi-bell-fill me-1"></i>Send Notification
+                            <i class="bi bi-bell-fill me-2"></i>Send Notification
                         </a>
                         <a href="tel:{{ donor.phone }}" class="btn btn-outline-danger">
-                            <i class="bi bi-telephone-fill me-1"></i>Call Donor
+                            <i class="bi bi-telephone-fill me-2"></i>Call Donor
+                        </a>
+                        <a href="mailto:{{ donor.user.email }}" class="btn btn-outline-primary">
+                            <i class="bi bi-envelope-fill me-2"></i>Send Email
                         </a>
                     </div>
                 </div>
 
                 <!-- Quick Stats -->
                 <div class="info-card">
-                    <h5 class="fw-bold mb-3">Donation Stats</h5>
-                    <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                        <span>Total Donations</span>
-                        <strong>{{ donor.donation_count|default:0 }}</strong>
+                    <h5 class="section-title mb-3">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Donation Statistics
+                    </h5>
+                    <div class="row g-0">
+                        <div class="col-12">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ donor.donation_count|default:0 }}</div>
+                                <div class="stat-label">Total Donations</div>
+                            </div>
+                        </div>
                     </div>
-                    {% if donor.last_donation_date %}
-                    <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                        <span>Last Donation</span>
-                        <strong>{{ donor.last_donation_date|date:"M d, Y" }}</strong>
+                    
+                    <div class="mt-3 pt-3 border-top">
+                        {% if donor.last_donation_date %}
+                        <div class="info-row">
+                            <div class="info-label">Last Donation</div>
+                            <div class="info-value">{{ donor.last_donation_date|date:"M d, Y" }}</div>
+                        </div>
+                        {% endif %}
+                        {% if distance %}
+                        <div class="info-row">
+                            <div class="info-label">Distance from Hospital</div>
+                            <div class="info-value">
+                                <span class="badge bg-info">{{ distance }} km</span>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                    {% if distance %}
-                    <div class="d-flex justify-content-between">
-                        <span>Distance from Hospital</span>
-                        <strong>{{ distance }} km</strong>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
 
-            <!-- Detailed Information -->
+            <!-- Right Column - Detailed Information -->
             <div class="col-lg-8">
                 <!-- Contact Information -->
                 <div class="info-card mb-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-telephone-fill text-danger me-2"></i>Contact Information
+                    <h5 class="section-title">
+                        <i class="bi bi-telephone-fill"></i>
+                        Contact Information
                     </h5>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="text-muted small">Phone Number</label>
-                            <p class="fw-bold mb-0">{{ donor.phone }}</p>
+                            <div class="info-label mb-1">Phone Number</div>
+                            <div class="info-value">
+                                <a href="tel:{{ donor.phone }}" class="text-decoration-none">
+                                    {{ donor.phone }}
+                                </a>
+                            </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="text-muted small">Email</label>
-                            <p class="fw-bold mb-0">{{ donor.user.email }}</p>
+                            <div class="info-label mb-1">Email Address</div>
+                            <div class="info-value">
+                                <a href="mailto:{{ donor.user.email }}" class="text-decoration-none">
+                                    {{ donor.user.email }}
+                                </a>
+                            </div>
                         </div>
                         <div class="col-12">
-                            <label class="text-muted small">Address</label>
-                            <p class="fw-bold mb-0">{{ donor.address }}</p>
+                            <div class="info-label mb-1">Address</div>
+                            <div class="info-value">
+                                <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+                                {{ donor.address }}
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Health Information -->
                 <div class="info-card mb-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-heart-pulse-fill text-danger me-2"></i>Health Information
+                    <h5 class="section-title">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                        Health Information
                     </h5>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="text-muted small">Blood Type</label>
-                            <p class="mb-0">
-                                <span class="badge bg-danger fs-6">{{ donor.blood_type }}</span>
-                            </p>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Blood Type</div>
+                                <div class="info-value">
+                                    <span class="badge bg-danger fs-6">{{ donor.blood_type }}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="text-muted small">Age</label>
-                            <p class="fw-bold mb-0">{{ donor.age }} years</p>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Age</div>
+                                <div class="info-value">{{ donor.age }} years</div>
+                            </div>
                         </div>
                         {% if donor.weight %}
-                        <div class="col-md-6 mb-3">
-                            <label class="text-muted small">Weight</label>
-                            <p class="fw-bold mb-0">{{ donor.weight }} kg</p>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Weight</div>
+                                <div class="info-value">{{ donor.weight }} kg</div>
+                            </div>
                         </div>
                         {% endif %}
-                        <div class="col-md-6 mb-3">
-                            <label class="text-muted small">Eligibility</label>
-                            <p class="mb-0">
-                                {% if donor.can_donate %}
-                                    <span class="badge bg-success">Eligible to Donate</span>
-                                {% else %}
-                                    <span class="badge bg-warning text-dark">Not Eligible (90-day wait)</span>
-                                {% endif %}
-                            </p>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Eligibility Status</div>
+                                <div class="info-value">
+                                    {% if donor.can_donate %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>
+                                            Eligible to Donate
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-clock me-1"></i>
+                                            90-day Wait Period
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                         {% if donor.medical_conditions %}
                         <div class="col-12">
-                            <label class="text-muted small">Medical Conditions</label>
-                            <p class="mb-0">{{ donor.medical_conditions }}</p>
+                            <div class="info-row">
+                                <div class="info-label">Medical Conditions</div>
+                                <div class="info-value text-muted">{{ donor.medical_conditions }}</div>
+                            </div>
                         </div>
                         {% endif %}
                     </div>
@@ -148,50 +435,58 @@
 
                 <!-- Donation History -->
                 <div class="info-card">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-clock-history text-danger me-2"></i>Donation History
+                    <h5 class="section-title">
+                        <i class="bi bi-clock-history"></i>
+                        Donation History
                     </h5>
                     {% if donor.donation_history.all %}
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th>Date</th>
                                         <th>Hospital</th>
-                                        <th>Units</th>
+                                        <th>Units Donated</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for donation in donor.donation_history.all %}
                                     <tr>
-                                        <td>{{ donation.date_donated|date:"M d, Y" }}</td>
-                                        <td>{{ donation.hospital.hospital_name|default:"N/A" }}</td>
-                                        <td>{{ donation.units_donated }} unit(s)</td>
+                                        <td>
+                                            <i class="bi bi-calendar3 text-danger me-2"></i>
+                                            {{ donation.date_donated|date:"M d, Y" }}
+                                        </td>
+                                        <td>
+                                            <i class="bi bi-hospital text-primary me-2"></i>
+                                            {{ donation.hospital.hospital_name|default:"N/A" }}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-danger">
+                                                {{ donation.units_donated }} unit{{ donation.units_donated|pluralize }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle-fill me-1"></i>
+                                                Completed
+                                            </span>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     {% else %}
-                        <p class="text-muted text-center py-4">No donation history available</p>
+                        <div class="text-center py-5">
+                            <i class="bi bi-clipboard-data text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                            <p class="text-muted mt-3 mb-0">No donation history available</p>
+                            <small class="text-muted">This donor hasn't made any donations yet</small>
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-{% block extra_css %}
-<style>
-    .info-card {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
-    body.dark-mode .info-card {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
-</style>
 {% endblock %}
