@@ -42,7 +42,12 @@ def hospital_dashboard(request):
 # ============================================
 @role_required('hospital')
 def create_blood_request(request):
-    """Create a new blood request and notify top eligible donors"""
+    """
+    Create a new blood request
+    - Creates donor queue for admin
+    - Sends email notification to admin
+    - Hospital sees success message
+    """
     hospital_profile = request.user.hospitalprofile
 
     if request.method == 'POST':
@@ -71,19 +76,22 @@ def create_blood_request(request):
                 status='pending'
             )
 
-            # Filter eligible donors using shared eligibility logic
+            # Filter eligible donors
             donors = DonorProfile.objects.filter(is_available=True, user__is_active=True)
             eligible_donors = [d for d in donors if is_donor_eligible(d, blood_request, max_distance=50)]
 
             if not eligible_donors:
                 messages.warning(
                     request,
-                    f"Blood request created, but no eligible donors found within 50km."
+                    f"Blood request created, but no eligible donors found within 50km. "
+                    f"Admin will be notified."
                 )
+                send_admin_notification(blood_request, 0)
                 return redirect('hospital_dashboard')
 
             # Rank using MCDM algorithm
-            distances = {d.id: d.distance for d in eligible_donors}
+            # Normalize distances: replace None with a large number so sorting works
+            distances = {d.id: (d.distance if d.distance is not None else 999.0) for d in eligible_donors}
             ranked_donors = rank_donors_mcdm(
                 eligible_donors,
                 hospital_profile.latitude or 0,
@@ -92,22 +100,30 @@ def create_blood_request(request):
                 blood_type
             )
 
-            # Notify top 10 donors
-            notification_count = 0
-            for donor, mcdm_score in ranked_donors[:10]:
+            # Sort by distance (nearest first) for sequential notification
+            ranked_donors.sort(key=lambda x: distances.get(x[0].id) if distances.get(x[0].id) is not None else 999)
+            
+            # Create donor queue for admin (NOT notified yet)
+            for priority_order, (donor, mcdm_score) in enumerate(ranked_donors, start=1):
                 DonorNotification.objects.create(
                     donor=donor,
                     blood_request=blood_request,
                     match_score=mcdm_score,
-                    distance=distances.get(donor.id, 0)
+                    distance=distances.get(donor.id, 0),
+                    is_notified=False,  # Admin will notify them
+                    priority_order=priority_order,
+                    status='pending'
                 )
-                donor.is_read = False
-                send_donor_sms_alert(donor, blood_request, mcdm_score, distances.get(donor.id, 0))
-                notification_count += 1
+
+            # Send notification to admin
+            send_admin_notification(blood_request, len(ranked_donors))
 
             messages.success(
                 request,
-                f"✅ Blood request created! {notification_count} donors notified."
+                f"✅ Emergency blood request created successfully! "
+                f"{len(ranked_donors)} eligible donors found. "
+                f"Admin has been notified and will manage donor notifications. "
+                f"You will be notified when a donor accepts."
             )
             return redirect('view_blood_request', request_id=blood_request.id)
 
@@ -136,50 +152,48 @@ def all_blood_requests(request):
 
 
 # ============================================
-# VIEW SINGLE BLOOD REQUEST & DONORS
+# VIEW SINGLE BLOOD REQUEST (LIMITED INFO)
 # ============================================
 @role_required('hospital')
 def view_blood_request(request, request_id):
+    """
+    Hospital sees:
+    - Request details
+    - Limited donor info (username, blood type, distance ONLY)
+    - Who accepted (if any)
+    """
     blood_request = get_object_or_404(BloodRequest, id=request_id, hospital=request.user.hospitalprofile)
-    hospital_profile = request.user.hospitalprofile
+    
+    # Get notifications
+    notifications = DonorNotification.objects.filter(
+        blood_request=blood_request
+    ).select_related('donor', 'donor__user').order_by('priority_order')
 
-    donors = DonorProfile.objects.filter(is_available=True, user__is_active=True)
-    eligible_donors = [d for d in donors if is_donor_eligible(d, blood_request, max_distance=50)]
-    distances = {d.id: d.distance for d in eligible_donors}
-
-    ranked_donors = []
-    if eligible_donors:
-        try:
-            ranked_donors = rank_donors_mcdm(
-                eligible_donors,
-                hospital_profile.latitude or 0,
-                hospital_profile.longitude or 0,
-                distances,
-                blood_request.blood_type
-            )
-        except Exception as e:
-            print(f"MCDM ranking failed in view_blood_request: {e}")
-            ranked_donors = [(d, 0.5) for d in eligible_donors[:20]]
-
+    # LIMITED INFO - Only username, blood type, distance
     donor_data = []
-    for donor, score in ranked_donors[:20]:
-        # Safely handle None distance and score values
-        raw_distance = distances.get(donor.id)
-        distance_display = round(raw_distance, 2) if raw_distance is not None else None
-        match_display = round(score * 100, 1) if score is not None else 0.0
-
+    for notification in notifications[:20]:
         donor_data.append({
-            'donor': donor,
-            'match_score': match_display,
-            'distance': distance_display,
-            'donations': donor.donation_count or 0,
-            'can_donate': donor.can_donate,
+            'username': notification.donor.user.username,  # Username only, not full name
+            'blood_type': notification.donor.blood_type,
+            'distance': round(notification.distance, 2) if notification.distance else None,
+            'status': notification.get_status_display(),
         })
+
+    # Show accepted donor info
+    accepted_notification = notifications.filter(status='accepted').first()
+    accepted_donor_info = None
+    if accepted_notification:
+        accepted_donor_info = {
+            'username': accepted_notification.donor.user.username,
+            'blood_type': accepted_notification.donor.blood_type,
+            'distance': round(accepted_notification.distance, 2) if accepted_notification.distance else None,
+        }
 
     context = {
         'blood_request': blood_request,
         'donor_data': donor_data,
         'total_donors_found': len(donor_data),
+        'accepted_donor': accepted_donor_info,
     }
     return render(request, 'hospitals/blood_request.html', context)
 
@@ -192,6 +206,13 @@ def mark_fulfilled(request, request_id):
     blood_request = get_object_or_404(BloodRequest, id=request_id, hospital=request.user.hospitalprofile)
     blood_request.status = 'fulfilled'
     blood_request.save()
+    
+    # Cancel all pending notifications
+    DonorNotification.objects.filter(
+        blood_request=blood_request,
+        status__in=['pending', 'notified']
+    ).update(status='cancelled')
+    
     messages.success(request, f"Request for {blood_request.patient_name} marked as fulfilled.")
     return redirect('hospital_dashboard')
 
@@ -201,15 +222,28 @@ def cancel_request(request, request_id):
     blood_request = get_object_or_404(BloodRequest, id=request_id, hospital=request.user.hospitalprofile)
     blood_request.status = 'cancelled'
     blood_request.save()
+    
+    # Cancel all pending notifications
+    DonorNotification.objects.filter(
+        blood_request=blood_request,
+        status__in=['pending', 'notified']
+    ).update(status='cancelled')
+    
     messages.info(request, "Blood request has been cancelled.")
     return redirect('hospital_dashboard')
 
 
 # ============================================
-# DONOR MANAGEMENT
+# DONOR MANAGEMENT (RESTRICTED)
 # ============================================
 @role_required('hospital')
 def hospital_donors(request):
+    """
+    Hospital can only see limited donor info:
+    - Username
+    - Blood type
+    - Distance
+    """
     hospital_profile = request.user.hospitalprofile
     blood_type_filter = request.GET.get('blood_type', '')
     max_distance = request.GET.get('max_distance', 50)
@@ -231,6 +265,7 @@ def hospital_donors(request):
 
     donor_list = []
     for donor in donors:
+        # RESTRICTED - include donor object so templates can access allowed attributes
         donor_list.append({
             'donor': donor,
             'distance': round(distances.get(donor.id, 0), 2) if donor.id in distances else None,
@@ -245,57 +280,6 @@ def hospital_donors(request):
         'max_distance': max_distance,
     }
     return render(request, 'hospitals/hospital_donors.html', context)
-
-
-@role_required('hospital')
-def view_donor_detail(request, donor_id):
-    donor = get_object_or_404(DonorProfile, id=donor_id)
-    hospital_profile = request.user.hospitalprofile
-
-    distance = None
-    if hospital_profile.latitude and donor.latitude:
-        distance = haversine_distance(
-            hospital_profile.latitude,
-            hospital_profile.longitude,
-            donor.latitude,
-            donor.longitude
-        )
-
-    context = {
-        'donor': donor,
-        'hospital': hospital_profile,
-        'distance': round(distance, 2) if distance else None,
-    }
-    return render(request, 'donors/view_donor_detail.html', context)
-
-
-@role_required('hospital')
-def notify_donor(request, donor_id):
-    donor = get_object_or_404(DonorProfile, id=donor_id)
-    hospital_profile = request.user.hospitalprofile
-
-    if request.method == 'POST':
-        blood_type = request.POST.get('blood_type')
-        units_needed = request.POST.get('units_needed', 1)
-        urgency = request.POST.get('urgency', 'normal')
-        message_text = request.POST.get('message', '')
-        # Send email / log the ad-hoc notification (no DB model for generic messages)
-        if donor.user.email:
-            from django.core.mail import send_mail
-            from django.conf import settings
-            send_mail(
-                subject=f"Message from {hospital_profile.hospital_name}",
-                message=f"Blood request: {blood_type}, {units_needed} units. Message: {message_text}",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[donor.user.email],
-                fail_silently=True,
-            )
-
-        messages.success(request, f"Notification sent to {donor.full_name} (email/SMS simulated).")
-        return redirect('hospital_donors')
-
-    context = {'donor': donor, 'hospital': hospital_profile}
-    return render(request, 'donors/notify_donor.html', context)
 
 
 # ============================================
@@ -315,7 +299,6 @@ def edit_hospital_profile(request):
         hospital_profile.hospital_name = request.POST.get('hospital_name', hospital_profile.hospital_name)
         hospital_profile.phone = request.POST.get('phone', hospital_profile.phone)
         hospital_profile.address = request.POST.get('address', hospital_profile.address)
-        # TODO: Geocode address
         hospital_profile.save()
         messages.success(request, "Profile updated successfully.")
         return redirect('hospital_profile')
@@ -325,26 +308,90 @@ def edit_hospital_profile(request):
 
 
 # ============================================
-# UTILITY
+# UTILITY FUNCTIONS
 # ============================================
-def send_donor_sms_alert(donor, blood_request, match_score, distance):
-    """Send SMS alert to donor (placeholder)"""
-    # Guard against None distance/match_score
-    distance_val = 0.0 if distance is None else float(distance)
-    match_val = 0.0 if match_score is None else float(match_score)
-
+def send_admin_notification(blood_request, donor_count):
+    """
+    Send email to admin about new blood request
+    Admin will manage donor notifications through Django admin panel
+    """
+    from django.contrib.auth import get_user_model
+    from django.core.mail import send_mail
+    from django.conf import settings
+    User = get_user_model()
+    
+    # Get all superusers (admin users)
+    admins = User.objects.filter(is_superuser=True, is_active=True)
+    
     message = f"""
-🔴 URGENT BLOOD NEEDED
+🚨 NEW BLOOD REQUEST - ADMIN ACTION REQUIRED
 
 Hospital: {blood_request.hospital.hospital_name}
+Patient: {blood_request.patient_name}
 Blood Type: {blood_request.blood_type}
-Units: {getattr(blood_request, 'units_needed', '')}
+Units Needed: {blood_request.units_needed}
 Urgency: {blood_request.urgency_level.upper()}
-Distance: {distance_val:.1f}km
+Condition: {blood_request.condition}
 
-You are a {int(match_val * 100)}% match!
+{donor_count} eligible donors found and queued.
 
-Login to LifeLink Nepal to respond.
+LOGIN TO ADMIN PANEL TO MANAGE DONORS:
+Go to: /admin/hospitals/bloodrequest/{blood_request.id}/change/
+Click "Notify Next Donor" to start sequential notifications.
+
     """.strip()
-    print(f"📱 SMS to {donor.full_name} ({donor.phone}): {message}")
+    
+    # Send email
+    admin_emails = [admin.email for admin in admins if admin.email]
+    if admin_emails:
+        send_mail(
+            subject=f"🚨 URGENT: New Blood Request #{blood_request.id} - {blood_request.blood_type}",
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=admin_emails,
+            fail_silently=True,
+        )
+    
+    print(f"📧 Admin notification sent for request #{blood_request.id}")
+    return True
+
+
+def send_hospital_acceptance_notification(donor, blood_request, distance):
+    """
+    Notify hospital when donor accepts
+    Hospital only sees: username, blood type, distance
+    """
+    from django.core.mail import send_mail
+    from django.conf import settings
+    
+    hospital = blood_request.hospital
+    
+    message = f"""
+✅ DONOR ACCEPTED YOUR BLOOD REQUEST!
+
+Request for: {blood_request.patient_name}
+Blood Type Required: {blood_request.blood_type}
+
+DONOR DETAILS (Limited Info):
+Username: {donor.user.username}
+Blood Type: {donor.blood_type}
+Distance: {distance:.2f}km
+
+The donor will be contacting you shortly through the platform.
+Please coordinate for donation details.
+
+Thank you for using LifeLink Nepal!
+    """.strip()
+    
+    # Send email to hospital
+    if hospital.user.email:
+        send_mail(
+            subject=f"✅ Donor Accepted - Blood Request #{blood_request.id}",
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[hospital.user.email],
+            fail_silently=True,
+        )
+    
+    print(f"📧 Hospital notified: Donor {donor.user.username} accepted request #{blood_request.id}")
     return True

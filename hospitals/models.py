@@ -79,24 +79,6 @@ class BloodRequest(models.Model):
         verbose_name_plural = 'Blood Requests'
 
 
-class DonorNotification(models.Model):
-    """Track which donors were notified for each blood request"""
-    # Use string reference to avoid circular import
-    donor = models.ForeignKey('donors.DonorProfile', on_delete=models.CASCADE, related_name='hospital_notifications')
-    blood_request = models.ForeignKey(BloodRequest, on_delete=models.CASCADE, related_name='notified_donors')
-    
-    match_score = models.FloatField(help_text="MCDM match score (0-1)")
-    distance = models.FloatField(help_text="Distance in km")
-    
-    is_read = models.BooleanField(default=False)
-    responded = models.BooleanField(default=False)
-    
-    sent_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.donor.full_name} notified for {self.blood_request}"
-    
-    class Meta:
-        ordering = ['-sent_at']
-
-
+# REMOVED DonorNotification from here!
+# It's already defined in donors/models.py with all the new fields
+# (is_notified, priority_order, status, notified_at, responded_at)

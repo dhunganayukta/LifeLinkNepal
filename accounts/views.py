@@ -8,56 +8,200 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout as auth_logout
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings  # ✅ ADDED
 from donors.models import DonorProfile
 from hospitals.models import HospitalProfile
 from accounts.decorators import role_required
+import os
 
 User = get_user_model()
 
-# -----------------------------
+# ========================================
+# ADMIN SECRET KEY (from Django settings)
+# ========================================
+ADMIN_SECRET_KEY = getattr(settings, 'ADMIN_SECRET_KEY', None)  # ✅ ADDED
+
+# ========================================
 # HELPER: JWT TOKEN GENERATOR
-# -----------------------------
+# ========================================
 def get_tokens_for_user(user):
     """
     Generate JWT tokens and embed role in payload
     """
     refresh = RefreshToken.for_user(user)
-    refresh['user_type'] = user.user_type
+    refresh['user_type'] = user.user_type if hasattr(user, 'user_type') else 'super_admin'
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
 
+# ========================================
+# PAGE VIEWS
+# ========================================
 def register_page(request):
-    """
-    Renders the registration page
-    """
+    """Renders the registration page"""
     return render(request, 'accounts/register.html')
 
 def login_page(request):
-    """
-    Renders the login page
-    """
+    """Renders the login page"""
     return render(request, 'accounts/login.html')
 
-# -----------------------------
-# REGISTER API
-# -----------------------------
+def admin_register_page(request):
+    """Renders the admin registration page"""
+    return render(request, 'admin_register.html')
+
+def admin_login_page(request):
+    """Renders the admin login page"""
+    return render(request, 'admin_login.html')
+
+# ========================================
+# ADMIN REGISTRATION API (WITH SECRET KEY)
+# ========================================
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def admin_register(request):
+    """
+    Register a new admin user - Requires secret key
+    """
+    username = request.data.get('username')
+    email = request.data.get('email')
+    password = request.data.get('password')
+    secret_key = request.data.get('secret_key')
+    
+    # Validate required fields
+    if not all([username, email, password, secret_key]):
+        return Response({
+            'error': 'All fields are required: username, email, password, secret_key'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Verify secret key
+    if secret_key != ADMIN_SECRET_KEY:
+        return Response({
+            'error': '🔒 Invalid secret key. Only authorized personnel can create admin accounts.'
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    # Check if username already exists
+    if User.objects.filter(username=username).exists():
+        return Response({
+            'error': 'Username already exists'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Check if email already exists
+    if User.objects.filter(email=email).exists():
+        return Response({
+            'error': 'Email already exists'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Create admin user (staff + superuser)
+        admin_user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        
+        # Make them staff and superuser
+        admin_user.is_staff = True
+        admin_user.is_superuser = True
+        admin_user.save()
+        
+        return Response({
+            'message': '✅ Admin account created successfully!',
+            'username': username,
+            'email': email,
+            'is_staff': True,
+            'is_superuser': True
+        }, status=status.HTTP_201_CREATED)
+        
+    except Exception as e:
+        return Response({
+            'error': f'Failed to create admin account: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# ========================================
+# ADMIN LOGIN API
+# ========================================
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def admin_login(request):
+    """
+    Login for admin users - Only allows staff users to login
+    """
+    username = request.data.get('username')
+    password = request.data.get('password')
+    
+    if not username or not password:
+        return Response({
+            'error': 'Please provide both username and password'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Authenticate user
+    user = authenticate(username=username, password=password)
+    
+    if user is None:
+        return Response({
+            'detail': 'Invalid username or password'
+        }, status=status.HTTP_401_UNAUTHORIZED)
+    
+    # Check if user is staff/superuser (admin)
+    if not (user.is_staff or user.is_superuser):
+        return Response({
+            'detail': '⛔ Access denied. This login is for administrators only.'
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    # Check if user is active
+    if not user.is_active:
+        return Response({
+            'detail': 'Account is disabled'
+        }, status=status.HTTP_403_FORBIDDEN)
+    
+    # Generate JWT tokens
+    tokens = get_tokens_for_user(user)
+    
+    # Store tokens in session
+    if hasattr(request, 'session'):
+        request.session['access_token'] = tokens.get('access')
+        request.session['refresh_token'] = tokens.get('refresh')
+    
+    # Log user into Django session
+    try:
+        auth_login(request, user)
+    except Exception:
+        pass
+    
+    # Return success response
+    return Response({
+        'message': 'Admin login successful',
+        'access': tokens['access'],
+        'refresh': tokens['refresh'],
+        'user_type': 'super_admin',
+        'is_staff': True,
+        'is_superuser': user.is_superuser,
+        'username': user.username,
+        'email': user.email,
+        'profile': {
+            'username': user.username,
+            'email': user.email,
+            'is_staff': True,
+            'is_superuser': user.is_superuser,
+        }
+    }, status=status.HTTP_200_OK)
+
+# ========================================
+# REGISTER API (DONOR & HOSPITAL)
+# ========================================
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
     """
     Registers donor or hospital and returns JWT tokens
     """
-
     user_type = request.data.get('user_type')
     username = request.data.get('username')
     password = request.data.get('password')
     email = request.data.get('email')
 
-    # -----------------------------
-    # BASIC USER VALIDATION
-    # -----------------------------
+    # Basic validation
     if user_type not in ['donor', 'hospital']:
         return Response({"error": "Invalid user type"}, status=400)
 
@@ -70,9 +214,7 @@ def register(request):
     if User.objects.filter(email=email).exists():
         return Response({"error": "Email already registered"}, status=400)
 
-    # -----------------------------
-    # DONOR VALIDATION (BEFORE USER CREATION)
-    # -----------------------------
+    # Donor validation
     if user_type == 'donor':
         donor_required = ['full_name', 'age', 'phone', 'blood_type', 'address']
         for field in donor_required:
@@ -82,9 +224,7 @@ def register(request):
                     status=400
                 )
 
-    # -----------------------------
-    # HOSPITAL VALIDATION
-    # -----------------------------
+    # Hospital validation
     if user_type == 'hospital':
         hospital_required = ['hospital_name', 'phone', 'address']
         for field in hospital_required:
@@ -94,9 +234,7 @@ def register(request):
                     status=400
                 )
 
-    # -----------------------------
-    # CREATE USER
-    # -----------------------------
+    # Create user
     user = User.objects.create_user(
         username=username,
         email=email,
@@ -104,9 +242,7 @@ def register(request):
         user_type=user_type
     )
 
-    # -----------------------------
-    # CREATE PROFILE
-    # -----------------------------
+    # Create profile
     if user_type == 'donor':
         DonorProfile.objects.create(
             user=user,
@@ -118,7 +254,6 @@ def register(request):
             weight=request.data.get('weight'),
             medical_conditions=request.data.get('medical_conditions', '')
         )
-
     else:  # hospital
         HospitalProfile.objects.create(
             user=user,
@@ -127,9 +262,7 @@ def register(request):
             address=request.data['address']
         )
 
-    # -----------------------------
-    # JWT TOKENS
-    # -----------------------------
+    # JWT tokens
     tokens = get_tokens_for_user(user)
 
     return Response(
@@ -141,15 +274,15 @@ def register(request):
         status=status.HTTP_201_CREATED
     )
 
-
-# -----------------------------
-# LOGIN API
-# -----------------------------
+# ========================================
+# LOGIN API (DONOR & HOSPITAL)
+# ========================================
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
     """
-    JWT login with account lock after 5 failed attempts
+    JWT login for donor and hospital users
+    (Admin users should use /admin/login/ instead)
     """
     username = request.data.get('username')
     password = request.data.get('password')
@@ -158,6 +291,13 @@ def login(request):
 
     if not user:
         raise AuthenticationFailed("Invalid credentials")
+
+    # ✅ BLOCK ADMIN USERS FROM REGULAR LOGIN
+    if user.is_staff or user.is_superuser:
+        return Response({
+            'detail': '⛔ Please use the admin login page for administrator accounts.',
+            'redirect': '/accounts/admin/login-page/'
+        }, status=status.HTTP_403_FORBIDDEN)
 
     if user.is_locked:
         raise AuthenticationFailed("Account locked due to multiple failed attempts")
@@ -176,32 +316,35 @@ def login(request):
     user.failed_attempts = 0
     user.save()
 
-    # Use the authenticated user object for tokens/session
+    # Generate tokens
     tokens = get_tokens_for_user(user_auth)
 
-    # Store tokens in the Django session so browser-based flows can access them
+    # Store tokens in session
     if hasattr(request, 'session'):
         request.session['access_token'] = tokens.get('access')
         request.session['refresh_token'] = tokens.get('refresh')
-        # Optional: set session expiry to match access token lifetime if desired
-        # request.session.set_expiry(60 * 60)  # e.g. 1 hour
 
-    # Also log the user into Django's session framework (for template-based views)
+    # Log user into Django session
     try:
         auth_login(request, user_auth)
     except Exception:
-        # If session login fails for any reason, continue — tokens are still returned
         pass
 
+    # Return response with is_staff status
     return Response({
         "message": "Login successful",
-        "tokens": tokens,
-        "user_type": user_auth.user_type
+        "access": tokens['access'],
+        "refresh": tokens['refresh'],
+        "user_type": user_auth.user_type,
+        "is_staff": False,  # ✅ Always False for regular users
+        "is_superuser": False,
+        "username": user_auth.username,
+        "email": user_auth.email
     })
 
-# -----------------------------
+# ========================================
 # DONOR DASHBOARD API
-# -----------------------------
+# ========================================
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @role_required('donor')
@@ -224,9 +367,9 @@ def donor_dashboard(request):
         ]
     })
 
-# -----------------------------
+# ========================================
 # HOSPITAL DASHBOARD API
-# -----------------------------
+# ========================================
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @role_required('hospital')
@@ -247,22 +390,11 @@ def hospital_dashboard(request):
             } for d in hospital_profile.highest_donors()
         ]
     })
-# -----------------------------
-# TEMPLATE LOGIN PAGE
-# -----------------------------
-def login_page(request):
-    """
-    Renders a login page for browser users
-    """
-    return render(request, 'accounts/login.html')
 
-
-# -----------------------------
-# TEMPLATE LOGOUT
-# -----------------------------
+# ========================================
+# LOGOUT
+# ========================================
 def logout_view(request):
-    """
-    Logs out the user from the session
-    """
+    """Logs out the user from the session"""
     auth_logout(request)
     return redirect('home')

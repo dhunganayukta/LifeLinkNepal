@@ -63,7 +63,20 @@ class DonorProfile(models.Model):
         verbose_name = "Donor Profile"
         verbose_name_plural = "Donor Profiles"
         ordering = ['-created_at']
+
+
 class DonorNotification(models.Model):
+    """
+    UPDATED MODEL - Now supports sequential notification workflow
+    """
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),        # Not notified yet
+        ('notified', 'Notified'),      # Notified, waiting for response
+        ('accepted', 'Accepted'),      # Donor accepted
+        ('rejected', 'Rejected'),      # Donor rejected
+        ('cancelled', 'Cancelled'),    # Request cancelled or another donor accepted
+    ]
+    
     donor = models.ForeignKey(
         DonorProfile,
         on_delete=models.CASCADE,
@@ -71,7 +84,8 @@ class DonorNotification(models.Model):
     )
     blood_request = models.ForeignKey(
         'hospitals.BloodRequest',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='donor_notifications'
     )
 
     match_score = models.FloatField(
@@ -85,16 +99,41 @@ class DonorNotification(models.Model):
         help_text="Distance in kilometers"
     )
 
+    # Existing fields
     is_read = models.BooleanField(default=False)
-    responded = models.BooleanField(default=False)
+    responded = models.BooleanField(default=False)  # Keep for backward compatibility
     sent_at = models.DateTimeField(auto_now_add=True)
 
+    # NEW FIELDS - Sequential notification support
+    is_notified = models.BooleanField(default=False, help_text="Has this donor been notified?")
+    priority_order = models.IntegerField(default=0, help_text="Order to notify (1, 2, 3...)")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    notified_at = models.DateTimeField(null=True, blank=True, help_text="When donor was notified")
+    responded_at = models.DateTimeField(null=True, blank=True, help_text="When donor responded")
+    response_notes = models.TextField(blank=True, help_text="Donor's response notes/reason")
+
     def __str__(self):
-        return f"Notification → {self.donor.full_name} | Request #{self.blood_request_id}"
+        return f"Notification → {self.donor.full_name} | Request #{self.blood_request_id} (Priority: {self.priority_order})"
+
+    @property
+    def response_time_hours(self):
+        """Calculate response time in hours"""
+        if self.notified_at and self.responded_at:
+            delta = self.responded_at - self.notified_at
+            return round(delta.total_seconds() / 3600, 2)
+        return None
 
     class Meta:
-        ordering = ['-sent_at']
+        ordering = ['priority_order', '-sent_at']
+        indexes = [
+            models.Index(fields=['blood_request', 'status']),
+            models.Index(fields=['donor', '-sent_at']),
+            models.Index(fields=['blood_request', 'priority_order']),
+        ]
+
+
 class DonorResponse(models.Model):
+    """Keep existing DonorResponse model for backward compatibility"""
     STATUS_CHOICES = [
         ('accepted', 'Accepted'),
         ('declined', 'Declined'),
@@ -122,6 +161,8 @@ class DonorResponse(models.Model):
 
     class Meta:
         ordering = ['-responded_at']
+
+
 class DonationHistory(models.Model):
     donor = models.ForeignKey(
         DonorProfile,

@@ -13,6 +13,7 @@ urlpatterns = [
 
     # Admin
     path('admin/', admin.site.urls),
+    path('admin-dashboard/', views.super_admin_dashboard, name='super_admin_dashboard'),
     
     # Apps
     path('accounts/', include('accounts.urls')),

@@ -4,7 +4,530 @@
 
 {% block extra_css %}
 <style>
-/* ... keep all your existing CSS unchanged ... */
+/* ========================================
+   REGISTRATION PAGE - LIFELINK NEPAL THEME
+   ======================================== */
+
+:root {
+    /* Brand Colors from Logo */
+    --primary-blue: #1e88e5;
+    --primary-red: #e53935;
+    --gradient-heart: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
+    --gradient-reverse: linear-gradient(135deg, #e53935 0%, #1e88e5 100%);
+    
+    /* Supporting Colors */
+    --white: #ffffff;
+    --light-bg: #f5f7fa;
+    --text-dark: #2c3e50;
+    --text-muted: #6c757d;
+    --border-color: #e1e8ed;
+    --success-color: #28a745;
+    --danger-color: #e53935;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.15);
+}
+
+/* Background Section */
+.registration-section {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
+    padding: 60px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.registration-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 20s ease-in-out infinite;
+}
+
+.registration-section::after {
+    content: '';
+    position: absolute;
+    bottom: -50%;
+    left: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    animation: float 25s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(50px, 50px); }
+}
+
+/* Registration Card */
+.registration-card {
+    background: var(--white);
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header Section */
+.registration-header {
+    background: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
+    color: var(--white);
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.registration-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Hospital Header Variant */
+.registration-card:has(input[value="hospital"]) .registration-header {
+    background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
+}
+
+/* Icon Wrapper */
+.icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    animation: pulse 2s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.icon-wrapper i {
+    font-size: 40px;
+    color: var(--white);
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.1); }
+    50% { transform: scale(1); }
+}
+
+.registration-header h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+}
+
+.registration-header p {
+    font-size: 16px;
+    opacity: 0.95;
+    margin-bottom: 0;
+    font-weight: 300;
+    position: relative;
+    z-index: 1;
+}
+
+/* Form Container */
+form {
+    padding: 40px 30px;
+}
+
+/* Form Labels */
+.form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.form-label i {
+    color: var(--primary-red);
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+/* Form Controls */
+.form-control,
+.form-select {
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background-color: var(--light-bg);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.1);
+    background-color: var(--white);
+    transform: translateY(-2px);
+}
+
+.form-control::placeholder {
+    color: #adb5bd;
+    font-size: 14px;
+}
+
+/* Input with Icons Effect */
+.mb-3 {
+    position: relative;
+}
+
+.mb-3:hover .form-label {
+    color: var(--primary-red);
+}
+
+/* Small Text */
+small.text-muted {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 5px;
+}
+
+/* Register Button */
+.btn-register {
+    background: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(30, 136, 229, 0.3);
+}
+
+.btn-register::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-register:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-register:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(30, 136, 229, 0.4);
+}
+
+.btn-register:active {
+    transform: translateY(-1px);
+}
+
+.btn-register i {
+    margin-right: 8px;
+}
+
+/* Hospital Button Variant */
+.registration-card:has(input[value="hospital"]) .btn-register {
+    background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
+    box-shadow: 0 8px 20px rgba(30, 136, 229, 0.3);
+}
+
+.registration-card:has(input[value="hospital"]) .btn-register:hover {
+    box-shadow: 0 12px 30px rgba(30, 136, 229, 0.4);
+}
+
+/* Login Link */
+.login-link {
+    text-align: center;
+    padding: 20px 30px 30px;
+    background: linear-gradient(to top, var(--light-bg) 0%, transparent 100%);
+    border-top: 1px solid var(--border-color);
+}
+
+.login-link p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.login-link a {
+    color: var(--primary-red);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.login-link a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-red);
+    transition: width 0.3s ease;
+}
+
+.login-link a:hover::after {
+    width: 100%;
+}
+
+.login-link a:hover {
+    color: #c62828;
+}
+
+/* Alert Messages */
+#responseMessage {
+    padding: 0 30px;
+    margin-top: -10px;
+}
+
+.alert {
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    animation: slideDown 0.3s ease-out;
+    box-shadow: var(--shadow-sm);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+    color: #1b5e20;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);
+    color: #b71c1c;
+}
+
+/* Select Dropdown Styling */
+.form-select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231e88e5' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px 16px;
+    padding-right: 40px;
+}
+
+/* Textarea Styling */
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Loading State */
+.btn-register.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-register.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--white);
+    animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+    to { transform: rotate(360deg); }
+}
+
+/* Blood Drop Animation for Donor */
+.registration-card:not(:has(input[value="hospital"])) .icon-wrapper::after {
+    content: '💉';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 24px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Hospital Plus Animation */
+.registration-card:has(input[value="hospital"]) .icon-wrapper::after {
+    content: '➕';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.8);
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Custom Scrollbar */
+.registration-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.registration-card::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.registration-card::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
+    border-radius: 10px;
+}
+
+.registration-card::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #1976d2 0%, #c62828 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .registration-section {
+        padding: 30px 15px;
+    }
+
+    .registration-card {
+        border-radius: 20px;
+    }
+
+    .registration-header {
+        padding: 30px 20px;
+    }
+
+    .registration-header h3 {
+        font-size: 24px;
+    }
+
+    .registration-header p {
+        font-size: 14px;
+    }
+
+    .icon-wrapper {
+        width: 70px;
+        height: 70px;
+    }
+
+    .icon-wrapper i {
+        font-size: 35px;
+    }
+
+    form {
+        padding: 30px 20px;
+    }
+
+    .btn-register {
+        padding: 14px 24px;
+        font-size: 15px;
+    }
+
+    .login-link {
+        padding: 15px 20px 25px;
+    }
+}
+
+@media (max-width: 576px) {
+    .registration-header h3 {
+        font-size: 22px;
+    }
+
+    .form-label {
+        font-size: 13px;
+    }
+
+    .form-control,
+    .form-select {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .btn-register {
+        padding: 12px 20px;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+}
 </style>
 {% endblock %}
 
@@ -42,25 +565,25 @@
                             <!-- Email -->
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">
-                                    <i class="bi bi-envelope-fill me-2"></i>Email
+                                    <i class="bi bi-envelope-fill"></i>Email
                                 </label>
                                 <input type="email" name="email" id="email" class="form-control"
-                                       placeholder="Enter your email" required>
+                                       placeholder="your.email@example.com" required>
                             </div>
 
                             <!-- Username -->
                             <div class="col-md-6 mb-3">
                                 <label for="username" class="form-label">
-                                    <i class="bi bi-person-fill me-2"></i>Username
+                                    <i class="bi bi-person-fill"></i>Username
                                 </label>
                                 <input type="text" autocomplete="new-username" name="username" id="username" class="form-control" 
-                                       placeholder="Choose a username" required>
+                                       placeholder="Choose a unique username" required>
                             </div>
 
                             <!-- Password -->
                             <div class="col-md-6 mb-3">
                                 <label for="password1" class="form-label">
-                                    <i class="bi bi-lock-fill me-2"></i>Password
+                                    <i class="bi bi-lock-fill"></i>Password
                                 </label>
                                 <input type="password" name="password1" id="password1" class="form-control" 
                                        placeholder="Create a strong password" required>
@@ -69,7 +592,7 @@
                             <!-- Confirm Password -->
                             <div class="col-md-6 mb-3">
                                 <label for="password2" class="form-label">
-                                    <i class="bi bi-lock-fill me-2"></i>Confirm Password
+                                    <i class="bi bi-lock-fill"></i>Confirm Password
                                 </label>
                                 <input type="password" name="password2" id="password2" class="form-control" 
                                        placeholder="Re-enter your password" required>
@@ -79,7 +602,7 @@
                             {% if user_type != "hospital" and request.GET.type != "hospital" %}
                             <div class="col-md-6 mb-3">
                                 <label for="full_name" class="form-label">
-                                    <i class="bi bi-person-badge-fill me-2"></i>Full Name
+                                    <i class="bi bi-person-badge-fill"></i>Full Name
                                 </label>
                                 <input type="text" name="full_name" id="full_name" class="form-control" 
                                        placeholder="Enter your full name" required>
@@ -87,7 +610,7 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="age" class="form-label">
-                                    <i class="bi bi-calendar-check-fill me-2"></i>Age
+                                    <i class="bi bi-calendar-check-fill"></i>Age
                                 </label>
                                 <input type="number" name="age" id="age" class="form-control" 
                                        min="18" max="65" placeholder="18-65 years" required>
@@ -95,7 +618,7 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">
-                                    <i class="bi bi-telephone-fill me-2"></i>Phone Number
+                                    <i class="bi bi-telephone-fill"></i>Phone Number
                                 </label>
                                 <input type="tel" name="phone" id="phone" class="form-control" 
                                        placeholder="9812345678" pattern="[0-9]{10}" required>
@@ -104,24 +627,24 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="blood_type" class="form-label">
-                                    <i class="bi bi-droplet-fill me-2"></i>Blood Group
+                                    <i class="bi bi-droplet-fill"></i>Blood Group
                                 </label>
                                 <select name="blood_type" id="blood_type" class="form-select" required>
                                     <option value="">Select Blood Group</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
+                                    <option value="A+">A+ (A Positive)</option>
+                                    <option value="A-">A- (A Negative)</option>
+                                    <option value="B+">B+ (B Positive)</option>
+                                    <option value="B-">B- (B Negative)</option>
+                                    <option value="O+">O+ (O Positive)</option>
+                                    <option value="O-">O- (O Negative)</option>
+                                    <option value="AB+">AB+ (AB Positive)</option>
+                                    <option value="AB-">AB- (AB Negative)</option>
                                 </select>
                             </div>
 
                             <div class="col-12 mb-3">
                                 <label for="address" class="form-label">
-                                    <i class="bi bi-geo-alt-fill me-2"></i>Address
+                                    <i class="bi bi-geo-alt-fill"></i>Address
                                 </label>
                                 <textarea name="address" id="address" class="form-control" rows="2" 
                                           placeholder="City, District (e.g., Kathmandu, Bagmati)" required></textarea>
@@ -132,15 +655,15 @@
                             {% if user_type == "hospital" or request.GET.type == "hospital" %}
                             <div class="col-md-6 mb-3">
                                 <label for="hospital_name" class="form-label">
-                                    <i class="bi bi-hospital-fill me-2"></i>Hospital Name
+                                    <i class="bi bi-hospital-fill"></i>Hospital Name
                                 </label>
                                 <input type="text" name="hospital_name" id="hospital_name" class="form-control" 
-                                       placeholder="Enter hospital name" required>
+                                       placeholder="Enter official hospital name" required>
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">
-                                    <i class="bi bi-telephone-fill me-2"></i>Contact Number
+                                    <i class="bi bi-telephone-fill"></i>Contact Number
                                 </label>
                                 <input type="tel" name="phone" id="phone" class="form-control" 
                                        placeholder="01-4123456" required>
@@ -148,7 +671,7 @@
 
                             <div class="col-12 mb-3">
                                 <label for="address" class="form-label">
-                                    <i class="bi bi-geo-alt-fill me-2"></i>Hospital Address
+                                    <i class="bi bi-geo-alt-fill"></i>Hospital Address
                                 </label>
                                 <textarea name="address" id="address" class="form-control" rows="2" 
                                           placeholder="Complete address (Street, City, District)" required></textarea>
@@ -156,7 +679,7 @@
                             {% endif %}
                         </div>
 
-                        <button type="submit" class="btn btn-register btn-primary w-100">
+                        <button type="submit" class="btn btn-register w-100">
                             {% if user_type == "hospital" or request.GET.type == "hospital" %}
                                 <i class="bi bi-hospital me-2"></i>Register Hospital
                             {% else %}
@@ -190,10 +713,15 @@ emailInput.addEventListener('input', () => {
 
 // ---------------- JWT FORM SUBMISSION ----------------
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
-    e.preventDefault(); // prevent default form submission
+    e.preventDefault();
 
     const form = e.target;
+    const submitBtn = form.querySelector('.btn-register');
     const data = Object.fromEntries(new FormData(form).entries());
+
+    // Add loading state
+    submitBtn.classList.add('loading');
+    submitBtn.textContent = 'Processing...';
 
     // Adjust password keys to match your view
     data['password'] = data['password1'];
@@ -213,19 +741,49 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         const result = await response.json();
         const msgDiv = document.getElementById('responseMessage');
 
+        // Remove loading state
+        submitBtn.classList.remove('loading');
+        
         if (response.ok) {
-            msgDiv.innerHTML = `<div class="alert alert-success">${result.message}</div>`;
+            msgDiv.innerHTML = `<div class="alert alert-success">
+                <i class="bi bi-check-circle-fill me-2"></i>${result.message}
+            </div>`;
             form.reset();
+            
+            // Restore button text
+            const userType = data.user_type;
+            if (userType === 'hospital') {
+                submitBtn.innerHTML = '<i class="bi bi-hospital me-2"></i>Register Hospital';
+            } else {
+                submitBtn.innerHTML = '<i class="bi bi-heart-pulse-fill me-2"></i>Register as Donor';
+            }
+            
             setTimeout(() => {
                 window.location.href = "{% url 'accounts:login_page' %}";
-            }, 1000);
+            }, 1500);
         } else {
             let errors = result.error || JSON.stringify(result);
-            msgDiv.innerHTML = `<div class="alert alert-danger">${errors}</div>`;
+            msgDiv.innerHTML = `<div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>${errors}
+            </div>`;
+            
+            // Restore button text
+            const userType = data.user_type;
+            if (userType === 'hospital') {
+                submitBtn.innerHTML = '<i class="bi bi-hospital me-2"></i>Register Hospital';
+            } else {
+                submitBtn.innerHTML = '<i class="bi bi-heart-pulse-fill me-2"></i>Register as Donor';
+            }
         }
 
     } catch (err) {
         console.error(err);
+        const msgDiv = document.getElementById('responseMessage');
+        msgDiv.innerHTML = `<div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>An error occurred. Please try again.
+        </div>`;
+        submitBtn.classList.remove('loading');
+        submitBtn.innerHTML = '<i class="bi bi-heart-pulse-fill me-2"></i>Register as Donor';
     }
 });
 </script>

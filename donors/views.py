@@ -1,6 +1,7 @@
-# donors/views.py
+# donors/views.py (CORRECTED VERSION)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.utils import timezone
 from accounts.decorators import role_required
 from donors.models import DonorProfile, DonorNotification, DonationHistory, DonorResponse
 from donors.forms import DonorProfileUpdateForm
@@ -11,6 +12,8 @@ from algorithms.priority import run_priority_algorithm
 from algorithms.eligibility import is_donor_eligible
 from datetime import date
 from collections import defaultdict
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 # ============================================
@@ -35,6 +38,24 @@ def donor_dashboard(request):
             'blood_type': highest_donor.blood_type,
             'hospital_name': last_hospital.hospital_name if last_hospital else None
         }
+
+    # --------------------------
+    # ACTIVE Notifications (waiting for response)
+    # --------------------------
+    active_notifications = DonorNotification.objects.filter(
+        donor=donor,
+        status='notified',  # Only notified ones need response
+        is_notified=True
+    ).select_related('blood_request', 'blood_request__hospital').order_by('-notified_at')
+
+    # --------------------------
+    # Past Notifications
+    # --------------------------
+    past_notifications = DonorNotification.objects.filter(
+        donor=donor
+    ).exclude(status='notified').select_related(
+        'blood_request', 'blood_request__hospital'
+    ).order_by('-sent_at')[:10]
 
     # --------------------------
     # Pending blood requests (eligible)
@@ -75,23 +96,204 @@ def donor_dashboard(request):
     history = donor.donation_history.all().order_by('-date_donated')
     total_units = sum([d.units_donated for d in history]) if history else 0
 
-    # --------------------------
-    # Notifications
-    # --------------------------
-    # DonorNotification uses 'sent_at' for timestamp (not 'created_at')
-    notifications = DonorNotification.objects.filter(donor=donor, is_read=False).order_by('-sent_at')[:10]
-
     context = {
         'donor': donor,
         'history': history,
         'total_units': total_units,
         'ranked_requests': ranked_requests_data,
         'leaderboard': leaderboard,
-        'notifications': notifications,
+        'active_notifications': active_notifications,  # CHANGED: Show active notifications
+        'past_notifications': past_notifications,
         'can_donate': donor.can_donate,
         'days_until_eligible': get_days_until_eligible(donor),
     }
     return render(request, 'donors/donor_dashboard.html', context)
+
+
+# ============================================
+# VIEW NOTIFICATION DETAIL
+# ============================================
+@role_required('donor')
+def view_notification_detail(request, notification_id):
+    """View full details of a blood request notification"""
+    notification = get_object_or_404(
+        DonorNotification,
+        id=notification_id,
+        donor=request.user.donor_profile
+    )
+    
+    # Mark as read
+    notification.is_read = True
+    notification.save()
+    
+    blood_request = notification.blood_request
+    hospital = blood_request.hospital
+    
+    context = {
+        'notification': notification,
+        'blood_request': blood_request,
+        'hospital': hospital,
+        'can_respond': notification.status == 'notified',  # Can only respond if status is 'notified'
+    }
+    return render(request, 'donors/notification_detail.html', context)
+
+
+# ============================================
+# ACCEPT BLOOD REQUEST (NEW - USES NOTIFICATION_ID)
+# ============================================
+@role_required('donor')
+def accept_blood_request(request, notification_id):
+    """
+    Donor accepts blood request via notification
+    - Updates notification status to 'accepted'
+    - Cancels all other pending notifications for this request
+    - Notifies hospital (limited info: username, blood type, distance)
+    - Notifies admin
+    """
+    notification = get_object_or_404(
+        DonorNotification,
+        id=notification_id,
+        donor=request.user.donor_profile
+    )
+    
+    # Check if notification is still active
+    if notification.status != 'notified':
+        messages.error(request, "This notification is no longer active.")
+        return redirect('donor_dashboard')
+    
+    if request.method == 'POST':
+        donor = notification.donor
+        blood_request = notification.blood_request
+        
+        # Update notification status
+        notification.status = 'accepted'
+        notification.responded_at = timezone.now()
+        notification.response_notes = request.POST.get('notes', '')
+        notification.responded = True
+        notification.save()
+        
+        # Also create DonorResponse for backward compatibility
+        DonorResponse.objects.create(
+            donor=donor,
+            blood_request=blood_request,
+            status='accepted',
+            response_notes=notification.response_notes
+        )
+        
+        # Cancel all other pending/notified notifications for this request
+        DonorNotification.objects.filter(
+            blood_request=blood_request,
+            status__in=['pending', 'notified']
+        ).exclude(id=notification_id).update(status='cancelled')
+        
+        # Notify hospital (LIMITED INFO: username, blood type, distance only)
+        send_hospital_acceptance_notification(donor, blood_request, notification.distance)
+        
+        # Notify admin
+        send_admin_acceptance_notification(blood_request, donor, notification)
+        
+        messages.success(
+            request,
+            f"✅ You have accepted the blood request from {blood_request.hospital.hospital_name}. "
+            f"The hospital has been notified and will contact you shortly."
+        )
+        
+        return redirect('donor_dashboard')
+    
+    context = {
+        'notification': notification,
+        'blood_request': notification.blood_request,
+    }
+    return render(request, 'donors/confirm_accept.html', context)
+
+
+# ============================================
+# REJECT BLOOD REQUEST (NEW - USES NOTIFICATION_ID)
+# ============================================
+@role_required('donor')
+def reject_blood_request(request, notification_id):
+    """
+    Donor rejects blood request
+    - Updates notification status to 'rejected'
+    - Notifies admin to trigger next donor notification
+    """
+    notification = get_object_or_404(
+        DonorNotification,
+        id=notification_id,
+        donor=request.user.donor_profile
+    )
+    
+    # Check if notification is still active
+    if notification.status != 'notified':
+        messages.error(request, "This notification is no longer active.")
+        return redirect('donor_dashboard')
+    
+    if request.method == 'POST':
+        rejection_reason = request.POST.get('reason', 'Not specified')
+        donor = notification.donor
+        blood_request = notification.blood_request
+        
+        # Update notification status
+        notification.status = 'rejected'
+        notification.responded_at = timezone.now()
+        notification.response_notes = rejection_reason
+        notification.responded = True
+        notification.save()
+        
+        # Also create DonorResponse for backward compatibility
+        DonorResponse.objects.create(
+            donor=donor,
+            blood_request=blood_request,
+            status='declined',
+            response_notes=rejection_reason
+        )
+        
+        # Notify admin about rejection (admin will manually notify next donor)
+        send_admin_rejection_notification(blood_request, donor, rejection_reason)
+        
+        messages.info(
+            request,
+            f"You have declined the blood request. "
+            f"Admin has been notified and will contact the next available donor."
+        )
+        
+        return redirect('donor_dashboard')
+    
+    context = {
+        'notification': notification,
+        'blood_request': notification.blood_request,
+    }
+    return render(request, 'donors/confirm_reject.html', context)
+
+
+# ============================================
+# DECLINE BLOOD REQUEST (OLD - Keep for backward compatibility)
+# ============================================
+@role_required('donor')
+def decline_blood_request(request, request_id):
+    """OLD VERSION - kept for backward compatibility with old URLs"""
+    if request.method != 'POST':
+        return redirect('donor_dashboard')
+
+    donor = request.user.donor_profile
+    blood_request = get_object_or_404(BloodRequest, id=request_id)
+
+    DonorResponse.objects.create(
+        donor=donor,
+        blood_request=blood_request,
+        status='declined',
+        response_notes=request.POST.get('reason', '')
+    )
+
+    DonorNotification.objects.filter(donor=donor, blood_request=blood_request).update(
+        is_read=True, 
+        responded=True,
+        status='rejected',
+        responded_at=timezone.now()
+    )
+
+    messages.info(request, "You declined the request.")
+    return redirect('donor_dashboard')
 
 
 # ============================================
@@ -115,68 +317,6 @@ def view_blood_request_detail(request, request_id):
         'donor_blood_type': donor.blood_type,
     }
     return render(request, 'donors/request_detail.html', context)
-
-
-# ============================================
-# ACCEPT BLOOD REQUEST
-# ============================================
-@role_required('donor')
-def accept_blood_request(request, request_id):
-    if request.method != 'POST':
-        return redirect('donor_dashboard')
-
-    donor = request.user.donor_profile
-    blood_request = get_object_or_404(BloodRequest, id=request_id)
-
-    if not is_donor_eligible(donor, blood_request):
-        messages.error(request, "You are not eligible to donate for this request yet.")
-        return redirect('donor_dashboard')
-
-    DonorResponse.objects.create(
-        donor=donor,
-        blood_request=blood_request,
-        status='accepted',
-        response_notes=request.POST.get('notes', '')
-    )
-
-    # Update notification
-    DonorNotification.objects.filter(donor=donor, blood_request=blood_request).update(
-        is_read=True, responded=True
-    )
-
-    notify_hospital_of_acceptance(blood_request, donor)
-    messages.success(request, f"Thank you! {blood_request.hospital.hospital_name} has been notified.")
-    return redirect('donor_dashboard')
-
-
-# ============================================
-# DECLINE BLOOD REQUEST
-# ============================================
-@role_required('donor')
-def decline_blood_request(request, request_id):
-    if request.method != 'POST':
-        return redirect('donor_dashboard')
-
-    donor = request.user.donor_profile
-    blood_request = get_object_or_404(BloodRequest, id=request_id)
-
-    DonorResponse.objects.create(
-        donor=donor,
-        blood_request=blood_request,
-        status='declined',
-        response_notes=request.POST.get('reason', '')
-    )
-
-    DonorNotification.objects.filter(donor=donor, blood_request=blood_request).update(
-        is_read=True, responded=True
-    )
-
-    # Notify next eligible donor
-    from hospitals.utils import notify_next_eligible_donor
-    notify_next_eligible_donor(blood_request)
-
-    messages.info(request, "You declined the request. Next eligible donor will be notified.")
-    return redirect('donor_dashboard')
 
 
 # ============================================
@@ -240,6 +380,26 @@ def donation_history(request):
 # ============================================
 # FIND NEARBY HOSPITALS
 # ============================================
+@role_required('hospital')
+def view_donor_detail(request, donor_id):
+    """
+    Limited donor detail for hospital users. Shows username, blood type and distance only.
+    """
+    donor = get_object_or_404(DonorProfile, id=donor_id)
+    # Try to get hospital profile from request user
+    hospital_profile = getattr(request.user, 'hospitalprofile', None)
+
+    distance = None
+    if hospital_profile and donor.latitude and donor.longitude and hospital_profile.latitude and hospital_profile.longitude:
+        distance = haversine_distance(hospital_profile.latitude, hospital_profile.longitude, donor.latitude, donor.longitude)
+
+    context = {
+        'donor': donor,
+        'distance': round(distance, 2) if distance is not None else None,
+        'hospital': hospital_profile,
+    }
+    return render(request, 'donors/view_donor_detail.html', context)
+
 @role_required('donor')
 def find_nearby_hospitals(request):
     donor = request.user.donor_profile
@@ -296,9 +456,149 @@ def mark_all_notifications_read(request):
 
 
 # ============================================
-# NOTIFICATION UTILITY
+# NOTIFICATION UTILITY FUNCTIONS (NEW)
 # ============================================
+def send_hospital_acceptance_notification(donor, blood_request, distance):
+    """
+    Notify hospital when donor accepts
+    Hospital only sees: username, blood type, distance (PRIVACY PROTECTED)
+    """
+    hospital = blood_request.hospital
+    
+    message = f"""
+✅ DONOR ACCEPTED YOUR BLOOD REQUEST!
+
+Request for: {blood_request.patient_name}
+Blood Type Required: {blood_request.blood_type}
+
+DONOR DETAILS (Limited Info):
+Username: {donor.user.username}
+Blood Type: {donor.blood_type}
+Distance: {distance:.2f}km
+
+The donor has been notified and will coordinate with you through the platform messaging system.
+
+Thank you for using LifeLink Nepal!
+    """.strip()
+    
+    # Send email to hospital
+    if hospital.user.email:
+        try:
+            send_mail(
+                subject=f"✅ Donor Accepted - Blood Request #{blood_request.id}",
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[hospital.user.email],
+                fail_silently=False,
+            )
+            print(f"📧 Email sent to hospital: {hospital.hospital_name}")
+        except Exception as e:
+            print(f"❌ Failed to send email to hospital: {e}")
+    
+    print(f"✅ Hospital notified: Donor {donor.user.username} accepted request #{blood_request.id}")
+
+
+def send_admin_acceptance_notification(blood_request, donor, notification):
+    """Notify admin that donor accepted"""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+
+    admins = User.objects.filter(is_superuser=True, is_active=True)
+    
+    message = f"""
+✅ DONOR ACCEPTED BLOOD REQUEST
+
+Request ID: #{blood_request.id}
+Hospital: {blood_request.hospital.hospital_name}
+Patient: {blood_request.patient_name}
+Blood Type: {blood_request.blood_type}
+
+ACCEPTED BY:
+Donor: {donor.full_name}
+Username: {donor.user.username}
+Phone: {donor.phone}
+Blood Type: {donor.blood_type}
+Distance: {notification.distance:.2f}km
+
+Response Time: {notification.response_time_hours} hours
+
+View in admin: {settings.SITE_URL}/admin/hospitals/bloodrequest/{blood_request.id}/change/
+    """.strip()
+    
+    admin_emails = [admin.email for admin in admins if admin.email]
+    if admin_emails:
+        try:
+            send_mail(
+                subject=f"✅ Donor Accepted - Request #{blood_request.id}",
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=admin_emails,
+                fail_silently=False,
+            )
+            print(f"📧 Email sent to {len(admin_emails)} admin(s)")
+        except Exception as e:
+            print(f"❌ Failed to send email to admins: {e}")
+    
+    print(f"✅ Admin notified: Donor {donor.full_name} accepted")
+
+
+def send_admin_rejection_notification(blood_request, donor, reason):
+    """Notify admin that donor rejected - admin needs to notify next donor"""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+
+    admins = User.objects.filter(is_superuser=True, is_active=True)
+    
+    # Get next donor in queue
+    next_notification = DonorNotification.objects.filter(
+        blood_request=blood_request,
+        is_notified=False,
+        status='pending'
+    ).order_by('priority_order').first()
+    
+    next_donor_info = ""
+    if next_notification:
+        next_donor_info = f"\nNEXT DONOR: {next_notification.donor.full_name} (Priority #{next_notification.priority_order})"
+    else:
+        next_donor_info = "\n⚠️ NO MORE DONORS AVAILABLE IN QUEUE"
+    
+    message = f"""
+❌ DONOR REJECTED BLOOD REQUEST
+
+Request ID: #{blood_request.id}
+Hospital: {blood_request.hospital.hospital_name}
+Patient: {blood_request.patient_name}
+Blood Type: {blood_request.blood_type}
+
+REJECTED BY:
+Donor: {donor.full_name}
+Reason: {reason}
+{next_donor_info}
+
+ACTION REQUIRED:
+Please login to admin panel and click "Notify Next Donor"
+Link: {settings.SITE_URL}/admin/hospitals/bloodrequest/{blood_request.id}/change/
+    """.strip()
+    
+    admin_emails = [admin.email for admin in admins if admin.email]
+    if admin_emails:
+        try:
+            send_mail(
+                subject=f"❌ Donor Rejected - Action Required - Request #{blood_request.id}",
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=admin_emails,
+                fail_silently=False,
+            )
+            print(f"📧 Email sent to {len(admin_emails)} admin(s)")
+        except Exception as e:
+            print(f"❌ Failed to send email to admins: {e}")
+    
+    print(f"❌ Admin notified: Donor {donor.full_name} rejected")
+
+
 def notify_hospital_of_acceptance(blood_request, donor):
+    """OLD FUNCTION - kept for backward compatibility"""
     hospital = blood_request.hospital
     message = f"""
     GOOD NEWS! A donor has accepted your blood request.

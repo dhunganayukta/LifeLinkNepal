@@ -1,0 +1,1310 @@
+{% extends 'base.html' %}
+
+{% block title %}Super Admin Dashboard - Life Link Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --primary-blue: #1e88e5;
+    --primary-red: #e53935;
+    --gradient-heart: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
+    --white: #ffffff;
+    --light-bg: #f5f7fa;
+    --text-dark: #2c3e50;
+    --text-muted: #6c757d;
+    --border-color: #e1e8ed;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #e53935;
+    --info: #17a2b8;
+}
+
+body {
+    background: var(--light-bg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    background: linear-gradient(180deg, #1e88e5 0%, #0d47a1 100%);
+    color: white;
+    padding: 0;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.sidebar-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+}
+
+.sidebar-header p {
+    font-size: 12px;
+    opacity: 0.8;
+    margin: 5px 0 0 0;
+}
+
+.sidebar-menu {
+    padding: 20px 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 24px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left-color: var(--primary-red);
+}
+
+.menu-item i {
+    font-size: 20px;
+    margin-right: 12px;
+    width: 24px;
+}
+
+.menu-item span {
+    flex: 1;
+    font-weight: 500;
+}
+
+.menu-badge {
+    background: var(--primary-red);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Main Content */
+.admin-main {
+    margin-left: 260px;
+    min-height: 100vh;
+    padding: 0;
+}
+
+.top-navbar {
+    background: white;
+    padding: 16px 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.search-bar {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.search-bar i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+}
+
+/* Content Area */
+.content-area {
+    padding: 32px;
+}
+
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.stat-icon.donors {
+    background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+    color: white;
+}
+
+.stat-icon.hospitals {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: white;
+}
+
+.stat-icon.requests {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: white;
+}
+
+.stat-icon.completed {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: white;
+}
+
+.stat-content h3 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.stat-content p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Content Sections */
+.content-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin-bottom: 24px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.section-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.filter-tab {
+    padding: 8px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: white;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-tab:hover,
+.filter-tab.active {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: white;
+}
+
+/* Table Styles */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: var(--light-bg);
+}
+
+.data-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.data-table tbody tr:hover {
+    background: var(--light-bg);
+}
+
+.donor-info,
+.hospital-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.donor-avatar,
+.hospital-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 14px;
+}
+
+.donor-avatar {
+    background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+}
+
+.hospital-avatar {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+}
+
+.info-text h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: var(--text-dark);
+}
+
+.info-text p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.blood-type {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.blood-type.positive {
+    background: #ffe5e5;
+    color: #e53935;
+}
+
+.blood-type.negative {
+    background: #e3f2fd;
+    color: #1e88e5;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-badge.active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-badge.urgent {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-notify {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: white;
+}
+
+.btn-notify:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+}
+
+.btn-view {
+    background: var(--light-bg);
+    color: var(--text-dark);
+}
+
+.btn-view:hover {
+    background: var(--border-color);
+}
+
+.btn-approve {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: white;
+}
+
+.btn-approve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-reject {
+    background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+    color: white;
+}
+
+.btn-reject:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+}
+
+/* Request Card (Alternative Layout) */
+.request-card {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.request-card:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.request-header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.request-meta {
+    display: flex;
+    gap: 20px;
+    padding: 12px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    margin: 16px 0;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.meta-item i {
+    color: var(--primary-blue);
+}
+
+.meta-value {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 64px;
+    opacity: 0.3;
+    margin-bottom: 20px;
+}
+
+.empty-state h4 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 14px;
+}
+
+/* Loading Spinner */
+.loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .admin-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .admin-main {
+        margin-left: 0;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-tabs {
+        flex-wrap: wrap;
+    }
+
+    .data-table {
+        font-size: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 8px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Sidebar -->
+<div class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+        <h3>🩸 LifeLink Nepal</h3>
+        <p>Super Admin Panel</p>
+    </div>
+    
+    <div class="sidebar-menu">
+        <a href="#dashboard" class="menu-item active" data-section="dashboard">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="#requests" class="menu-item" data-section="requests">
+            <i class="bi bi-bell-fill"></i>
+            <span>Blood Requests</span>
+            <span class="menu-badge" id="requestCount">0</span>
+        </a>
+        <a href="#donors" class="menu-item" data-section="donors">
+            <i class="bi bi-heart-pulse-fill"></i>
+            <span>Donor Management</span>
+        </a>
+        <a href="#hospitals" class="menu-item" data-section="hospitals">
+            <i class="bi bi-hospital-fill"></i>
+            <span>Hospital Management</span>
+        </a>
+        <a href="#matches" class="menu-item" data-section="matches">
+            <i class="bi bi-link-45deg"></i>
+            <span>Donor Matching</span>
+        </a>
+        <a href="#analytics" class="menu-item" data-section="analytics">
+            <i class="bi bi-graph-up"></i>
+            <span>Analytics</span>
+        </a>
+        <a href="#settings" class="menu-item" data-section="settings">
+            <i class="bi bi-gear-fill"></i>
+            <span>Settings</span>
+        </a>
+        <a href="{% url 'accounts:login_page' %}" class="menu-item" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1);">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="admin-main">
+    <!-- Top Navbar -->
+    <div class="top-navbar">
+        <div class="search-bar">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Search donors, hospitals, requests..." id="searchInput">
+        </div>
+        
+        <div class="admin-profile">
+            <div class="admin-avatar">SA</div>
+            <div>
+                <h4 style="margin: 0; font-size: 14px; font-weight: 600;">Super Admin</h4>
+                <p style="margin: 0; font-size: 12px; color: var(--text-muted);">admin@lifelink.com</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content-area">
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="content-section-wrapper">
+            <div class="page-header">
+                <h2>📊 Dashboard Overview</h2>
+                <p>Monitor and manage all blood donation activities</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon donors">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalDonors">0</h3>
+                        <p>Total Donors</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon hospitals">
+                            <i class="bi bi-hospital-fill"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalHospitals">0</h3>
+                        <p>Registered Hospitals</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon requests">
+                            <i class="bi bi-bell-fill"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="activeRequests">0</h3>
+                        <p>Active Requests</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon completed">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="completedRequests">0</h3>
+                        <p>Completed Donations</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Requests -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>🔔 Recent Blood Requests</h3>
+                    <button class="btn-action btn-view" onclick="showSection('requests')">
+                        View All <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+                <div id="recentRequests">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading requests...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Requests Section -->
+        <div id="requestsSection" class="content-section-wrapper" style="display: none;">
+            <div class="page-header">
+                <h2>🔔 Blood Request Management</h2>
+                <p>View and manage all emergency blood requests</p>
+            </div>
+
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>All Blood Requests</h3>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">All</button>
+                        <button class="filter-tab" data-filter="pending">Pending</button>
+                        <button class="filter-tab" data-filter="matched">Matched</button>
+                        <button class="filter-tab" data-filter="completed">Completed</button>
+                    </div>
+                </div>
+                <div id="allRequests">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading all requests...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Donors Section -->
+        <div id="donorsSection" class="content-section-wrapper" style="display: none;">
+            <div class="page-header">
+                <h2>🩸 Donor Management</h2>
+                <p>Manage all registered blood donors</p>
+            </div>
+
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>All Donors</h3>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-blood="all">All Blood Types</button>
+                        <button class="filter-tab" data-blood="A+">A+</button>
+                        <button class="filter-tab" data-blood="B+">B+</button>
+                        <button class="filter-tab" data-blood="O+">O+</button>
+                        <button class="filter-tab" data-blood="AB+">AB+</button>
+                    </div>
+                </div>
+                <div id="donorsList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading donors...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hospitals Section -->
+        <div id="hospitalsSection" class="content-section-wrapper" style="display: none;">
+            <div class="page-header">
+                <h2>🏥 Hospital Management</h2>
+                <p>Manage all registered hospitals</p>
+            </div>
+
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>All Hospitals</h3>
+                </div>
+                <div id="hospitalsList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading hospitals...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Donor Matching Section -->
+        <div id="matchesSection" class="content-section-wrapper" style="display: none;">
+            <div class="page-header">
+                <h2>🔗 Donor Matching System</h2>
+                <p>Match donors with blood requests and notify them</p>
+            </div>
+
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>Active Matches</h3>
+                </div>
+                <div id="matchesList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading matches...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Get JWT token
+const token = localStorage.getItem('accessToken');
+
+// API Base URL
+const API_URL = window.location.origin;
+
+// Navigation
+document.querySelectorAll('.menu-item[data-section]').forEach(item => {
+    item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const section = this.dataset.section;
+        showSection(section);
+        
+        // Update active state
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+
+function showSection(section) {
+    // Hide all sections
+    document.querySelectorAll('.content-section-wrapper').forEach(s => s.style.display = 'none');
+    
+    // Show selected section
+    const sectionMap = {
+        'dashboard': 'dashboardSection',
+        'requests': 'requestsSection',
+        'donors': 'donorsSection',
+        'hospitals': 'hospitalsSection',
+        'matches': 'matchesSection'
+    };
+    
+    const sectionId = sectionMap[section];
+    if (sectionId) {
+        document.getElementById(sectionId).style.display = 'block';
+        
+        // Load section data
+        if (section === 'requests') loadAllRequests();
+        if (section === 'donors') loadAllDonors();
+        if (section === 'hospitals') loadAllHospitals();
+        if (section === 'matches') loadMatches();
+    }
+}
+
+// Load Dashboard Stats
+async function loadDashboardStats() {
+    try {
+        // Load donors
+        const donorsRes = await fetch(`${API_URL}/api/donors/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const donors = await donorsRes.json();
+        document.getElementById('totalDonors').textContent = donors.length;
+
+        // Load hospitals
+        const hospitalsRes = await fetch(`${API_URL}/api/hospitals/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const hospitals = await hospitalsRes.json();
+        document.getElementById('totalHospitals').textContent = hospitals.length;
+
+        // Load requests
+        const requestsRes = await fetch(`${API_URL}/api/blood-requests/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const requests = await requestsRes.json();
+        
+        const activeReqs = requests.filter(r => r.status === 'pending' || r.status === 'matched');
+        const completedReqs = requests.filter(r => r.status === 'completed');
+        
+        document.getElementById('activeRequests').textContent = activeReqs.length;
+        document.getElementById('completedRequests').textContent = completedReqs.length;
+        document.getElementById('requestCount').textContent = activeReqs.length;
+
+        // Load recent requests
+        loadRecentRequests(requests.slice(0, 5));
+
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+// Load Recent Requests
+function loadRecentRequests(requests) {
+    const container = document.getElementById('recentRequests');
+    
+    if (requests.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h4>No Recent Requests</h4>
+                <p>There are no blood requests at the moment</p>
+            </div>
+        `;
+        return;
+    }
+
+    const html = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Hospital</th>
+                    <th>Blood Type</th>
+                    <th>Units</th>
+                    <th>Urgency</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${requests.map(req => `
+                    <tr>
+                        <td>
+                            <div class="hospital-info">
+                                <div class="hospital-avatar">${req.hospital_name?.charAt(0) || 'H'}</div>
+                                <div class="info-text">
+                                    <h4>${req.hospital_name || 'Hospital'}</h4>
+                                    <p>${new Date(req.created_at).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="blood-type ${req.blood_type?.includes('-') ? 'negative' : 'positive'}">
+                                ${req.blood_type}
+                            </span>
+                        </td>
+                        <td><strong>${req.units_needed}</strong> units</td>
+                        <td><span class="status-badge ${req.urgency}">${req.urgency?.toUpperCase()}</span></td>
+                        <td><span class="status-badge ${req.status}">${req.status?.toUpperCase()}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-notify" onclick="notifyDonors(${req.id}, '${req.blood_type}')">
+                                    <i class="bi bi-bell-fill"></i> Notify Donors
+                                </button>
+                                <button class="btn-action btn-view" onclick="viewRequestDetails(${req.id})">
+                                    <i class="bi bi-eye-fill"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// Load All Requests
+async function loadAllRequests() {
+    try {
+        const response = await fetch(`${API_URL}/api/blood-requests/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const requests = await response.json();
+        
+        const container = document.getElementById('allRequests');
+        
+        if (requests.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h4>No Requests Found</h4>
+                    <p>There are no blood requests to display</p>
+                </div>
+            `;
+            return;
+        }
+
+        const html = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Hospital</th>
+                        <th>Blood Type</th>
+                        <th>Units Needed</th>
+                        <th>Urgency</th>
+                        <th>Status</th>
+                        <th>Eligible Donors</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${requests.map(req => `
+                        <tr>
+                            <td><strong>#${req.id}</strong></td>
+                            <td>
+                                <div class="hospital-info">
+                                    <div class="hospital-avatar">${req.hospital_name?.charAt(0) || 'H'}</div>
+                                    <div class="info-text">
+                                        <h4>${req.hospital_name || 'Hospital'}</h4>
+                                        <p>${req.contact_number || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="blood-type ${req.blood_type?.includes('-') ? 'negative' : 'positive'}">
+                                    ${req.blood_type}
+                                </span>
+                            </td>
+                            <td><strong>${req.units_needed}</strong> units</td>
+                            <td><span class="status-badge ${req.urgency}">${req.urgency?.toUpperCase()}</span></td>
+                            <td><span class="status-badge ${req.status}">${req.status?.toUpperCase()}</span></td>
+                            <td><strong>${req.eligible_donors_count || 0}</strong> donors</td>
+                            <td>${new Date(req.created_at).toLocaleString()}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action btn-notify" onclick="notifyDonors(${req.id}, '${req.blood_type}')">
+                                        <i class="bi bi-bell-fill"></i> Notify
+                                    </button>
+                                    <button class="btn-action btn-view" onclick="viewRequestDetails(${req.id})">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error('Error loading requests:', error);
+        document.getElementById('allRequests').innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <h4>Error Loading Requests</h4>
+                <p>Please try again later</p>
+            </div>
+        `;
+    }
+}
+
+// Load All Donors
+async function loadAllDonors() {
+    try {
+        const response = await fetch(`${API_URL}/api/donors/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const donors = await response.json();
+        
+        const container = document.getElementById('donorsList');
+        
+        if (donors.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h4>No Donors Found</h4>
+                    <p>There are no registered donors yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        const html = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Donor</th>
+                        <th>Blood Type</th>
+                        <th>Age</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${donors.map(donor => `
+                        <tr>
+                            <td>
+                                <div class="donor-info">
+                                    <div class="donor-avatar">${donor.full_name?.charAt(0) || 'D'}</div>
+                                    <div class="info-text">
+                                        <h4>${donor.full_name || 'Donor'}</h4>
+                                        <p>${donor.email || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="blood-type ${donor.blood_type?.includes('-') ? 'negative' : 'positive'}">
+                                    ${donor.blood_type}
+                                </span>
+                            </td>
+                            <td>${donor.age} years</td>
+                            <td>${donor.phone || 'N/A'}</td>
+                            <td>${donor.address || 'N/A'}</td>
+                            <td><span class="status-badge active">ACTIVE</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action btn-view" onclick="viewDonorDetails(${donor.id})">
+                                        <i class="bi bi-eye-fill"></i> View
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error('Error loading donors:', error);
+        document.getElementById('donorsList').innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <h4>Error Loading Donors</h4>
+                <p>Please try again later</p>
+            </div>
+        `;
+    }
+}
+
+// Load All Hospitals
+async function loadAllHospitals() {
+    try {
+        const response = await fetch(`${API_URL}/api/hospitals/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const hospitals = await response.json();
+        
+        const container = document.getElementById('hospitalsList');
+        
+        if (hospitals.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h4>No Hospitals Found</h4>
+                    <p>There are no registered hospitals yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        const html = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Hospital</th>
+                        <th>Contact Number</th>
+                        <th>Address</th>
+                        <th>Total Requests</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${hospitals.map(hospital => `
+                        <tr>
+                            <td>
+                                <div class="hospital-info">
+                                    <div class="hospital-avatar">${hospital.hospital_name?.charAt(0) || 'H'}</div>
+                                    <div class="info-text">
+                                        <h4>${hospital.hospital_name || 'Hospital'}</h4>
+                                        <p>${hospital.email || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${hospital.phone || 'N/A'}</td>
+                            <td>${hospital.address || 'N/A'}</td>
+                            <td><strong>0</strong> requests</td>
+                            <td><span class="status-badge active">ACTIVE</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action btn-view" onclick="viewHospitalDetails(${hospital.id})">
+                                        <i class="bi bi-eye-fill"></i> View
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error('Error loading hospitals:', error);
+        document.getElementById('hospitalsList').innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <h4>Error Loading Hospitals</h4>
+                <p>Please try again later</p>
+            </div>
+        `;
+    }
+}
+
+// Load Matches
+async function loadMatches() {
+    const container = document.getElementById('matchesList');
+    container.innerHTML = `
+        <div class="empty-state">
+            <i class="bi bi-link-45deg"></i>
+            <h4>Donor Matching System</h4>
+            <p>Match donors with requests and notify them</p>
+        </div>
+    `;
+}
+
+// Notify Donors
+async function notifyDonors(requestId, bloodType) {
+    if (!confirm(`Are you sure you want to notify all ${bloodType} donors about this request?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/blood-requests/${requestId}/notify-donors/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(`✅ Successfully notified ${result.notified_count || 0} donors!`);
+            loadDashboardStats();
+        } else {
+            alert(`❌ Error: ${result.error || 'Failed to notify donors'}`);
+        }
+
+    } catch (error) {
+        console.error('Error notifying donors:', error);
+        alert('❌ An error occurred while notifying donors');
+    }
+}
+
+// View Details Functions
+function viewRequestDetails(id) {
+    alert(`View details for request #${id}`);
+}
+
+function viewDonorDetails(id) {
+    alert(`View details for donor #${id}`);
+}
+
+function viewHospitalDetails(id) {
+    alert(`View details for hospital #${id}`);
+}
+
+// Filter Tabs
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('filter-tab')) {
+        const parent = e.target.parentElement;
+        parent.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+        e.target.classList.add('active');
+    }
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardStats();
+});
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    // Implement search logic here
+});
+</script>
+{% endblock %}
