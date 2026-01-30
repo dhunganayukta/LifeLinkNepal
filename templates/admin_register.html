@@ -530,6 +530,22 @@
             width: 100%;
         }
 
+        /* Debug info */
+        .debug-info {
+            background: rgba(46, 213, 115, 0.1);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            font-size: 11px;
+            color: #69f0ae;
+            display: none;
+        }
+
+        .debug-info.show {
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .register-container {
@@ -576,6 +592,7 @@
         <div id="success-message" class="message success-message"></div>
 
         <form id="adminRegisterForm">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="username">Username <span class="required">*</span></label>
                 <input 
@@ -649,6 +666,8 @@
             </button>
         </form>
 
+        <div class="debug-info" id="debugInfo"></div>
+
         <div class="divider"></div>
 
         <div class="links">
@@ -661,6 +680,7 @@
         const submitBtn = document.getElementById('submitBtn');
         const errorDiv = document.getElementById('error-message');
         const successDiv = document.getElementById('success-message');
+        const debugInfo = document.getElementById('debugInfo');
         const passwordInput = document.getElementById('password');
         const strengthBar = document.getElementById('strengthBar');
 
@@ -672,6 +692,28 @@
         function hideMessages() {
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
+        }
+
+        function showDebug(message) {
+            debugInfo.textContent = message;
+            debugInfo.classList.add('show');
+            console.log('DEBUG:', message);
+        }
+
+        // Get CSRF token from cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
 
         // Password strength indicator
@@ -697,6 +739,7 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideMessages();
+            debugInfo.classList.remove('show');
 
             const username = document.getElementById('username').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -724,21 +767,42 @@
             submitBtn.classList.add('loading');
             submitBtn.disabled = true;
 
+            const csrftoken = getCookie('csrftoken');
+            showDebug(`Attempting registration... CSRF Token: ${csrftoken ? 'Found' : 'Not Found'}`);
+
             try {
+                const requestBody = {
+                    username,
+                    email,
+                    password,
+                    secret_key: secretKey
+                };
+
+                showDebug(`Sending request to /accounts/admin/register/`);
+
                 const response = await fetch('/accounts/admin/register/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
                     },
-                    body: JSON.stringify({
-                        username,
-                        email,
-                        password,
-                        secret_key: secretKey
-                    })
+                    credentials: 'same-origin',
+                    body: JSON.stringify(requestBody)
                 });
 
-                const data = await response.json();
+                showDebug(`Response status: ${response.status}`);
+
+                const contentType = response.headers.get("content-type");
+                let data;
+                
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    data = await response.json();
+                    showDebug(`Response data: ${JSON.stringify(data)}`);
+                } else {
+                    const text = await response.text();
+                    showDebug(`Response (not JSON): ${text.substring(0, 200)}`);
+                    throw new Error('Server returned non-JSON response');
+                }
 
                 if (response.ok) {
                     // Show success message
@@ -754,12 +818,32 @@
                     }, 2500);
                 } else {
                     // Show error message
-                    const errorMessage = data.error || 'Registration failed. Please check your information and try again.';
+                    let errorMessage = 'Registration failed. Please check your information and try again.';
+                    
+                    if (data.error) {
+                        errorMessage = data.error;
+                    } else if (data.detail) {
+                        errorMessage = data.detail;
+                    } else if (data.message) {
+                        errorMessage = data.message;
+                    } else if (data.non_field_errors) {
+                        errorMessage = data.non_field_errors.join(', ');
+                    } else if (typeof data === 'object') {
+                        // Try to extract first error from object
+                        const firstError = Object.values(data)[0];
+                        if (Array.isArray(firstError)) {
+                            errorMessage = firstError[0];
+                        } else if (typeof firstError === 'string') {
+                            errorMessage = firstError;
+                        }
+                    }
+                    
                     showMessage(errorDiv, '⚠ ' + errorMessage);
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                showMessage(errorDiv, '⚠ System error. Please try again or contact support.');
+                showDebug(`Error: ${error.message}`);
+                showMessage(errorDiv, '⚠ System error: ' + error.message + '. Please check the console for details.');
             } finally {
                 // Remove loading state
                 submitBtn.classList.remove('loading');
@@ -770,6 +854,17 @@
         // Clear messages on input
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', hideMessages);
+        });
+
+        // On page load, check if CSRF token exists
+        window.addEventListener('load', () => {
+            const csrftoken = getCookie('csrftoken');
+            if (!csrftoken) {
+                console.warn('Warning: CSRF token not found. Django may reject the request.');
+                showDebug('⚠ Warning: CSRF token not found. This may cause registration to fail.');
+            } else {
+                console.log('CSRF token found:', csrftoken.substring(0, 10) + '...');
+            }
         });
     </script>
 </body>

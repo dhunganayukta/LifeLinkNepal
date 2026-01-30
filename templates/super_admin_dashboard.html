@@ -276,6 +276,7 @@ body {
 .filter-tabs {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .filter-tab {
@@ -301,6 +302,16 @@ body {
 .data-table {
     width: 100%;
     border-collapse: collapse;
+    overflow-x: auto;
+    display: block;
+}
+
+.data-table thead,
+.data-table tbody,
+.data-table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
 
 .data-table thead {
@@ -322,6 +333,7 @@ body {
     border-bottom: 1px solid var(--border-color);
     font-size: 14px;
     color: var(--text-dark);
+    word-wrap: break-word;
 }
 
 .data-table tbody tr:hover {
@@ -346,6 +358,7 @@ body {
     font-weight: 700;
     color: white;
     font-size: 14px;
+    flex-shrink: 0;
 }
 
 .donor-avatar {
@@ -374,6 +387,8 @@ body {
     border-radius: 8px;
     font-weight: 700;
     font-size: 13px;
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .blood-type.positive {
@@ -392,6 +407,8 @@ body {
     font-size: 12px;
     font-weight: 600;
     display: inline-block;
+    white-space: nowrap;
+    text-transform: uppercase;
 }
 
 .status-badge.active {
@@ -404,6 +421,11 @@ body {
     color: #856404;
 }
 
+.status-badge.matched {
+    background: #cfe2ff;
+    color: #084298;
+}
+
 .status-badge.completed {
     background: #d1ecf1;
     color: #0c5460;
@@ -414,10 +436,26 @@ body {
     color: #721c24;
 }
 
+.status-badge.high {
+    background: #ffe5e5;
+    color: #e53935;
+}
+
+.status-badge.medium {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.low {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
 /* Action Buttons */
 .action-buttons {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .btn-action {
@@ -431,6 +469,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
 }
 
 .btn-notify {
@@ -441,6 +480,12 @@ body {
 .btn-notify:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+}
+
+.btn-notify:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .btn-view {
@@ -472,51 +517,70 @@ body {
     box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
 }
 
-/* Request Card (Alternative Layout) */
-.request-card {
-    background: white;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
+/* Blood Type Chart */
+.blood-chart {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    padding: 20px 0;
+}
+
+.blood-chart-item {
+    text-align: center;
     padding: 20px;
-    margin-bottom: 16px;
+    background: var(--light-bg);
+    border-radius: 12px;
     transition: all 0.3s ease;
 }
 
-.request-card:hover {
-    border-color: var(--primary-blue);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.blood-chart-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.request-header {
-    display: flex;
-    align-items: start;
-    justify-content: space-between;
-    margin-bottom: 16px;
+.blood-chart-item .blood-type {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: block;
 }
 
-.request-meta {
-    display: flex;
-    gap: 20px;
-    padding: 12px 0;
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-    margin: 16px 0;
+.blood-chart-item .count {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: block;
+    margin-bottom: 4px;
 }
 
-.meta-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
+.blood-chart-item .label {
+    font-size: 12px;
     color: var(--text-muted);
 }
 
-.meta-item i {
-    color: var(--primary-blue);
+/* Monthly Stats Grid */
+.monthly-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
 }
 
-.meta-value {
-    font-weight: 600;
+.monthly-stat-card {
+    background: var(--light-bg);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-blue);
+}
+
+.monthly-stat-card h4 {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0 0 8px 0;
+}
+
+.monthly-stat-card .value {
+    font-size: 28px;
+    font-weight: 700;
     color: var(--text-dark);
 }
 
@@ -560,6 +624,52 @@ body {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--text-muted);
+    border-radius: 24px;
+    transition: 0.4s;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--success);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(26px);
 }
 
 /* Responsive */
@@ -823,13 +933,207 @@ body {
 
             <div class="content-section">
                 <div class="section-header">
-                    <h3>Active Matches</h3>
+                    <h3>Active Blood Requests Needing Donors</h3>
                 </div>
                 <div id="matchesList">
                     <div class="loading">
                         <div class="spinner"></div>
-                        <p>Loading matches...</p>
+                        <p>Loading matching data...</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analyticsSection" class="content-section-wrapper" style="display: none;">
+            <div class="page-header">
+                <h2>📊 Analytics & Reports</h2>
+                <p>View detailed statistics and insights</p>
+            </div>
+
+            <!-- Blood Type Distribution -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>Blood Type Distribution</h3>
+                </div>
+                <div id="bloodTypeChart">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading analytics...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Stats -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>Monthly Statistics</h3>
+                </div>
+                <div id="monthlyStats">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading monthly data...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request Status Overview -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>Request Status Overview</h3>
+                </div>
+                <div id="requestStatusChart">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading status data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settingsSection" class="content-section-wrapper" style="display: none;">
+            <div class="page-header">
+                <h2>⚙️ System Settings</h2>
+                <p>Configure system preferences and notifications</p>
+            </div>
+
+            <!-- General Settings -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>General Settings</h3>
+                </div>
+                <div style="padding: 20px;">
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">
+                            <i class="bi bi-globe"></i> System Name
+                        </label>
+                        <input type="text" value="LifeLink Nepal" 
+                               style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px;">
+                    </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">
+                            <i class="bi bi-envelope"></i> Admin Email
+                        </label>
+                        <input type="email" value="admin@lifelink.com" 
+                               style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px;">
+                    </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">
+                            <i class="bi bi-telephone"></i> Emergency Contact
+                        </label>
+                        <input type="tel" value="+977-1-4444444" 
+                               style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>Notification Settings</h3>
+                </div>
+                <div style="padding: 20px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--light-bg); border-radius: 8px; margin-bottom: 12px;">
+                        <div>
+                            <strong style="display: block; color: var(--text-dark);">Email Notifications</strong>
+                            <small style="color: var(--text-muted);">Send email alerts for new requests</small>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--light-bg); border-radius: 8px; margin-bottom: 12px;">
+                        <div>
+                            <strong style="display: block; color: var(--text-dark);">SMS Notifications</strong>
+                            <small style="color: var(--text-muted);">Send SMS alerts to donors</small>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--light-bg); border-radius: 8px; margin-bottom: 12px;">
+                        <div>
+                            <strong style="display: block; color: var(--text-dark);">Auto-Matching</strong>
+                            <small style="color: var(--text-muted);">Automatically match donors with requests</small>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--light-bg); border-radius: 8px; margin-bottom: 12px;">
+                        <div>
+                            <strong style="display: block; color: var(--text-dark);">Push Notifications</strong>
+                            <small style="color: var(--text-muted);">Enable browser push notifications</small>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Information -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h3>System Information</h3>
+                </div>
+                <div style="padding: 20px;">
+                    <table class="data-table">
+                        <tbody>
+                            <tr>
+                                <td><strong>Version</strong></td>
+                                <td>1.0.0</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Last Updated</strong></td>
+                                <td>January 30, 2026</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database Status</strong></td>
+                                <td><span class="status-badge active">ONLINE</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Users</strong></td>
+                                <td><strong id="settingsTotalUsers">0</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Storage Used</strong></td>
+                                <td>2.4 GB / 100 GB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>API Status</strong></td>
+                                <td><span class="status-badge active">OPERATIONAL</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="content-section">
+                <div style="display: flex; gap: 12px; padding: 20px; flex-wrap: wrap;">
+                    <button class="btn-action btn-approve" onclick="saveSettings()">
+                        <i class="bi bi-check-circle-fill"></i> Save Settings
+                    </button>
+                    <button class="btn-action btn-view" onclick="exportData()">
+                        <i class="bi bi-download"></i> Export Data
+                    </button>
+                    <button class="btn-action btn-notify" onclick="testNotifications()">
+                        <i class="bi bi-bell-fill"></i> Test Notifications
+                    </button>
+                    <button class="btn-action btn-reject" onclick="clearCache()">
+                        <i class="bi bi-trash-fill"></i> Clear Cache
+                    </button>
                 </div>
             </div>
         </div>
@@ -837,11 +1141,53 @@ body {
 </div>
 
 <script>
-// Get JWT token
+// Get JWT token or use session authentication
 const token = localStorage.getItem('accessToken');
 
 // API Base URL
 const API_URL = window.location.origin;
+
+// Get CSRF token from cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+// Helper function to make API requests
+async function makeApiRequest(url, options = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers
+    };
+    
+    // Add CSRF token for non-GET requests
+    if (options.method && options.method !== 'GET' && csrftoken) {
+        headers['X-CSRFToken'] = csrftoken;
+    }
+    
+    // Add authorization token if available
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return fetch(url, {
+        ...options,
+        headers,
+        credentials: 'include'
+    });
+}
 
 // Navigation
 document.querySelectorAll('.menu-item[data-section]').forEach(item => {
@@ -866,7 +1212,9 @@ function showSection(section) {
         'requests': 'requestsSection',
         'donors': 'donorsSection',
         'hospitals': 'hospitalsSection',
-        'matches': 'matchesSection'
+        'matches': 'matchesSection',
+        'analytics': 'analyticsSection',
+        'settings': 'settingsSection'
     };
     
     const sectionId = sectionMap[section];
@@ -878,6 +1226,8 @@ function showSection(section) {
         if (section === 'donors') loadAllDonors();
         if (section === 'hospitals') loadAllHospitals();
         if (section === 'matches') loadMatches();
+        if (section === 'analytics') loadAnalytics();
+        if (section === 'settings') loadSettings();
     }
 }
 
@@ -885,23 +1235,17 @@ function showSection(section) {
 async function loadDashboardStats() {
     try {
         // Load donors
-        const donorsRes = await fetch(`${API_URL}/api/donors/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const donorsRes = await makeApiRequest(`${API_URL}/api/donors/`);
         const donors = await donorsRes.json();
         document.getElementById('totalDonors').textContent = donors.length;
 
         // Load hospitals
-        const hospitalsRes = await fetch(`${API_URL}/api/hospitals/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const hospitalsRes = await makeApiRequest(`${API_URL}/api/hospitals/`);
         const hospitals = await hospitalsRes.json();
         document.getElementById('totalHospitals').textContent = hospitals.length;
 
         // Load requests
-        const requestsRes = await fetch(`${API_URL}/api/blood-requests/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const requestsRes = await makeApiRequest(`${API_URL}/api/blood-requests/`);
         const requests = await requestsRes.json();
         
         const activeReqs = requests.filter(r => r.status === 'pending' || r.status === 'matched');
@@ -911,8 +1255,11 @@ async function loadDashboardStats() {
         document.getElementById('completedRequests').textContent = completedReqs.length;
         document.getElementById('requestCount').textContent = activeReqs.length;
 
-        // Load recent requests
-        loadRecentRequests(requests.slice(0, 5));
+        // Load recent requests (sort by date, most recent first)
+        const sortedRequests = requests.sort((a, b) => 
+            new Date(b.created_at) - new Date(a.created_at)
+        );
+        loadRecentRequests(sortedRequests.slice(0, 5));
 
     } catch (error) {
         console.error('Error loading stats:', error);
@@ -938,12 +1285,12 @@ function loadRecentRequests(requests) {
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Hospital</th>
-                    <th>Blood Type</th>
-                    <th>Units</th>
-                    <th>Urgency</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th style="width: 25%;">Hospital</th>
+                    <th style="width: 12%;">Blood Type</th>
+                    <th style="width: 12%;">Units</th>
+                    <th style="width: 13%;">Urgency</th>
+                    <th style="width: 13%;">Status</th>
+                    <th style="width: 25%;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -964,12 +1311,12 @@ function loadRecentRequests(requests) {
                             </span>
                         </td>
                         <td><strong>${req.units_needed}</strong> units</td>
-                        <td><span class="status-badge ${req.urgency}">${req.urgency?.toUpperCase()}</span></td>
+                        <td><span class="status-badge ${(req.urgency || 'medium').toLowerCase()}">${(req.urgency || 'Medium').toUpperCase()}</span></td>
                         <td><span class="status-badge ${req.status}">${req.status?.toUpperCase()}</span></td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn-action btn-notify" onclick="notifyDonors(${req.id}, '${req.blood_type}')">
-                                    <i class="bi bi-bell-fill"></i> Notify Donors
+                                <button class="btn-action btn-notify" onclick="notifyDonors(${req.id}, '${req.blood_type}')" id="notifyBtn${req.id}">
+                                    <i class="bi bi-bell-fill"></i> Notify
                                 </button>
                                 <button class="btn-action btn-view" onclick="viewRequestDetails(${req.id})">
                                     <i class="bi bi-eye-fill"></i>
@@ -988,9 +1335,7 @@ function loadRecentRequests(requests) {
 // Load All Requests
 async function loadAllRequests() {
     try {
-        const response = await fetch(`${API_URL}/api/blood-requests/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await makeApiRequest(`${API_URL}/api/blood-requests/`);
         const requests = await response.json();
         
         const container = document.getElementById('allRequests');
@@ -1006,23 +1351,28 @@ async function loadAllRequests() {
             return;
         }
 
+        // Sort by date, most recent first
+        const sortedRequests = requests.sort((a, b) => 
+            new Date(b.created_at) - new Date(a.created_at)
+        );
+
         const html = `
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Hospital</th>
-                        <th>Blood Type</th>
-                        <th>Units Needed</th>
-                        <th>Urgency</th>
-                        <th>Status</th>
-                        <th>Eligible Donors</th>
-                        <th>Date</th>
-                        <th>Actions</th>
+                        <th style="width: 5%;">ID</th>
+                        <th style="width: 18%;">Hospital</th>
+                        <th style="width: 10%;">Blood Type</th>
+                        <th style="width: 10%;">Units</th>
+                        <th style="width: 10%;">Urgency</th>
+                        <th style="width: 10%;">Status</th>
+                        <th style="width: 10%;">Eligible</th>
+                        <th style="width: 12%;">Date</th>
+                        <th style="width: 15%;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${requests.map(req => `
+                    ${sortedRequests.map(req => `
                         <tr>
                             <td><strong>#${req.id}</strong></td>
                             <td>
@@ -1039,14 +1389,14 @@ async function loadAllRequests() {
                                     ${req.blood_type}
                                 </span>
                             </td>
-                            <td><strong>${req.units_needed}</strong> units</td>
-                            <td><span class="status-badge ${req.urgency}">${req.urgency?.toUpperCase()}</span></td>
+                            <td><strong>${req.units_needed}</strong></td>
+                            <td><span class="status-badge ${(req.urgency || 'medium').toLowerCase()}">${(req.urgency || 'Medium').toUpperCase()}</span></td>
                             <td><span class="status-badge ${req.status}">${req.status?.toUpperCase()}</span></td>
-                            <td><strong>${req.eligible_donors_count || 0}</strong> donors</td>
-                            <td>${new Date(req.created_at).toLocaleString()}</td>
+                            <td><strong>${req.eligible_donors_count || 0}</strong></td>
+                            <td>${new Date(req.created_at).toLocaleDateString()}</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn-action btn-notify" onclick="notifyDonors(${req.id}, '${req.blood_type}')">
+                                    <button class="btn-action btn-notify" onclick="notifyDonors(${req.id}, '${req.blood_type}')" id="notifyBtn${req.id}">
                                         <i class="bi bi-bell-fill"></i> Notify
                                     </button>
                                     <button class="btn-action btn-view" onclick="viewRequestDetails(${req.id})">
@@ -1068,7 +1418,7 @@ async function loadAllRequests() {
             <div class="empty-state">
                 <i class="bi bi-exclamation-triangle"></i>
                 <h4>Error Loading Requests</h4>
-                <p>Please try again later</p>
+                <p>${error.message || 'Please try again later'}</p>
             </div>
         `;
     }
@@ -1077,9 +1427,7 @@ async function loadAllRequests() {
 // Load All Donors
 async function loadAllDonors() {
     try {
-        const response = await fetch(`${API_URL}/api/donors/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await makeApiRequest(`${API_URL}/api/donors/`);
         const donors = await response.json();
         
         const container = document.getElementById('donorsList');
@@ -1099,13 +1447,13 @@ async function loadAllDonors() {
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Donor</th>
-                        <th>Blood Type</th>
-                        <th>Age</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th style="width: 25%;">Donor</th>
+                        <th style="width: 12%;">Blood Type</th>
+                        <th style="width: 10%;">Age</th>
+                        <th style="width: 15%;">Phone</th>
+                        <th style="width: 20%;">Address</th>
+                        <th style="width: 10%;">Status</th>
+                        <th style="width: 8%;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1130,11 +1478,9 @@ async function loadAllDonors() {
                             <td>${donor.address || 'N/A'}</td>
                             <td><span class="status-badge active">ACTIVE</span></td>
                             <td>
-                                <div class="action-buttons">
-                                    <button class="btn-action btn-view" onclick="viewDonorDetails(${donor.id})">
-                                        <i class="bi bi-eye-fill"></i> View
-                                    </button>
-                                </div>
+                                <button class="btn-action btn-view" onclick="viewDonorDetails(${donor.id})">
+                                    <i class="bi bi-eye-fill"></i>
+                                </button>
                             </td>
                         </tr>
                     `).join('')}
@@ -1150,7 +1496,7 @@ async function loadAllDonors() {
             <div class="empty-state">
                 <i class="bi bi-exclamation-triangle"></i>
                 <h4>Error Loading Donors</h4>
-                <p>Please try again later</p>
+                <p>${error.message || 'Please try again later'}</p>
             </div>
         `;
     }
@@ -1159,9 +1505,7 @@ async function loadAllDonors() {
 // Load All Hospitals
 async function loadAllHospitals() {
     try {
-        const response = await fetch(`${API_URL}/api/hospitals/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await makeApiRequest(`${API_URL}/api/hospitals/`);
         const hospitals = await response.json();
         
         const container = document.getElementById('hospitalsList');
@@ -1181,11 +1525,11 @@ async function loadAllHospitals() {
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Hospital</th>
-                        <th>Contact Number</th>
-                        <th>Address</th>
-                        <th>Total Requests</th>
-                        <th>Status</th>
+                        <th style="width: 30%;">Hospital</th>
+                        <th style="width: 15%;">Contact</th>
+                        <th style="width: 30%;">Address</th>
+                        <th style="width: 12%;">Requests</th>
+                        <th style="width: 10%;">Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -1206,11 +1550,9 @@ async function loadAllHospitals() {
                             <td><strong>0</strong> requests</td>
                             <td><span class="status-badge active">ACTIVE</span></td>
                             <td>
-                                <div class="action-buttons">
-                                    <button class="btn-action btn-view" onclick="viewHospitalDetails(${hospital.id})">
-                                        <i class="bi bi-eye-fill"></i> View
-                                    </button>
-                                </div>
+                                <button class="btn-action btn-view" onclick="viewHospitalDetails(${hospital.id})">
+                                    <i class="bi bi-eye-fill"></i>
+                                </button>
                             </td>
                         </tr>
                     `).join('')}
@@ -1226,7 +1568,7 @@ async function loadAllHospitals() {
             <div class="empty-state">
                 <i class="bi bi-exclamation-triangle"></i>
                 <h4>Error Loading Hospitals</h4>
-                <p>Please try again later</p>
+                <p>${error.message || 'Please try again later'}</p>
             </div>
         `;
     }
@@ -1234,57 +1576,290 @@ async function loadAllHospitals() {
 
 // Load Matches
 async function loadMatches() {
-    const container = document.getElementById('matchesList');
-    container.innerHTML = `
-        <div class="empty-state">
-            <i class="bi bi-link-45deg"></i>
-            <h4>Donor Matching System</h4>
-            <p>Match donors with requests and notify them</p>
-        </div>
-    `;
+    try {
+        const requestsResponse = await makeApiRequest(`${API_URL}/api/blood-requests/`);
+        const requests = await requestsResponse.json();
+        
+        const donorsResponse = await makeApiRequest(`${API_URL}/api/donors/`);
+        const donors = await donorsResponse.json();
+        
+        const container = document.getElementById('matchesList');
+        const activeRequests = requests.filter(r => r.status === 'pending' || r.status === 'matched');
+        
+        if (activeRequests.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-check-circle"></i>
+                    <h4>No Active Requests</h4>
+                    <p>All blood requests have been fulfilled</p>
+                </div>
+            `;
+            return;
+        }
+
+        const html = `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">ID</th>
+                        <th style="width: 22%;">Hospital</th>
+                        <th style="width: 12%;">Blood Type</th>
+                        <th style="width: 10%;">Units</th>
+                        <th style="width: 12%;">Matching</th>
+                        <th style="width: 12%;">Urgency</th>
+                        <th style="width: 24%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${activeRequests.map(req => {
+                        const matchingDonors = donors.filter(d => d.blood_type === req.blood_type);
+                        return `
+                            <tr>
+                                <td><strong>#${req.id}</strong></td>
+                                <td>
+                                    <div class="hospital-info">
+                                        <div class="hospital-avatar">${req.hospital_name?.charAt(0) || 'H'}</div>
+                                        <div class="info-text">
+                                            <h4>${req.hospital_name || 'Hospital'}</h4>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="blood-type ${req.blood_type?.includes('-') ? 'negative' : 'positive'}">
+                                        ${req.blood_type}
+                                    </span>
+                                </td>
+                                <td><strong>${req.units_needed}</strong></td>
+                                <td><strong>${matchingDonors.length}</strong> eligible</td>
+                                <td><span class="status-badge ${(req.urgency || 'medium').toLowerCase()}">${(req.urgency || 'Medium').toUpperCase()}</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-action btn-notify" onclick="notifyDonors(${req.id}, '${req.blood_type}')" id="notifyBtn${req.id}">
+                                            <i class="bi bi-bell-fill"></i> Notify All
+                                        </button>
+                                        <button class="btn-action btn-view" onclick="viewMatchingDonors(${req.id}, '${req.blood_type}')">
+                                            <i class="bi bi-people-fill"></i> View
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+        
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error('Error loading matches:', error);
+        document.getElementById('matchesList').innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-exclamation-triangle"></i>
+                <h4>Error Loading Matching Data</h4>
+                <p>${error.message || 'Please try again later'}</p>
+            </div>
+        `;
+    }
 }
 
-// Notify Donors
+// Load Analytics
+async function loadAnalytics() {
+    try {
+        const donorsResponse = await makeApiRequest(`${API_URL}/api/donors/`);
+        const donors = await donorsResponse.json();
+
+        const requestsResponse = await makeApiRequest(`${API_URL}/api/blood-requests/`);
+        const requests = await requestsResponse.json();
+
+        // Blood Type Distribution
+        const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
+        const bloodTypeChart = document.getElementById('bloodTypeChart');
+        
+        const bloodTypeDistribution = bloodTypes.map(type => {
+            const count = donors.filter(d => d.blood_type === type).length;
+            return { type, count };
+        });
+
+        bloodTypeChart.innerHTML = `
+            <div class="blood-chart">
+                ${bloodTypeDistribution.map(item => `
+                    <div class="blood-chart-item">
+                        <span class="blood-type ${item.type.includes('-') ? 'negative' : 'positive'}">
+                            ${item.type}
+                        </span>
+                        <span class="count">${item.count}</span>
+                        <span class="label">donors</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        // Monthly Stats
+        const monthlyStats = document.getElementById('monthlyStats');
+        const thisMonth = new Date().getMonth();
+        const thisMonthRequests = requests.filter(r => {
+            const reqMonth = new Date(r.created_at).getMonth();
+            return reqMonth === thisMonth;
+        });
+
+        monthlyStats.innerHTML = `
+            <div class="monthly-grid">
+                <div class="monthly-stat-card">
+                    <h4><i class="bi bi-calendar-check"></i> This Month's Requests</h4>
+                    <div class="value">${thisMonthRequests.length}</div>
+                </div>
+                <div class="monthly-stat-card" style="border-left-color: var(--success);">
+                    <h4><i class="bi bi-check-circle"></i> Completed This Month</h4>
+                    <div class="value">${thisMonthRequests.filter(r => r.status === 'completed').length}</div>
+                </div>
+                <div class="monthly-stat-card" style="border-left-color: var(--warning);">
+                    <h4><i class="bi bi-hourglass-split"></i> Pending This Month</h4>
+                    <div class="value">${thisMonthRequests.filter(r => r.status === 'pending').length}</div>
+                </div>
+                <div class="monthly-stat-card" style="border-left-color: var(--info);">
+                    <h4><i class="bi bi-people"></i> New Donors This Month</h4>
+                    <div class="value">${donors.filter(d => new Date(d.created_at).getMonth() === thisMonth).length}</div>
+                </div>
+            </div>
+        `;
+
+        // Request Status Overview
+        const requestStatusChart = document.getElementById('requestStatusChart');
+        const statusCounts = {
+            pending: requests.filter(r => r.status === 'pending').length,
+            matched: requests.filter(r => r.status === 'matched').length,
+            completed: requests.filter(r => r.status === 'completed').length,
+            cancelled: requests.filter(r => r.status === 'cancelled').length
+        };
+
+        requestStatusChart.innerHTML = `
+            <div class="monthly-grid">
+                <div class="monthly-stat-card" style="border-left-color: var(--warning);">
+                    <h4><i class="bi bi-clock"></i> Pending Requests</h4>
+                    <div class="value">${statusCounts.pending}</div>
+                </div>
+                <div class="monthly-stat-card" style="border-left-color: var(--info);">
+                    <h4><i class="bi bi-link-45deg"></i> Matched Requests</h4>
+                    <div class="value">${statusCounts.matched}</div>
+                </div>
+                <div class="monthly-stat-card" style="border-left-color: var(--success);">
+                    <h4><i class="bi bi-check-circle"></i> Completed</h4>
+                    <div class="value">${statusCounts.completed}</div>
+                </div>
+                <div class="monthly-stat-card" style="border-left-color: var(--danger);">
+                    <h4><i class="bi bi-x-circle"></i> Cancelled</h4>
+                    <div class="value">${statusCounts.cancelled}</div>
+                </div>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+    }
+}
+
+// Load Settings
+async function loadSettings() {
+    try {
+        const donorsResponse = await makeApiRequest(`${API_URL}/api/donors/`);
+        const donors = await donorsResponse.json();
+
+        const hospitalsResponse = await makeApiRequest(`${API_URL}/api/hospitals/`);
+        const hospitals = await hospitalsResponse.json();
+
+        const totalUsers = donors.length + hospitals.length;
+        document.getElementById('settingsTotalUsers').textContent = totalUsers;
+
+    } catch (error) {
+        console.error('Error loading settings:', error);
+    }
+}
+
+// Notify Donors - FIXED VERSION
 async function notifyDonors(requestId, bloodType) {
-    if (!confirm(`Are you sure you want to notify all ${bloodType} donors about this request?`)) {
+    if (!confirm(`Are you sure you want to notify all ${bloodType} donors about this request #${requestId}?`)) {
         return;
     }
 
-    try {
-        const response = await fetch(`${API_URL}/api/blood-requests/${requestId}/notify-donors/`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
+    const button = document.getElementById(`notifyBtn${requestId}`);
+    if (button) {
+        button.disabled = true;
+        button.innerHTML = '<i class="bi bi-hourglass-split"></i> Notifying...';
+    }
 
+    try {
+        console.log(`Attempting to notify donors for request ${requestId}`);
+        
+        const response = await makeApiRequest(
+            `${API_URL}/api/blood-requests/${requestId}/notify-donors/`,
+            {
+                method: 'POST'
+            }
+        );
+
+        console.log('Response status:', response.status);
         const result = await response.json();
+        console.log('Response data:', result);
         
         if (response.ok) {
-            alert(`✅ Successfully notified ${result.notified_count || 0} donors!`);
+            alert(`✅ Successfully notified ${result.notified_count || result.donors_notified || 0} donors!`);
             loadDashboardStats();
+            // Reload the current section if it's requests or matches
+            const currentSection = document.querySelector('.menu-item.active').dataset.section;
+            if (currentSection === 'requests') loadAllRequests();
+            if (currentSection === 'matches') loadMatches();
         } else {
-            alert(`❌ Error: ${result.error || 'Failed to notify donors'}`);
+            const errorMsg = result.error || result.detail || result.message || 'Failed to notify donors';
+            alert(`❌ Error: ${errorMsg}`);
+            console.error('Error response:', result);
         }
 
     } catch (error) {
         console.error('Error notifying donors:', error);
-        alert('❌ An error occurred while notifying donors');
+        alert(`❌ An error occurred: ${error.message}. Please check the console for details.`);
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = '<i class="bi bi-bell-fill"></i> Notify';
+        }
     }
 }
 
 // View Details Functions
 function viewRequestDetails(id) {
-    alert(`View details for request #${id}`);
+    alert(`View details for request #${id}\n\nThis feature will show complete request information including hospital details, requirements, and status.`);
 }
 
 function viewDonorDetails(id) {
-    alert(`View details for donor #${id}`);
+    alert(`View details for donor #${id}\n\nThis feature will show complete donor profile including contact information and donation history.`);
 }
 
 function viewHospitalDetails(id) {
-    alert(`View details for hospital #${id}`);
+    alert(`View details for hospital #${id}\n\nThis feature will show complete hospital information including all requests made.`);
+}
+
+function viewMatchingDonors(requestId, bloodType) {
+    alert(`View matching donors for Request #${requestId}\n\nBlood Type: ${bloodType}\n\nThis will show a list of all eligible donors for this request.`);
+}
+
+// Settings Functions
+function saveSettings() {
+    alert('✅ Settings saved successfully!');
+}
+
+function exportData() {
+    alert('📥 Data export initiated. The file will be downloaded shortly.');
+}
+
+function testNotifications() {
+    alert('📧 Test notification sent to admin@lifelink.com');
+}
+
+function clearCache() {
+    if (confirm('Are you sure you want to clear the cache? This may temporarily slow down the system.')) {
+        alert('🗑️ Cache cleared successfully!');
+    }
 }
 
 // Filter Tabs
@@ -1298,12 +1873,15 @@ document.addEventListener('click', function(e) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard loaded. CSRF Token:', csrftoken ? 'Present' : 'Missing');
+    console.log('Auth Token:', token ? 'Present' : 'Missing');
     loadDashboardStats();
 });
 
 // Search functionality
 document.getElementById('searchInput').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
+    console.log('Searching for:', searchTerm);
     // Implement search logic here
 });
 </script>

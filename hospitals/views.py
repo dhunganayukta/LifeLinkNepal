@@ -10,6 +10,7 @@ from algorithms.haversine import haversine_distance
 from algorithms.mcdm import rank_donors_mcdm
 from algorithms.priority import run_priority_algorithm
 from algorithms.eligibility import is_donor_eligible
+from django.utils import timezone
 
 
 # ============================================
@@ -90,7 +91,6 @@ def create_blood_request(request):
                 return redirect('hospital_dashboard')
 
             # Rank using MCDM algorithm
-            # Normalize distances: replace None with a large number so sorting works
             distances = {d.id: (d.distance if d.distance is not None else 999.0) for d in eligible_donors}
             ranked_donors = rank_donors_mcdm(
                 eligible_donors,
@@ -234,15 +234,23 @@ def cancel_request(request, request_id):
 
 
 # ============================================
-# DONOR MANAGEMENT (RESTRICTED)
+# DONOR MANAGEMENT (RESTRICTED - PRIVACY PROTECTED)
 # ============================================
 @role_required('hospital')
 def hospital_donors(request):
     """
-    Hospital can only see limited donor info:
-    - Username
+    Hospital can ONLY see limited donor info:
+    - Username (NOT full name)
     - Blood type
     - Distance
+    
+    Hospital CANNOT see:
+    - Full name
+    - Phone number
+    - Email
+    - Address
+    - Age
+    - Any other personal information
     """
     hospital_profile = request.user.hospitalprofile
     blood_type_filter = request.GET.get('blood_type', '')
@@ -265,10 +273,13 @@ def hospital_donors(request):
 
     donor_list = []
     for donor in donors:
-        # RESTRICTED - include donor object so templates can access allowed attributes
+        # CRITICAL: Only expose username, blood_type, distance
+        # DO NOT include the donor object itself
         donor_list.append({
-            'donor': donor,
+            'username': donor.user.username,  # Only username, NOT full name
+            'blood_type': donor.blood_type,   # Blood type only
             'distance': round(distances.get(donor.id, 0), 2) if donor.id in distances else None,
+            # NO: full_name, phone, email, address, age, etc.
         })
 
     donor_list.sort(key=lambda x: x['distance'] if x['distance'] is not None else 999)

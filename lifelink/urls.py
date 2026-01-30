@@ -4,6 +4,7 @@ from . import views  # Import views from lifelink folder
 from donors import views as donor_views
 from hospitals import views as hospital_views
 
+
 urlpatterns = [
     # Main pages
     path('', views.home, name='home'),
@@ -13,6 +14,7 @@ urlpatterns = [
 
     # Admin
     path('admin/', admin.site.urls),
+    path('api/', include('api.urls')),
     path('admin-dashboard/', views.super_admin_dashboard, name='super_admin_dashboard'),
     
     # Apps

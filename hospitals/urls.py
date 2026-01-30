@@ -18,6 +18,7 @@ urlpatterns = [
     path('donors/', views.hospital_donors, name='hospital_donors'),
     # Donor detail view for hospitals (limited info)
     path('donor/<int:donor_id>/', donor_views.view_donor_detail, name='view_donor_detail'),
+   
     # notify_donor remains available in views but is intentionally not exposed as public URL in some setups
     
     # Profile Management

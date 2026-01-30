@@ -1,4 +1,4 @@
-# lifelink/views.py - Your main project views.py (UPDATED)
+# lifelink/views.py - CORRECTED VERSION
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -52,34 +52,8 @@ def create_request(request):
 
 
 # ========================================
-# DASHBOARD ROUTING SYSTEM (NEW!)
+# SUPER ADMIN DASHBOARD
 # ========================================
-
-@login_required
-def dashboard_router(request):
-    """
-    Smart router that automatically redirects users to their appropriate dashboard
-    This is a BACKUP route - usually the frontend handles routing via JavaScript
-    """
-    user = request.user
-    
-    # Check if user is super admin (staff/superuser)
-    if user.is_staff or user.is_superuser:
-        return redirect('super_admin_dashboard')
-    
-    # Check if user has donor profile
-    elif hasattr(user, 'donor_profile'):
-        return redirect('donor_dashboard')
-    
-    # Check if user has hospital profile  
-    elif hasattr(user, 'hospital_profile'):
-        return redirect('hospital_dashboard')
-    
-    # Fallback - something went wrong
-    else:
-        messages.error(request, "Unable to determine user type. Please contact support.")
-        return redirect('home')
-
 
 @login_required
 def super_admin_dashboard(request):
@@ -90,7 +64,7 @@ def super_admin_dashboard(request):
     # Security check: Only staff/superuser can access
     if not (request.user.is_staff or request.user.is_superuser):
         messages.error(request, "⛔ Access denied. Admin privileges required.")
-        return redirect('dashboard_router')
+        return redirect('home')  # ✅ Changed from 'dashboard_router' to 'home'
     
     context = {
         'user_type': 'super_admin',
