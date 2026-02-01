@@ -5,43 +5,31 @@
 
 {% block extra_css %}
 <style>
-    .info-card {
+    .donor-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .donor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 25px rgba(0,0,0,0.12);
+    }
+    
+    .filter-card {
         background: white;
         border-radius: 15px;
         padding: 1.5rem;
         box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        transition: transform 0.3s, box-shadow 0.3s;
-        border: none;
+        margin-bottom: 2rem;
     }
-    .info-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-    }
-
-    .fade-in-up {
-        animation: fadeInUp 0.6s ease-out;
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .privacy-notice {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-        border-left: 4px solid #ffc107;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-
-    body.dark-mode .info-card {
+    
+    /* Dark mode support */
+    body.dark-mode .donor-card,
+    body.dark-mode .filter-card {
         background-color: #2d2d2d;
         color: #e0e0e0;
     }
@@ -49,177 +37,184 @@
 {% endblock %}
 
 {% block content %}
-<!-- Page Header -->
+<!-- Header -->
 <section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
-            <div>
+            <div class="mb-3 mb-md-0">
                 <h2 class="fw-bold mb-1">
                     <i class="bi bi-people-fill me-2"></i>Browse Donors (Limited View)
                 </h2>
                 <p class="mb-0">
-                    <i class="bi bi-shield-lock-fill me-1"></i>Privacy Protected - Only basic info shown
+                    <i class="bi bi-shield-fill-check me-1"></i>Privacy Protected - Only basic info shown
                 </p>
             </div>
-            <a href="{% url 'hospital_dashboard' %}" class="btn btn-light">
-                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-            </a>
+            <div class="text-end">
+                <a href="{% url 'hospital_dashboard' %}" class="btn btn-light">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
         </div>
-    </div>
-</section>
-
-<!-- Privacy Notice -->
-<section class="py-3">
-    <div class="container">
-        <div class="privacy-notice">
-            <i class="bi bi-shield-lock-fill text-warning me-2"></i>
-            <strong>Privacy Protected:</strong> For donor safety, only username, blood type, and distance are visible. 
-            Full donor details are managed by admin. Create a blood request to notify eligible donors.
-        </div>
-    </div>
-</section>
-
-<!-- Filters Section -->
-<section class="py-3 bg-light">
-    <div class="container">
-        <form method="GET" action="{% url 'hospital_donors' %}" class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    <i class="bi bi-droplet-fill text-danger me-1"></i>Blood Type
-                </label>
-                <select name="blood_type" class="form-select">
-                    <option value="">All Blood Types</option>
-                    <option value="A+" {% if blood_type_filter == 'A+' %}selected{% endif %}>A+</option>
-                    <option value="A-" {% if blood_type_filter == 'A-' %}selected{% endif %}>A-</option>
-                    <option value="B+" {% if blood_type_filter == 'B+' %}selected{% endif %}>B+</option>
-                    <option value="B-" {% if blood_type_filter == 'B-' %}selected{% endif %}>B-</option>
-                    <option value="O+" {% if blood_type_filter == 'O+' %}selected{% endif %}>O+</option>
-                    <option value="O-" {% if blood_type_filter == 'O-' %}selected{% endif %}>O-</option>
-                    <option value="AB+" {% if blood_type_filter == 'AB+' %}selected{% endif %}>AB+</option>
-                    <option value="AB-" {% if blood_type_filter == 'AB-' %}selected{% endif %}>AB-</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-bold">
-                    <i class="bi bi-arrows-expand text-primary me-1"></i>Max Distance (km)
-                </label>
-                <input type="number" name="max_distance" class="form-control" 
-                       value="{{ max_distance }}" min="1" max="200" step="5">
-            </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-danger w-100">
-                    <i class="bi bi-funnel-fill me-1"></i>Apply Filters
-                </button>
-            </div>
-        </form>
     </div>
 </section>
 
 <section class="py-5">
     <div class="container">
-        {% if donor_list %}
-            <!-- Results Count -->
-            <div class="alert alert-info mb-4">
+        <!-- Privacy Notice -->
+        <div class="alert alert-warning border-warning mb-4">
+            <i class="bi bi-shield-exclamation me-2"></i>
+            <strong>Privacy Protected:</strong> For donor safety, only username, blood type, and distance are visible. 
+            Full donor details are managed by admin. Create a blood request to notify eligible donors.
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-card">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-droplet-fill text-danger me-1"></i>Blood Type
+                    </label>
+                    <select name="blood_type" class="form-select">
+                        <option value="">All Blood Types</option>
+                        <option value="A+" {% if blood_type_filter == "A+" %}selected{% endif %}>A+</option>
+                        <option value="A-" {% if blood_type_filter == "A-" %}selected{% endif %}>A-</option>
+                        <option value="B+" {% if blood_type_filter == "B+" %}selected{% endif %}>B+</option>
+                        <option value="B-" {% if blood_type_filter == "B-" %}selected{% endif %}>B-</option>
+                        <option value="AB+" {% if blood_type_filter == "AB+" %}selected{% endif %}>AB+</option>
+                        <option value="AB-" {% if blood_type_filter == "AB-" %}selected{% endif %}>AB-</option>
+                        <option value="O+" {% if blood_type_filter == "O+" %}selected{% endif %}>O+</option>
+                        <option value="O-" {% if blood_type_filter == "O-" %}selected{% endif %}>O-</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">
+                        <i class="bi bi-geo-alt-fill text-success me-1"></i>Max Distance (km)
+                        {% if not hospital_has_location %}
+                        <span class="text-danger small">(requires location)</span>
+                        {% endif %}
+                    </label>
+                    <input type="number" 
+                           name="max_distance" 
+                           class="form-control" 
+                           value="{{ max_distance }}" 
+                           min="1" 
+                           max="500"
+                           {% if not hospital_has_location %}disabled{% endif %}>
+                </div>
+                
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-danger w-100">
+                        <i class="bi bi-funnel-fill me-2"></i>Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Location Setup Notice (only if hospital doesn't have location) -->
+        {% if not hospital_has_location %}
+        <div class="alert alert-info border-info mb-4">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <strong>Setup Required:</strong> Distance filtering is currently disabled. 
+            <a href="{% url 'edit_hospital_profile' %}" class="alert-link fw-bold">Update your profile</a> 
+            with a valid address to enable distance-based donor searches and accurate routing.
+        </div>
+        {% endif %}
+
+        <!-- Results -->
+        <div class="mb-4">
+            <div class="alert alert-info mb-0">
                 <i class="bi bi-info-circle-fill me-2"></i>
-                Found <strong>{{ donor_list|length }}</strong> donors 
+                Found <strong>{{ donor_list|length }}</strong> donor(s)
                 {% if blood_type_filter %}matching <strong>{{ blood_type_filter }}</strong>{% endif %}
-                within <strong>{{ max_distance }}km</strong>
+                {% if hospital_has_location %}within <strong>{{ max_distance }}km</strong>{% endif %}
             </div>
+        </div>
 
+        <!-- Donor Grid -->
+        {% if donor_list %}
             <div class="row g-4">
-                {% for item in donor_list %}
-                    <div class="col-md-6 col-lg-4">
-                        <div class="info-card fade-in-up h-100">
-                            <!-- Limited Donor Info Header -->
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div>
-                                    <h5 class="fw-bold mb-1">
-                                        <i class="bi bi-person-circle text-primary me-1"></i>
-                                        @{{ item.username }}
-                                    </h5>
-                                    <small class="text-muted">Anonymous Donor</small>
-                                </div>
-                                <span class="badge bg-success">
-                                    <i class="bi bi-check-circle-fill me-1"></i>Available
-                                </span>
-                            </div>
-
-                            <!-- ONLY 3 PIECES OF INFO -->
-                            <div class="mb-3">
-                                <!-- 1. Blood Type -->
-                                <p class="mb-2">
-                                    <i class="bi bi-droplet-fill text-danger me-2"></i>
-                                    <strong>Blood Type:</strong>
-                                    <span class="badge bg-danger ms-2">{{ item.blood_type }}</span>
-                                </p>
-
-                                <!-- 2. Distance -->
-                                {% if item.distance %}
-                                <p class="mb-2">
-                                    <i class="bi bi-geo-alt-fill text-primary me-2"></i>
-                                    <strong>Distance:</strong>
-                                    <span class="badge bg-primary ms-2">{{ item.distance }} km</span>
-                                </p>
-                                {% else %}
-                                <p class="mb-2">
-                                    <i class="bi bi-geo-alt-fill text-muted me-2"></i>
-                                    <strong>Distance:</strong>
-                                    <span class="text-muted">Not available</span>
-                                </p>
-                                {% endif %}
-
-                                <!-- 3. Username (already shown above) -->
-                            </div>
-
-                            <!-- Privacy Notice -->
-                            <div class="alert alert-warning py-2 mb-3">
-                                <small>
-                                    <i class="bi bi-shield-lock-fill me-1"></i>
-                                    <strong>Privacy Protected</strong><br>
-                                    Full details managed by admin
-                                </small>
-                            </div>
-
-                            <!-- Action Info -->
-                            <div class="alert alert-info py-2 mb-0">
-                                <small>
-                                    <i class="bi bi-info-circle-fill me-1"></i>
-                                    Create a blood request to notify eligible donors through admin
-                                </small>
+                {% for donor in donor_list %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="donor-card">
+                        <div class="text-center mb-3">
+                            <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                 style="width: 80px; height: 80px;">
+                                <i class="bi bi-person-fill text-danger" style="font-size: 2.5rem;"></i>
                             </div>
                         </div>
+                        
+                        <div class="text-center">
+                            <h5 class="fw-bold mb-2">
+                                <i class="bi bi-person-badge me-1"></i>@{{ donor.username }}
+                            </h5>
+                            <p class="text-muted small mb-3">Anonymous Donor</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-droplet-fill text-danger me-1"></i>Blood Type:
+                                </span>
+                                <span class="badge bg-danger fs-6">{{ donor.blood_type }}</span>
+                            </div>
+                            
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-muted">
+                                    <i class="bi bi-geo-alt-fill text-success me-1"></i>Distance:
+                                </span>
+                                {% if donor.distance is not None %}
+                                    <span class="fw-bold">{{ donor.distance }} km</span>
+                                {% else %}
+                                    <span class="text-muted">Not available</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="border-top pt-3">
+                            <div class="d-flex align-items-center justify-content-center text-success">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <span class="badge bg-success">Available</span>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning mt-3 mb-0 small">
+                            <i class="bi bi-shield-lock-fill me-1"></i>
+                            <strong>Privacy Protected</strong><br>
+                            Full details managed by admin
+                        </div>
                     </div>
+                </div>
                 {% endfor %}
             </div>
-
-            <!-- Admin Contact Notice -->
-            <div class="alert alert-primary mt-4">
-                <i class="bi bi-headset me-2"></i>
-                <strong>Need to contact a specific donor?</strong> 
-                Create a blood request and our admin will manage sequential donor notifications to find the best match.
-            </div>
-
         {% else %}
             <div class="text-center py-5">
-                <i class="bi bi-people-fill text-muted" style="font-size: 4rem;"></i>
-                <h4 class="text-muted mt-3">No Donors Found</h4>
-                <p class="text-muted">
-                    {% if blood_type_filter or max_distance != 50 %}
-                        Try adjusting your filters or expanding the search radius
+                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3 mb-2">No Donors Found</h4>
+                <p class="text-muted mb-4">
+                    {% if blood_type_filter %}
+                        No donors found matching <strong>{{ blood_type_filter }}</strong>
+                        {% if hospital_has_location %}within {{ max_distance }}km{% endif %}.
                     {% else %}
-                        No donors are currently available in your area
+                        No available donors
+                        {% if hospital_has_location %}within {{ max_distance }}km{% endif %}.
                     {% endif %}
                 </p>
-                <div class="d-flex gap-2 justify-content-center mt-3">
-                    <a href="{% url 'hospital_donors' %}" class="btn btn-outline-primary">
-                        <i class="bi bi-arrow-counterclockwise me-1"></i>Clear Filters
-                    </a>
-                    <a href="{% url 'create_blood_request' %}" class="btn btn-danger">
-                        <i class="bi bi-plus-circle me-1"></i>Create Blood Request
-                    </a>
-                </div>
+                <p class="text-muted">
+                    Try adjusting your filters or 
+                    <a href="{% url 'create_blood_request' %}" class="text-danger fw-bold">create a blood request</a> 
+                    to notify eligible donors.
+                </p>
             </div>
         {% endif %}
+
+        <!-- Bottom Notice -->
+        <div class="alert alert-info mt-4">
+            <i class="bi bi-lightbulb-fill me-2"></i>
+            <strong>Tip:</strong> To contact specific donors, create a blood request. 
+            Our AI algorithms will automatically find, rank, and notify the best matching donors based on 
+            distance, blood compatibility, and availability.
+        </div>
     </div>
 </section>
 {% endblock %}

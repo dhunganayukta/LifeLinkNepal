@@ -54,6 +54,17 @@
     }
 </style>
 {% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.fulfill-form button[type=submit]').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+            console.log('Fulfill button clicked for form:', this.closest('form'));
+        });
+    });
+});
+</script>
+{% endblock %}
 
 {% block content %}
 <!-- Dashboard Header -->
@@ -131,9 +142,10 @@
                                     <tr>
                                         <th>Patient</th>
                                         <th>Blood Type</th>
-                                        <th>Units</th>
+
+                                        <th class="d-none d-sm-table-cell">Units</th>
                                         <th>Urgency</th>
-                                        <th>Priority Score</th>
+                                        <th class="d-none d-md-table-cell">Priority Score</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -149,7 +161,7 @@
                                             <small class="text-muted">{{ item.request.patient_age|default:"N/A" }} yrs</small>
                                         </td>
                                         <td><span class="badge bg-danger fs-6">{{ item.request.blood_type }}</span></td>
-                                        <td>{{ item.request.units_needed }} units</td>
+                                        <td class="d-none d-sm-table-cell">{{ item.request.units_needed }} units</td>
                                         <td>
                                             <span class="badge 
                                                 {% if item.request.urgency_level == 'critical' %}bg-danger
@@ -158,7 +170,7 @@
                                                 {{ item.request.get_urgency_level_display|default:item.request.urgency_level|upper }}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td class="d-none d-md-table-cell">
                                             <div class="d-flex align-items-center">
                                                 <span class="badge 
                                                     {% if item.priority_level == 'critical' %}bg-danger
@@ -192,12 +204,13 @@
                                                     <i class="bi bi-search"></i>
                                                 </a>
                                                 {% if item.request.status == 'pending' %}
-                                                <a href="{% url 'mark_fulfilled' item.request.id %}" 
-                                                   class="btn btn-outline-success"
-                                                   title="Mark as Fulfilled"
-                                                   onclick="return confirm('Mark this request as fulfilled?')">
-                                                    <i class="bi bi-check-circle"></i>
-                                                </a>
+                                                <form method="post" action="{% url 'mark_fulfilled' item.request.id %}" style="display:inline" class="fulfill-form">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                                    <button type="submit" class="btn btn-outline-success" title="Mark as Fulfilled" onclick="return confirm('Mark this request as fulfilled?')">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+                                                </form>
                                                 {% endif %}
                                             </div>
                                         </td>

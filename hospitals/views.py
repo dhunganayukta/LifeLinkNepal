@@ -11,6 +11,7 @@ from algorithms.mcdm import rank_donors_mcdm
 from algorithms.priority import run_priority_algorithm
 from algorithms.eligibility import is_donor_eligible
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 
 # ============================================
@@ -139,14 +140,21 @@ def create_blood_request(request):
 @role_required('hospital')
 def all_blood_requests(request):
     hospital_profile = request.user.hospitalprofile
-    blood_requests = BloodRequest.objects.filter(
-        hospital=hospital_profile
-    ).order_by('-created_at')
+    # Support simple status filtering via ?status=all|pending|fulfilled
+    status = request.GET.get('status', 'all')
+
+    blood_requests = BloodRequest.objects.filter(hospital=hospital_profile).order_by('-created_at')
+    if status and status != 'all':
+        # Only allow expected statuses to avoid invalid filters
+        allowed = ['pending', 'fulfilled', 'cancelled', 'matched', 'completed']
+        if status in allowed:
+            blood_requests = blood_requests.filter(status=status)
 
     ranked_requests = run_priority_algorithm(blood_requests)
     context = {
         'hospital': hospital_profile,
         'ranked_requests': ranked_requests,
+        'status': status,
     }
     return render(request, 'hospitals/all_blood_requests.html', context)
 
@@ -202,6 +210,7 @@ def view_blood_request(request, request_id):
 # MARK FULFILLED / CANCEL
 # ============================================
 @role_required('hospital')
+@require_POST
 def mark_fulfilled(request, request_id):
     blood_request = get_object_or_404(BloodRequest, id=request_id, hospital=request.user.hospitalprofile)
     blood_request.status = 'fulfilled'
@@ -214,6 +223,10 @@ def mark_fulfilled(request, request_id):
     ).update(status='cancelled')
     
     messages.success(request, f"Request for {blood_request.patient_name} marked as fulfilled.")
+    # Redirect back to the page that triggered the action, if provided
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
+    if next_url:
+        return redirect(next_url)
     return redirect('hospital_dashboard')
 
 
@@ -254,41 +267,71 @@ def hospital_donors(request):
     """
     hospital_profile = request.user.hospitalprofile
     blood_type_filter = request.GET.get('blood_type', '')
-    max_distance = request.GET.get('max_distance', 50)
+
+    # Get max_distance parameter
+    try:
+        max_distance = int(request.GET.get('max_distance', 50))
+    except (ValueError, TypeError):
+        max_distance = 50
 
     donors = DonorProfile.objects.filter(is_available=True, user__is_active=True)
+
     if blood_type_filter:
         donors = donors.filter(blood_type=blood_type_filter)
 
-    distances = {}
-    if hospital_profile.latitude and hospital_profile.longitude:
-        distances = {d.id: haversine_distance(hospital_profile.latitude, hospital_profile.longitude, d.latitude, d.longitude)
-                     for d in donors if d.latitude and d.longitude}
-        try:
-            max_dist = float(max_distance)
-            nearby_ids = [d_id for d_id, dist in distances.items() if dist <= max_dist]
-            donors = donors.filter(id__in=nearby_ids)
-        except ValueError:
-            pass
+    # Check if hospital has location coordinates
+    hospital_has_location = (
+        hospital_profile.latitude is not None
+        and hospital_profile.longitude is not None
+    )
 
+    distances = {}  # donor.id -> km
     donor_list = []
-    for donor in donors:
-        # CRITICAL: Only expose username, blood_type, distance
-        # DO NOT include the donor object itself
-        donor_list.append({
-            'username': donor.user.username,  # Only username, NOT full name
-            'blood_type': donor.blood_type,   # Blood type only
-            'distance': round(distances.get(donor.id, 0), 2) if donor.id in distances else None,
-            # NO: full_name, phone, email, address, age, etc.
-        })
 
-    donor_list.sort(key=lambda x: x['distance'] if x['distance'] is not None else 999)
+    if hospital_has_location:
+        # Calculate distance for every donor that has coordinates
+        for d in donors:
+            if d.latitude is not None and d.longitude is not None:
+                distance = haversine_distance(
+                    hospital_profile.latitude,
+                    hospital_profile.longitude,
+                    d.latitude,
+                    d.longitude,
+                )
+                distances[d.id] = distance
+                
+                # Only include donors within max_distance
+                if distance <= max_distance:
+                    donor_list.append({
+                        'username': d.user.username,
+                        'blood_type': d.blood_type,
+                        'distance': round(distance, 2),
+                    })
+            else:
+                # Donor doesn't have coordinates - still show them but without distance
+                donor_list.append({
+                    'username': d.user.username,
+                    'blood_type': d.blood_type,
+                    'distance': None,
+                })
+        
+        # Sort by distance (donors without distance go to end)
+        donor_list.sort(key=lambda x: x['distance'] if x['distance'] is not None else float('inf'))
+    else:
+        # Hospital doesn't have location - show all donors without distance
+        for d in donors:
+            donor_list.append({
+                'username': d.user.username,
+                'blood_type': d.blood_type,
+                'distance': None,
+            })
 
     context = {
         'hospital': hospital_profile,
         'donor_list': donor_list,
         'blood_type_filter': blood_type_filter,
         'max_distance': max_distance,
+        'hospital_has_location': hospital_has_location,
     }
     return render(request, 'hospitals/hospital_donors.html', context)
 
@@ -302,20 +345,64 @@ def hospital_profile(request):
     context = {'hospital': hospital_profile}
     return render(request, 'hospitals/hospital_profile.html', context)
 
-
 @role_required('hospital')
 def edit_hospital_profile(request):
     hospital_profile = request.user.hospitalprofile
+
     if request.method == 'POST':
+        old_address = hospital_profile.address
+
+        # Update fields from form
         hospital_profile.hospital_name = request.POST.get('hospital_name', hospital_profile.hospital_name)
         hospital_profile.phone = request.POST.get('phone', hospital_profile.phone)
         hospital_profile.address = request.POST.get('address', hospital_profile.address)
+        hospital_profile.license_number = request.POST.get('license_number', hospital_profile.license_number)
+
+        # Auto-geocode if address changed
+        if hospital_profile.address != old_address:
+            try:
+                from geopy.geocoders import Nominatim
+                from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+
+                geolocator = Nominatim(user_agent="lifelink_nepal")
+                location = geolocator.geocode(hospital_profile.address + ", Nepal", timeout=10)
+
+                if location:
+                    hospital_profile.latitude = location.latitude
+                    hospital_profile.longitude = location.longitude
+                    messages.success(
+                        request, 
+                        f"✅ Profile updated! Coordinates set: {location.latitude:.4f}, {location.longitude:.4f}"
+                    )
+                else:
+                    messages.warning(
+                        request,
+                        "⚠️ Profile updated, but couldn't find exact coordinates. "
+                        "Distance-based donor search may not be accurate."
+                    )
+            except (GeocoderTimedOut, GeocoderServiceError):
+                messages.warning(
+                    request,
+                    "⚠️ Profile updated, but geocoding service is temporarily unavailable. "
+                    "Coordinates not updated."
+                )
+            except Exception as e:
+                messages.warning(
+                    request,
+                    f"⚠️ Profile updated, but an unexpected error occurred while geocoding: {str(e)}"
+                )
+        else:
+            messages.success(request, "✅ Profile updated successfully.")
+
+        # Save all changes
         hospital_profile.save()
-        messages.success(request, "Profile updated successfully.")
         return redirect('hospital_profile')
 
+    # GET request - show the form
     context = {'hospital': hospital_profile}
-    return render(request, 'hospitals/hospital_profile.html', context)
+    return render(request, 'hospitals/edit_hospital_profile.html', context)
+
+
 
 
 # ============================================

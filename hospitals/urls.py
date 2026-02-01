@@ -24,4 +24,5 @@ urlpatterns = [
     # Profile Management
     path('profile/', views.hospital_profile, name='hospital_profile'),
     path('profile/edit/', views.edit_hospital_profile, name='edit_hospital_profile'),
+ 
 ]
