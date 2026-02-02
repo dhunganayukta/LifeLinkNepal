@@ -1,4 +1,3 @@
-<!-- hospital_profile.html -->
 {% extends 'base.html' %}
 {% load static %}
 
@@ -28,6 +27,21 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
+                <!-- Location Status Alert -->
+                {% if hospital.latitude and hospital.longitude %}
+                <div class="alert alert-success border-success mb-4">
+                    <i class="bi bi-geo-alt-fill me-2"></i>
+                    <strong>Location Configured:</strong> Distance-based donor search is enabled.
+                </div>
+                {% else %}
+                <div class="alert alert-warning border-warning mb-4">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Location Not Set:</strong> Distance filtering is disabled. 
+                    <a href="{% url 'edit_hospital_profile' %}" class="alert-link fw-bold">Update your address</a> 
+                    to enable distance-based donor searches.
+                </div>
+                {% endif %}
+
                 <div class="info-card">
                     <div class="text-center mb-4">
                         <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
@@ -70,11 +84,65 @@
                             <p class="fw-bold">{{ hospital.created_at|date:"M d, Y" }}</p>
                         </div>
                     </div>
+
+                    <!-- Location Coordinates Section -->
+                    <div class="border-top mt-4 pt-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-geo-alt-fill text-success me-2"></i>Location Coordinates
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="text-muted small">Latitude</label>
+                                {% if hospital.latitude %}
+                                    <p class="fw-bold text-success">
+                                        <i class="bi bi-check-circle-fill me-1"></i>{{ hospital.latitude|floatformat:6 }}
+                                    </p>
+                                {% else %}
+                                    <p class="text-danger">
+                                        <i class="bi bi-x-circle-fill me-1"></i>Not set
+                                    </p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small">Longitude</label>
+                                {% if hospital.longitude %}
+                                    <p class="fw-bold text-success">
+                                        <i class="bi bi-check-circle-fill me-1"></i>{{ hospital.longitude|floatformat:6 }}
+                                    </p>
+                                {% else %}
+                                    <p class="text-danger">
+                                        <i class="bi bi-x-circle-fill me-1"></i>Not set
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if hospital.latitude and hospital.longitude %}
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <small>
+                                <strong>Distance-based features enabled:</strong> You can now filter donors by distance 
+                                and see accurate routing information for blood requests.
+                            </small>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning mt-3 mb-0">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <small>
+                                <strong>Action Required:</strong> To enable distance-based donor filtering, please 
+                                <a href="{% url 'edit_hospital_profile' %}" class="alert-link fw-bold">update your profile</a> 
+                                with a valid address. The system will automatically geocode your location.
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -84,93 +152,10 @@
         padding: 2rem;
         box-shadow: 0 5px 20px rgba(0,0,0,0.08);
     }
-</style>
-{% endblock %}
-{% endblock %}
-
-
-<!-- edit_hospital_profile.html -->
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Edit Profile - {{ hospital.hospital_name }}{% endblock %}
-
-{% block content %}
-<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
-            <div>
-                <h2 class="fw-bold mb-1">Edit Hospital Profile</h2>
-                <p class="mb-0">Update your hospital information</p>
-            </div>
-            <a href="{% url 'hospital_profile' %}" class="btn btn-light">
-                <i class="bi bi-arrow-left me-2"></i>Back
-            </a>
-        </div>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="info-card">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label fw-bold">
-                                    <i class="bi bi-hospital-fill text-danger me-1"></i>Hospital Name
-                                </label>
-                                <input type="text" name="hospital_name" class="form-control" 
-                                       value="{{ hospital.hospital_name }}" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">
-                                    <i class="bi bi-telephone-fill text-danger me-1"></i>Phone Number
-                                </label>
-                                <input type="tel" name="phone" class="form-control" 
-                                       value="{{ hospital.phone }}" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">
-                                    <i class="bi bi-envelope-fill text-danger me-1"></i>Email
-                                </label>
-                                <input type="email" class="form-control" 
-                                       value="{{ hospital.user.email }}" disabled>
-                                <small class="text-muted">Contact admin to change email</small>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold">
-                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>Address
-                                </label>
-                                <textarea name="address" class="form-control" rows="3" required>{{ hospital.address }}</textarea>
-                            </div>
-                            <div class="col-12">
-                                <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{% url 'hospital_profile' %}" class="btn btn-outline-secondary">
-                                        Cancel
-                                    </a>
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="bi bi-save-fill me-1"></i>Save Changes
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{% block extra_css %}
-<style>
-    .info-card {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    
+    body.dark-mode .info-card {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
     }
 </style>
 {% endblock %}

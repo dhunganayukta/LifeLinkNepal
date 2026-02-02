@@ -7,59 +7,166 @@
 <style>
     .info-card {
         background: white;
-        border-radius: 15px;
+        border-radius: 8px;
         padding: 1.5rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .info-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .table {
+        background: white;
     }
     
     .table th {
         background-color: #f8f9fa;
         font-weight: 600;
         border-bottom: 2px solid #dee2e6;
+        color: #495057;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .table td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
     }
     
     .table-hover tbody tr:hover {
-        background-color: rgba(199, 30, 53, 0.05);
+        background-color: rgba(199, 30, 53, 0.04);
     }
     
-    .fade-in-up {
-        animation: fadeInUp 0.6s ease-out;
+    /* Responsive button group */
+    .action-buttons {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: nowrap;
     }
     
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+    .action-buttons .btn {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.875rem;
+        white-space: nowrap;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        
+        .action-buttons .btn {
+            width: 100%;
+            padding: 0.5rem;
         }
+        
+        .table td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .table th {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .action-buttons .btn {
+            font-size: 0.75rem;
+        }
+    }
+    
+    /* Classic stat cards */
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        border: 1px solid #e0e0e0;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0.25rem 0;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    /* Priority badges */
+    .priority-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 600;
     }
     
     /* Dark mode support */
-    body.dark-mode .info-card {
+    body.dark-mode .info-card,
+    body.dark-mode .stat-card,
+    body.dark-mode .table {
         background-color: #2d2d2d;
         color: #e0e0e0;
+        border-color: #404040;
     }
     
     body.dark-mode .table th {
         background-color: #1a1a1a;
         color: #e0e0e0;
+        border-color: #404040;
     }
     
-    body.dark-mode .table {
+    body.dark-mode .table td {
         color: #e0e0e0;
+        border-color: #404040;
+    }
+    
+    body.dark-mode .stat-card .stat-label {
+        color: #adb5bd;
     }
 </style>
 {% endblock %}
+
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-    document.querySelectorAll('.fulfill-form button[type=submit]').forEach(function(btn){
-        btn.addEventListener('click', function(e){
-            console.log('Fulfill button clicked for form:', this.closest('form'));
+    // Confirm before marking as fulfilled
+    document.querySelectorAll('.fulfill-form').forEach(function(form){
+        form.addEventListener('submit', function(e){
+            if (!confirm('Are you sure you want to mark this request as fulfilled?')) {
+                e.preventDefault();
+            }
         });
     });
 });
@@ -70,14 +177,14 @@ document.addEventListener('DOMContentLoaded', function(){
 <!-- Dashboard Header -->
 <section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
-            <div class="mb-3 mb-md-0">
+        <div class="d-flex justify-content-between align-items-center text-white flex-wrap gap-3">
+            <div>
                 <h2 class="fw-bold mb-1">{{ hospital.hospital_name }}</h2>
                 <p class="mb-0">
                     <i class="bi bi-geo-alt-fill me-1"></i>{{ hospital.address }}
                 </p>
             </div>
-            <div class="text-end">
+            <div>
                 <a href="{% url 'create_blood_request' %}" class="btn btn-light btn-lg">
                     <i class="bi bi-plus-circle-fill me-2"></i>New Blood Request
                 </a>
@@ -93,61 +200,68 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="col-lg-8">
                 <!-- Stats Overview -->
                 <div class="row g-3 mb-4">
-                    <div class="col-md-3 col-6">
-                        <div class="info-card text-center bg-danger bg-opacity-10 fade-in-up">
-                            <i class="bi bi-clipboard2-pulse-fill text-danger fs-1"></i>
-                            <h4 class="fw-bold mt-2 mb-0">{{ pending_count|default:0 }}</h4>
-                            <p class="text-muted small mb-0">Pending Requests</p>
+                    <div class="col-xl-3 col-md-6 col-6">
+                        <div class="stat-card">
+                            <div class="stat-icon text-warning">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="stat-number text-warning">{{ pending_count|default:0 }}</div>
+                            <div class="stat-label">Pending</div>
                         </div>
                     </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-card text-center bg-success bg-opacity-10 fade-in-up" style="animation-delay: 0.1s;">
-                            <i class="bi bi-check-circle-fill text-success fs-1"></i>
-                            <h4 class="fw-bold mt-2 mb-0">{{ fulfilled_count|default:0 }}</h4>
-                            <p class="text-muted small mb-0">Fulfilled</p>
+                    <div class="col-xl-3 col-md-6 col-6">
+                        <div class="stat-card">
+                            <div class="stat-icon text-success">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="stat-number text-success">{{ fulfilled_count|default:0 }}</div>
+                            <div class="stat-label">Fulfilled</div>
                         </div>
                     </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-card text-center bg-warning bg-opacity-10 fade-in-up" style="animation-delay: 0.2s;">
-                            <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
-                            <h4 class="fw-bold mt-2 mb-0">{{ critical_count|default:0 }}</h4>
-                            <p class="text-muted small mb-0">Critical Priority</p>
+                    <div class="col-xl-3 col-md-6 col-6">
+                        <div class="stat-card">
+                            <div class="stat-icon text-danger">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+                            <div class="stat-number text-danger">{{ critical_count|default:0 }}</div>
+                            <div class="stat-label">Critical</div>
                         </div>
                     </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-card text-center bg-info bg-opacity-10 fade-in-up" style="animation-delay: 0.3s;">
-                            <i class="bi bi-cpu-fill text-info fs-1"></i>
-                            <h4 class="fw-bold mt-2 mb-0">AI</h4>
-                            <p class="text-muted small mb-0">Algorithms Active</p>
+                    <div class="col-xl-3 col-md-6 col-6">
+                        <div class="stat-card">
+                            <div class="stat-icon text-primary">
+                                <i class="bi bi-list-check"></i>
+                            </div>
+                            <div class="stat-number text-primary">{{ total_requests|default:0 }}</div>
+                            <div class="stat-label">Total</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Blood Requests Ranked by Priority -->
-                <div class="info-card mb-4 fade-in-up">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Blood Requests Table -->
+                <div class="info-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
                         <h4 class="fw-bold mb-0">
                             <i class="bi bi-list-check text-danger me-2"></i>
-                            Blood Requests (Priority Ranked)
+                            Blood Requests
                         </h4>
                         <span class="badge bg-info">
-                            <i class="bi bi-cpu me-1"></i>Priority Algorithm
+                            <i class="bi bi-cpu me-1"></i>AI Ranked
                         </span>
                     </div>
 
                     {% if ranked_requests %}
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
                                         <th>Patient</th>
-                                        <th>Blood Type</th>
-
-                                        <th class="d-none d-sm-table-cell">Units</th>
+                                        <th>Blood</th>
+                                        <th class="d-none d-md-table-cell">Units</th>
                                         <th>Urgency</th>
-                                        <th class="d-none d-md-table-cell">Priority Score</th>
+                                        <th class="d-none d-lg-table-cell">Priority</th>
                                         <th>Status</th>
-                                        <th>Actions</th>
+                                        <th style="min-width: 140px;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -157,58 +271,61 @@ document.addEventListener('DOMContentLoaded', function(){
                                         {% elif item.priority_level == 'high' %}table-warning
                                         {% endif %}">
                                         <td>
-                                            <strong>{{ item.request.patient_name }}</strong><br>
-                                            <small class="text-muted">{{ item.request.patient_age|default:"N/A" }} yrs</small>
+                                            <strong class="d-block">{{ item.request.patient_name }}</strong>
+                                            <small class="text-muted">
+                                                {% if item.request.patient_age %}{{ item.request.patient_age }} yrs{% else %}Age N/A{% endif %}
+                                            </small>
                                         </td>
-                                        <td><span class="badge bg-danger fs-6">{{ item.request.blood_type }}</span></td>
-                                        <td class="d-none d-sm-table-cell">{{ item.request.units_needed }} units</td>
+                                        <td>
+                                            <span class="badge bg-danger">{{ item.request.blood_type }}</span>
+                                        </td>
+                                        <td class="d-none d-md-table-cell">
+                                            {{ item.request.units_needed }}
+                                        </td>
                                         <td>
                                             <span class="badge 
                                                 {% if item.request.urgency_level == 'critical' %}bg-danger
                                                 {% elif item.request.urgency_level == 'urgent' %}bg-warning text-dark
                                                 {% else %}bg-success{% endif %}">
-                                                {{ item.request.get_urgency_level_display|default:item.request.urgency_level|upper }}
+                                                {{ item.request.get_urgency_level_display|upper }}
                                             </span>
                                         </td>
-                                        <td class="d-none d-md-table-cell">
-                                            <div class="d-flex align-items-center">
-                                                <span class="badge 
-                                                    {% if item.priority_level == 'critical' %}bg-danger
-                                                    {% elif item.priority_level == 'high' %}bg-warning text-dark
-                                                    {% elif item.priority_level == 'medium' %}bg-info
-                                                    {% else %}bg-secondary{% endif %} me-2">
-                                                    {{ item.priority_score|floatformat:0 }}
-                                                </span>
-                                                <div class="progress flex-grow-1" style="height: 8px; max-width: 60px;">
-                                                    <div class="progress-bar 
-                                                        {% if item.priority_score >= 80 %}bg-danger
-                                                        {% elif item.priority_score >= 60 %}bg-warning
-                                                        {% else %}bg-info{% endif %}" 
-                                                        style="width: {{ item.priority_score }}%"></div>
-                                                </div>
-                                            </div>
+                                        <td class="d-none d-lg-table-cell">
+                                            <span class="badge 
+                                                {% if item.priority_level == 'critical' %}bg-danger
+                                                {% elif item.priority_level == 'high' %}bg-warning text-dark
+                                                {% elif item.priority_level == 'medium' %}bg-info
+                                                {% else %}bg-secondary{% endif %}">
+                                                {{ item.priority_score|floatformat:0 }}
+                                            </span>
                                         </td>
                                         <td>
                                             <span class="badge 
                                                 {% if item.request.status == 'fulfilled' %}bg-success
                                                 {% elif item.request.status == 'pending' %}bg-warning text-dark
                                                 {% else %}bg-secondary{% endif %}">
-                                                {{ item.request.get_status_display|default:item.request.status }}
+                                                {{ item.request.get_status_display }}
                                             </span>
                                         </td>
                                         <td>
-                                            <div class="btn-group btn-group-sm">
+                                            <div class="action-buttons">
                                                 <a href="{% url 'view_blood_request' item.request.id %}" 
-                                                   class="btn btn-outline-primary" 
-                                                   title="View & Find Donors">
-                                                    <i class="bi bi-search"></i>
+                                                   class="btn btn-sm btn-primary" 
+                                                   title="View Details">
+                                                    <i class="bi bi-eye me-1"></i>
+                                                    <span class="d-none d-sm-inline">View</span>
                                                 </a>
                                                 {% if item.request.status == 'pending' %}
-                                                <form method="post" action="{% url 'mark_fulfilled' item.request.id %}" style="display:inline" class="fulfill-form">
+                                                <form method="post" 
+                                                      action="{% url 'mark_fulfilled' item.request.id %}" 
+                                                      class="fulfill-form d-inline">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                                    <button type="submit" class="btn btn-outline-success" title="Mark as Fulfilled" onclick="return confirm('Mark this request as fulfilled?')">
-                                                        <i class="bi bi-check-circle"></i>
+                                                    <button type="submit" 
+                                                            class="btn btn-sm btn-success" 
+                                                            title="Mark as Fulfilled">
+                                                        <i class="bi bi-check-circle me-1"></i>
+                                                        <span class="d-none d-sm-inline">Fulfill</span>
                                                     </button>
                                                 </form>
                                                 {% endif %}
@@ -222,55 +339,46 @@ document.addEventListener('DOMContentLoaded', function(){
                         
                         <div class="alert alert-info mt-3 mb-0">
                             <i class="bi bi-info-circle-fill me-2"></i>
-                            <strong>Smart Ranking:</strong> Requests are automatically prioritized based on urgency level, waiting time, blood units needed, and blood type rarity using our Priority Algorithm.
+                            <small><strong>AI Ranking:</strong> Requests prioritized by urgency, waiting time, units needed, and blood rarity.</small>
                         </div>
                     {% else %}
                         <div class="text-center py-5">
                             <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
-                            <h5 class="text-muted mt-3">No Active Blood Requests</h5>
-                            <p class="text-muted">Click "New Blood Request" to create your first request</p>
-                            <a href="{% url 'create_blood_request' %}" class="btn btn-danger mt-2">
+                            <h5 class="text-muted mt-3 mb-2">No Blood Requests</h5>
+                            <p class="text-muted mb-3">Create your first blood request to get started</p>
+                            <a href="{% url 'create_blood_request' %}" class="btn btn-danger">
                                 <i class="bi bi-plus-circle me-1"></i>Create Request
                             </a>
                         </div>
                     {% endif %}
                 </div>
 
-                <!-- Active Algorithms Info -->
-                <div class="info-card fade-in-up">
-                    <h4 class="fw-bold mb-3">
+                <!-- AI Algorithms Info -->
+                <div class="info-card">
+                    <h5 class="fw-bold mb-3">
                         <i class="bi bi-cpu text-danger me-2"></i>
                         Active AI Algorithms
-                    </h4>
+                    </h5>
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <div class="border rounded p-3 text-center h-100">
-                                <i class="bi bi-sort-numeric-down text-primary fs-2"></i>
-                                <h6 class="fw-bold mt-2">Priority Algorithm</h6>
-                                <small class="text-muted">Ranks requests by urgency, time, units, and blood rarity</small>
-                                <div class="progress mt-2" style="height: 4px;">
-                                    <div class="progress-bar bg-primary" style="width: 100%"></div>
-                                </div>
+                            <div class="text-center p-3 border rounded">
+                                <i class="bi bi-sort-numeric-down text-primary fs-3"></i>
+                                <h6 class="fw-bold mt-2 mb-1">Priority Algorithm</h6>
+                                <small class="text-muted">Smart request ranking</small>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="border rounded p-3 text-center h-100">
-                                <i class="bi bi-geo-alt text-success fs-2"></i>
-                                <h6 class="fw-bold mt-2">Haversine Distance</h6>
-                                <small class="text-muted">Calculates distances to find nearest donors</small>
-                                <div class="progress mt-2" style="height: 4px;">
-                                    <div class="progress-bar bg-success" style="width: 100%"></div>
-                                </div>
+                            <div class="text-center p-3 border rounded">
+                                <i class="bi bi-geo-alt text-success fs-3"></i>
+                                <h6 class="fw-bold mt-2 mb-1">Haversine Distance</h6>
+                                <small class="text-muted">Nearest donor finder</small>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="border rounded p-3 text-center h-100">
-                                <i class="bi bi-star text-warning fs-2"></i>
-                                <h6 class="fw-bold mt-2">MCDM (TOPSIS)</h6>
-                                <small class="text-muted">Multi-criteria ranking for best donor matches</small>
-                                <div class="progress mt-2" style="height: 4px;">
-                                    <div class="progress-bar bg-warning" style="width: 100%"></div>
-                                </div>
+                            <div class="text-center p-3 border rounded">
+                                <i class="bi bi-star text-warning fs-3"></i>
+                                <h6 class="fw-bold mt-2 mb-1">MCDM (TOPSIS)</h6>
+                                <small class="text-muted">Best match ranking</small>
                             </div>
                         </div>
                     </div>
@@ -278,11 +386,11 @@ document.addEventListener('DOMContentLoaded', function(){
             </div>
 
             <!-- Sidebar -->
-            <div class="col-lg-4">
+            <div class="col-lg-4 mt-4 mt-lg-0">
                 <!-- Hospital Info Card -->
-                <div class="info-card text-center fade-in-up mb-4">
-                    <div class="bg-danger bg-opacity-10 rounded-3 p-4 mb-3">
-                        <i class="bi bi-hospital-fill text-danger" style="font-size: 4rem;"></i>
+                <div class="info-card text-center mb-4">
+                    <div class="bg-danger bg-opacity-10 rounded p-4 mb-3">
+                        <i class="bi bi-hospital-fill text-danger" style="font-size: 3.5rem;"></i>
                     </div>
                     <h5 class="fw-bold mb-2">{{ hospital.hospital_name }}</h5>
                     <p class="text-muted small mb-2">
@@ -293,40 +401,40 @@ document.addEventListener('DOMContentLoaded', function(){
                     </p>
                     <div class="d-grid gap-2">
                         <a href="{% url 'create_blood_request' %}" class="btn btn-danger">
-                            <i class="bi bi-plus-circle me-1"></i>New Request
+                            <i class="bi bi-plus-circle me-2"></i>New Request
                         </a>
-                        <a href="{% url 'hospital_profile' %}" class="btn btn-outline-danger">
-                            <i class="bi bi-pencil-fill me-1"></i>Edit Profile
+                        <a href="{% url 'hospital_profile' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-person-circle me-2"></i>View Profile
                         </a>
                     </div>
                 </div>
 
                 <!-- Quick Stats -->
-                <div class="info-card fade-in-up mb-4" style="animation-delay: 0.1s;">
+                <div class="info-card mb-4">
                     <h5 class="fw-bold mb-3">
                         <i class="bi bi-graph-up text-danger me-2"></i>
                         Statistics
                     </h5>
-                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
-                        <span>Total Requests</span>
-                        <span class="fw-bold">{{ total_requests|default:0 }}</span>
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <span class="text-muted">Total Requests</span>
+                        <span class="fs-5 fw-bold">{{ total_requests|default:0 }}</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
-                        <span>Pending</span>
-                        <span class="fw-bold text-warning">{{ pending_count|default:0 }}</span>
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <span class="text-muted">Pending</span>
+                        <span class="fs-5 fw-bold text-warning">{{ pending_count|default:0 }}</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
-                        <span>Fulfilled</span>
-                        <span class="fw-bold text-success">{{ fulfilled_count|default:0 }}</span>
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <span class="text-muted">Fulfilled</span>
+                        <span class="fs-5 fw-bold text-success">{{ fulfilled_count|default:0 }}</span>
                     </div>
-                    <div class="d-flex justify-content-between">
-                        <span>Critical Priority</span>
-                        <span class="fw-bold text-danger">{{ critical_count|default:0 }}</span>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Critical Priority</span>
+                        <span class="fs-5 fw-bold text-danger">{{ critical_count|default:0 }}</span>
                     </div>
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="info-card bg-light fade-in-up" style="animation-delay: 0.2s;">
+                <div class="info-card">
                     <h5 class="fw-bold mb-3">Quick Actions</h5>
                     <div class="d-grid gap-2">
                         <a href="{% url 'create_blood_request' %}" class="btn btn-danger">

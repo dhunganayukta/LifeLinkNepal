@@ -249,6 +249,8 @@ def cancel_request(request, request_id):
 # ============================================
 # DONOR MANAGEMENT (RESTRICTED - PRIVACY PROTECTED)
 # ============================================
+
+
 @role_required('hospital')
 def hospital_donors(request):
     """
@@ -268,14 +270,19 @@ def hospital_donors(request):
     hospital_profile = request.user.hospitalprofile
     blood_type_filter = request.GET.get('blood_type', '')
 
-    # Get max_distance parameter
+    # Get max_distance parameter with proper validation
+    max_distance_param = request.GET.get('max_distance', '')
     try:
-        max_distance = int(request.GET.get('max_distance', 50))
+        max_distance = int(max_distance_param) if max_distance_param else 50
+        # Ensure it's within valid range (1-500)
+        max_distance = max(1, min(500, max_distance))
     except (ValueError, TypeError):
         max_distance = 50
 
+    # Start with available donors
     donors = DonorProfile.objects.filter(is_available=True, user__is_active=True)
 
+    # Apply blood type filter if specified
     if blood_type_filter:
         donors = donors.filter(blood_type=blood_type_filter)
 
@@ -285,44 +292,36 @@ def hospital_donors(request):
         and hospital_profile.longitude is not None
     )
 
-    distances = {}  # donor.id -> km
     donor_list = []
 
     if hospital_has_location:
-        # Calculate distance for every donor that has coordinates
-        for d in donors:
-            if d.latitude is not None and d.longitude is not None:
+        # Hospital has location - calculate distances and filter
+        for donor in donors:
+            if donor.latitude is not None and donor.longitude is not None:
+                # Calculate distance
                 distance = haversine_distance(
                     hospital_profile.latitude,
                     hospital_profile.longitude,
-                    d.latitude,
-                    d.longitude,
+                    donor.latitude,
+                    donor.longitude,
                 )
-                distances[d.id] = distance
                 
                 # Only include donors within max_distance
                 if distance <= max_distance:
                     donor_list.append({
-                        'username': d.user.username,
-                        'blood_type': d.blood_type,
+                        'username': donor.user.username,
+                        'blood_type': donor.blood_type,
                         'distance': round(distance, 2),
                     })
-            else:
-                # Donor doesn't have coordinates - still show them but without distance
-                donor_list.append({
-                    'username': d.user.username,
-                    'blood_type': d.blood_type,
-                    'distance': None,
-                })
         
-        # Sort by distance (donors without distance go to end)
-        donor_list.sort(key=lambda x: x['distance'] if x['distance'] is not None else float('inf'))
+        # Sort by distance (closest first)
+        donor_list.sort(key=lambda x: x['distance'])
     else:
-        # Hospital doesn't have location - show all donors without distance
-        for d in donors:
+        # Hospital doesn't have location - show all donors without distance filtering
+        for donor in donors:
             donor_list.append({
-                'username': d.user.username,
-                'blood_type': d.blood_type,
+                'username': donor.user.username,
+                'blood_type': donor.blood_type,
                 'distance': None,
             })
 

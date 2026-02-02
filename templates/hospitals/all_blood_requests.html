@@ -32,13 +32,24 @@
             <!-- Filter Tabs -->
             <ul class="nav nav-pills mb-4">
                 <li class="nav-item">
-                    <a class="nav-link active" href="?status=all">All ({{ ranked_requests|length }})</a>
+                    <a class="nav-link {% if status == 'all' or not status %}active{% endif %}" href="?status=all">
+                        All ({{ ranked_requests|length }})
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="?status=pending">Pending</a>
+                    <a class="nav-link {% if status == 'pending' %}active{% endif %}" href="?status=pending">
+                        Pending
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="?status=fulfilled">Fulfilled</a>
+                    <a class="nav-link {% if status == 'fulfilled' %}active{% endif %}" href="?status=fulfilled">
+                        Fulfilled
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if status == 'cancelled' %}active{% endif %}" href="?status=cancelled">
+                        Cancelled
+                    </a>
                 </li>
             </ul>
 
@@ -104,10 +115,16 @@
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         {% if item.request.status == 'pending' %}
-                                        <a href="{% url 'mark_fulfilled' item.request.id %}" 
-                                           class="btn btn-outline-success" title="Mark Fulfilled">
-                                            <i class="bi bi-check-circle"></i>
-                                        </a>
+                                        <form method="POST" action="{% url 'mark_fulfilled' item.request.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{{ request.path }}?status={{ status }}">
+                                            <button type="submit" 
+                                                    class="btn btn-outline-success" 
+                                                    title="Mark Fulfilled"
+                                                    onclick="return confirm('Mark this request as fulfilled?');">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                        </form>
                                         {% endif %}
                                     </div>
                                 </td>
@@ -120,14 +137,23 @@
         {% else %}
             <div class="text-center py-5">
                 <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
-                <h4 class="text-muted mt-3">No Blood Requests Yet</h4>
-                <a href="{% url 'create_blood_request' %}" class="btn btn-danger mt-3">
-                    <i class="bi bi-plus-circle me-1"></i>Create First Request
-                </a>
+                <h4 class="text-muted mt-3">No Blood Requests Found</h4>
+                {% if status and status != 'all' %}
+                    <p class="text-muted">No requests with status "{{ status }}"</p>
+                    <a href="?status=all" class="btn btn-primary mt-3">
+                        <i class="bi bi-list-ul me-1"></i>View All Requests
+                    </a>
+                {% else %}
+                    <a href="{% url 'create_blood_request' %}" class="btn btn-danger mt-3">
+                        <i class="bi bi-plus-circle me-1"></i>Create First Request
+                    </a>
+                {% endif %}
             </div>
         {% endif %}
     </div>
 </section>
+
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -141,6 +167,23 @@
         background-color: #2d2d2d;
         color: #e0e0e0;
     }
+    
+    .nav-pills .nav-link {
+        color: #6c757d;
+        border-radius: 10px;
+        padding: 10px 20px;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-pills .nav-link:hover {
+        background-color: rgba(199, 30, 53, 0.1);
+        color: #c71e35;
+    }
+    
+    .nav-pills .nav-link.active {
+        background-color: #c71e35;
+        color: white;
+    }
 </style>
-{% endblock %}
 {% endblock %}

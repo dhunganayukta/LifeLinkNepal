@@ -10,5 +10,7 @@ django-cors-headers==4.9.0
 Pillow==12.1.0
 numpy==1.27.0
 python-decouple==3.8
-geopy==2.4.1 --break-system-packages
+geopy==2.4.1
 djangorestframework==3.16.1
+dj-database-url==1.0.0
+psycopg[binary]

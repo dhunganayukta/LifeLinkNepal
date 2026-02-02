@@ -41,9 +41,9 @@
         <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
             <div class="mb-3 mb-md-0">
                 <h2 class="fw-bold mb-1">
-                    <i class="bi bi-search me-2"></i>Matching Donors
+                    <i class="bi bi-search me-2"></i>Blood Request Details
                 </h2>
-                <p class="mb-0">Using MCDM & Haversine Algorithms</p>
+                <p class="mb-0">Donor information is privacy protected</p>
             </div>
             <div class="text-end">
                 <a href="{% url 'hospital_dashboard' %}" class="btn btn-light">
@@ -99,6 +99,24 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Status -->
+                    <div class="mt-3 text-center">
+                        <span class="badge 
+                            {% if blood_request.status == 'fulfilled' %}bg-success
+                            {% elif blood_request.status == 'pending' %}bg-warning text-dark
+                            {% elif blood_request.status == 'cancelled' %}bg-secondary
+                            {% else %}bg-info{% endif %} fs-5 px-4 py-2">
+                            Status: {{ blood_request.status|upper }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Privacy Notice -->
+                <div class="alert alert-warning border-warning mb-4">
+                    <i class="bi bi-shield-exclamation me-2"></i>
+                    <strong>Privacy Protected:</strong> For donor safety, only username, blood type, and distance are visible. 
+                    Full donor details are managed by admin. Admin will handle donor notifications.
                 </div>
 
                 <!-- Results Header -->
@@ -106,24 +124,68 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="fw-bold mb-0">
                             <i class="bi bi-people-fill text-danger me-2"></i>
-                            Top {{ total_donors_found }} Matching Donors
+                            {{ total_donors_found }} Donors Found
                         </h4>
                         <span class="badge bg-info fs-6">
-                            <i class="bi bi-cpu me-1"></i>MCDM Ranked
+                            <i class="bi bi-cpu me-1"></i>Admin Managed
                         </span>
                     </div>
                 </div>
 
-                <!-- Donors List -->
+                <!-- Accepted Donor (if any) -->
+                {% if accepted_donor %}
+                <div class="info-card mb-4 fade-in-up border-start border-5 border-success">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="fw-bold text-success mb-0">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            Donor Accepted!
+                        </h5>
+                        <span class="badge bg-success fs-6">MATCHED</span>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="text-center p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">Username</small>
+                                <h6 class="fw-bold mb-0">@{{ accepted_donor.username }}</h6>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">Blood Type</small>
+                                <h5 class="fw-bold text-danger mb-0">{{ accepted_donor.blood_type }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">Distance</small>
+                                <h6 class="fw-bold mb-0">
+                                    {% if accepted_donor.distance %}
+                                        {{ accepted_donor.distance }} km
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <strong>Next Steps:</strong> The donor will contact you directly through the admin. 
+                        Please coordinate donation details.
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Donors List (LIMITED INFO) -->
                 {% if donor_data %}
-                    {% for item in donor_data %}
-                    {% with donor=item.donor match_score=item.match_score distance=item.distance donations=item.donations %}
-                    <div class="info-card mb-3 fade-in-up border-start border-5
-                        {% if match_score >= 80 %}border-success
-                        {% elif match_score >= 60 %}border-primary
-                        {% elif match_score >= 40 %}border-warning
-                        {% else %}border-secondary{% endif %}"
-                        style="animation-delay: {{ forloop.counter0|add:1|stringformat:'d' }}00ms;">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-list-ul me-2"></i>Queued Donors (Top {{ donor_data|length }})
+                    </h5>
+                    {% for donor in donor_data %}
+                    <div class="info-card mb-3 fade-in-up"
+                        style="animation-delay: {{ forloop.counter0|stringformat:'d' }}00ms;">
                         
                         <!-- Donor Header -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -133,99 +195,52 @@
                                     <i class="bi bi-person-fill text-danger fs-4"></i>
                                 </div>
                                 <div>
-                                    <h5 class="fw-bold mb-0">{{ donor.full_name }}</h5>
-                                    <small class="text-muted">
-                                        <i class="bi bi-geo-alt"></i> {{ distance }} km away
-                                    </small>
+                                    <h5 class="fw-bold mb-0">@{{ donor.username }}</h5>
+                                    <small class="text-muted">Anonymous Donor</small>
                                 </div>
                             </div>
-                            <span class="badge 
-                                {% if match_score >= 80 %}bg-success
-                                {% elif match_score >= 60 %}bg-primary
-                                {% elif match_score >= 40 %}bg-warning text-dark
-                                {% else %}bg-secondary{% endif %} fs-6 px-3 py-2">
-                                {% if match_score >= 80 %}EXCELLENT
-                                {% elif match_score >= 60 %}GOOD
-                                {% elif match_score >= 40 %}FAIR
-                                {% else %}POOR{% endif %} MATCH
+                            <span class="badge bg-{{ donor.status|lower }} fs-6">
+                                {{ donor.status }}
                             </span>
                         </div>
 
-                        <!-- Metrics -->
-                        <div class="row g-2 mb-3">
-                            <div class="col-3">
+                        <!-- LIMITED Metrics -->
+                        <div class="row g-2">
+                            <div class="col-4">
                                 <div class="bg-light rounded p-2 text-center">
                                     <div class="text-danger fw-bold fs-5">{{ donor.blood_type }}</div>
                                     <small class="text-muted">Blood Type</small>
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
                                 <div class="bg-light rounded p-2 text-center">
-                                    <div class="text-primary fw-bold fs-5">{{ distance }} km</div>
+                                    <div class="text-primary fw-bold fs-5">
+                                        {% if donor.distance %}
+                                            {{ donor.distance }} km
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </div>
                                     <small class="text-muted">Distance</small>
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
                                 <div class="bg-light rounded p-2 text-center">
-                                    <div class="text-success fw-bold fs-5">{{ match_score }}%</div>
-                                    <small class="text-muted">Match Score</small>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="bg-light rounded p-2 text-center">
-                                    <div class="text-warning fw-bold fs-5">{{ donations }}</div>
-                                    <small class="text-muted">Donations</small>
+                                    <div class="text-muted fw-bold fs-5">
+                                        <i class="bi bi-shield-lock-fill"></i>
+                                    </div>
+                                    <small class="text-muted">Private</small>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Contact Details -->
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <small class="text-muted d-block">
-                                    <i class="bi bi-telephone text-danger"></i> Phone
-                                </small>
-                                <strong>{{ donor.phone }}</strong>
-                            </div>
-                            <div class="col-md-4">
-                                <small class="text-muted d-block">
-                                    <i class="bi bi-envelope text-danger"></i> Email
-                                </small>
-                                <strong>{{ donor.user.email }}</strong>
-                            </div>
-                            <div class="col-md-4">
-                                <small class="text-muted d-block">
-                                    <i class="bi bi-geo-alt text-danger"></i> Location
-                                </small>
-                                <strong>{{ donor.address|truncatewords:3 }}</strong>
-                            </div>
-                        </div>
-
-                        {% if donor.last_donation_date %}
-                        <div class="alert alert-info mb-3 py-2">
-                            <small>
-                                <i class="bi bi-calendar-check"></i> 
-                                Last Donation: {{ donor.last_donation_date|date:"M d, Y" }}
-                            </small>
-                        </div>
-                        {% endif %}
-
-                        {% if not item.can_donate %}
-                        <div class="alert alert-warning mb-3 py-2">
-                            <small>
-                                <i class="bi bi-exclamation-triangle"></i> 
-                                Not eligible to donate yet (90-day waiting period)
-                            </small>
-                        </div>
-                        {% endif %}
-
-                        <!-- Actions -->
-                        <button class="btn btn-danger" onclick="contactDonor('{{ donor.phone }}', '{{ donor.full_name }}', '{{ donor.user.email }}')">
-                            <i class="bi bi-telephone-fill me-1"></i>Contact Donor
-                        </button>
                     </div>
-                    {% endwith %}
                     {% endfor %}
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <strong>Note:</strong> Admin is managing donor notifications sequentially. 
+                        You will be notified when a donor accepts.
+                    </div>
                 {% else %}
                     <div class="info-card text-center py-5 fade-in-up">
                         <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
@@ -240,123 +255,94 @@
 
             <!-- Sidebar -->
             <div class="col-lg-4">
+                <!-- Request Actions -->
+                <div class="info-card fade-in-up mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-gear text-danger me-2"></i>
+                        Request Actions
+                    </h5>
+                    
+                    {% if blood_request.status == 'pending' %}
+                    <form method="POST" action="{% url 'mark_fulfilled' blood_request.id %}" class="mb-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Mark this request as fulfilled?');">
+                            <i class="bi bi-check-circle me-2"></i>Mark as Fulfilled
+                        </button>
+                    </form>
+                    
+                    <a href="{% url 'cancel_request' blood_request.id %}" 
+                       class="btn btn-outline-danger w-100"
+                       onclick="return confirm('Cancel this blood request?');">
+                        <i class="bi bi-x-circle me-2"></i>Cancel Request
+                    </a>
+                    {% elif blood_request.status == 'fulfilled' %}
+                    <div class="alert alert-success mb-0">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        This request has been fulfilled!
+                    </div>
+                    {% elif blood_request.status == 'cancelled' %}
+                    <div class="alert alert-secondary mb-0">
+                        <i class="bi bi-x-circle-fill me-2"></i>
+                        This request has been cancelled.
+                    </div>
+                    {% endif %}
+                </div>
+                
                 <!-- Algorithm Info -->
                 <div class="info-card fade-in-up mb-4">
                     <h5 class="fw-bold mb-3">
                         <i class="bi bi-cpu text-danger me-2"></i>
-                        Matching Algorithms
+                        Matching Process
                     </h5>
                     <div class="mb-3 pb-3 border-bottom">
                         <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-geo-alt-fill text-success me-2 fs-5"></i>
-                            <strong>Haversine Distance</strong>
+                            <i class="bi bi-1-circle-fill text-primary me-2 fs-5"></i>
+                            <strong>Find Compatible Donors</strong>
                         </div>
-                        <small class="text-muted">Calculates geographic distance between hospital and donors</small>
-                        <div class="progress mt-2" style="height: 6px;">
-                            <div class="progress-bar bg-success" style="width: 100%"></div>
-                        </div>
+                        <small class="text-muted">System searches for donors with compatible blood type within 50km</small>
                     </div>
                     <div class="mb-3 pb-3 border-bottom">
                         <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-star-fill text-warning me-2 fs-5"></i>
-                            <strong>MCDM (TOPSIS)</strong>
+                            <i class="bi bi-2-circle-fill text-warning me-2 fs-5"></i>
+                            <strong>Rank Using AI</strong>
                         </div>
-                        <small class="text-muted">Multi-criteria ranking: distance, donations, recency, compatibility</small>
-                        <div class="progress mt-2" style="height: 6px;">
-                            <div class="progress-bar bg-warning" style="width: 100%"></div>
-                        </div>
+                        <small class="text-muted">MCDM algorithm ranks donors by distance, history, and compatibility</small>
                     </div>
                     <div>
                         <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-heart-pulse-fill text-danger me-2 fs-5"></i>
-                            <strong>Blood Compatibility</strong>
+                            <i class="bi bi-3-circle-fill text-success me-2 fs-5"></i>
+                            <strong>Admin Notifies</strong>
                         </div>
-                        <small class="text-muted">Verifies donor blood type matches recipient needs</small>
-                        <div class="progress mt-2" style="height: 6px;">
-                            <div class="progress-bar bg-danger" style="width: 100%"></div>
-                        </div>
+                        <small class="text-muted">Admin manages sequential donor notifications until one accepts</small>
                     </div>
                 </div>
 
-                <!-- Matching Criteria -->
-                <div class="info-card fade-in-up mb-4" style="animation-delay: 0.1s;">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-sliders text-danger me-2"></i>
-                        Ranking Criteria
-                    </h5>
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>Distance</small>
-                            <small class="fw-bold">30%</small>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary" style="width: 30%"></div>
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>Blood Compatibility</small>
-                            <small class="fw-bold">30%</small>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-danger" style="width: 30%"></div>
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>Donation History</small>
-                            <small class="fw-bold">20%</small>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-warning" style="width: 20%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>Recent Activity</small>
-                            <small class="fw-bold">20%</small>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-success" style="width: 20%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Match Levels Guide -->
+                <!-- Privacy Info -->
                 <div class="info-card bg-light fade-in-up" style="animation-delay: 0.2s;">
-                    <h5 class="fw-bold mb-3">Match Level Guide</h5>
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="badge bg-success me-2">EXCELLENT</span>
-                        <small>Score ≥ 80%</small>
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-shield-check text-success me-2"></i>
+                        Privacy Protection
+                    </h5>
+                    <div class="mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        <small>Only basic info shown</small>
                     </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="badge bg-primary me-2">GOOD</span>
-                        <small>Score 60-79%</small>
+                    <div class="mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        <small>Full details via admin only</small>
                     </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="badge bg-warning me-2">FAIR</span>
-                        <small>Score 40-59%</small>
+                    <div class="mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        <small>Donor safety prioritized</small>
                     </div>
-                    <div class="d-flex align-items-center">
-                        <span class="badge bg-secondary me-2">POOR</span>
-                        <small>Score &lt; 40%</small>
+                    <div>
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        <small>Contact through platform</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    function contactDonor(phone, name, email) {
-        const message = `Contact ${name}?\n\nPhone: ${phone}\nEmail: ${email}\n\nThis will:\n✓ Send SMS notification\n✓ Send email alert\n✓ Log contact attempt`;
-        
-        if (confirm(message)) {
-            alert('✅ Donor contacted successfully!\n\nThe donor has been notified about this blood request.');
-            // In production: Make AJAX call to backend to log the contact
-        }
-    }
-</script>
 {% endblock %}

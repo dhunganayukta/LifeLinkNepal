@@ -69,12 +69,12 @@
 
         <!-- Filters -->
         <div class="filter-card">
-            <form method="get" class="row g-3 align-items-end">
+            <form method="GET" action="" class="row g-3 align-items-end">
                 <div class="col-md-4">
-                    <label class="form-label fw-bold">
+                    <label for="blood_type_select" class="form-label fw-bold">
                         <i class="bi bi-droplet-fill text-danger me-1"></i>Blood Type
                     </label>
-                    <select name="blood_type" class="form-select">
+                    <select name="blood_type" id="blood_type_select" class="form-select">
                         <option value="">All Blood Types</option>
                         <option value="A+" {% if blood_type_filter == "A+" %}selected{% endif %}>A+</option>
                         <option value="A-" {% if blood_type_filter == "A-" %}selected{% endif %}>A-</option>
@@ -88,19 +88,30 @@
                 </div>
                 
                 <div class="col-md-4">
-                    <label class="form-label fw-bold">
+                    <label for="max_distance_input" class="form-label fw-bold">
                         <i class="bi bi-geo-alt-fill text-success me-1"></i>Max Distance (km)
                         {% if not hospital_has_location %}
-                        <span class="text-danger small">(requires location)</span>
+                        <span class="text-warning small">(requires location)</span>
                         {% endif %}
                     </label>
-                    <input type="number" 
-                           name="max_distance" 
-                           class="form-control" 
-                           value="{{ max_distance }}" 
-                           min="1" 
-                           max="500"
-                           {% if not hospital_has_location %}disabled{% endif %}>
+                    <input 
+                        type="number" 
+                        name="max_distance" 
+                        id="max_distance_input"
+                        class="form-control" 
+                        value="{{ max_distance }}" 
+                        min="1" 
+                        max="500"
+                        step="1"
+                        placeholder="Enter distance (1-500)"
+                    >
+                    <small class="text-muted">
+                        {% if hospital_has_location %}
+                        Enter distance in kilometers (1-500)
+                        {% else %}
+                        Set location in profile to enable distance filtering
+                        {% endif %}
+                    </small>
                 </div>
                 
                 <div class="col-md-4">
@@ -127,7 +138,7 @@
                 <i class="bi bi-info-circle-fill me-2"></i>
                 Found <strong>{{ donor_list|length }}</strong> donor(s)
                 {% if blood_type_filter %}matching <strong>{{ blood_type_filter }}</strong>{% endif %}
-                {% if hospital_has_location %}within <strong>{{ max_distance }}km</strong>{% endif %}
+                {% if hospital_has_location and max_distance %}within <strong>{{ max_distance }}km</strong>{% endif %}
             </div>
         </div>
 
@@ -194,10 +205,10 @@
                 <p class="text-muted mb-4">
                     {% if blood_type_filter %}
                         No donors found matching <strong>{{ blood_type_filter }}</strong>
-                        {% if hospital_has_location %}within {{ max_distance }}km{% endif %}.
+                        {% if hospital_has_location and max_distance %}within {{ max_distance }}km{% endif %}.
                     {% else %}
                         No available donors
-                        {% if hospital_has_location %}within {{ max_distance }}km{% endif %}.
+                        {% if hospital_has_location and max_distance %}within {{ max_distance }}km{% endif %}.
                     {% endif %}
                 </p>
                 <p class="text-muted">

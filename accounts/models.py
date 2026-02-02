@@ -5,10 +5,11 @@ class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = (
         ('donor', 'Donor'),
         ('hospital', 'Hospital'),
+        ('super_admin', 'Super Admin'),
     )
 
     user_type = models.CharField(
-        max_length=10,
+        max_length=15,
         choices=USER_TYPE_CHOICES,
         default='donor'
     )

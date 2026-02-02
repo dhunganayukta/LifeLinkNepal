@@ -11,11 +11,154 @@
     --lifelink-dark-blue: #003A70;
     --lifelink-light-red: #FFE5E8;
     --lifelink-gradient: linear-gradient(135deg, #1D70B8 0%, #E63946 100%);
+    --gold: #fbbf24;
 }
 
 body {
     background-color: #F8F9FA;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Star Achievement Banner */
+.achievement-banner {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 30px rgba(251, 191, 36, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.achievement-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.achievement-content {
+    position: relative;
+    z-index: 1;
+    color: white;
+}
+
+.star-display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.star-count {
+    font-size: 4rem;
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: star-glow 2s infinite;
+}
+
+@keyframes star-glow {
+    0%, 100% { text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+    50% { text-shadow: 0 4px 20px rgba(255, 255, 255, 0.6); }
+}
+
+.star-icon-large {
+    font-size: 5rem;
+    animation: star-spin 4s linear infinite;
+}
+
+@keyframes star-spin {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(90deg) scale(1.1); }
+    50% { transform: rotate(180deg) scale(1); }
+    75% { transform: rotate(270deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+.star-level-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.next-star-progress {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    height: 12px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.progress-fill {
+    background: white;
+    height: 100%;
+    border-radius: 20px;
+    transition: width 1s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.achievement-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.achievement-stat {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.achievement-stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    display: block;
+}
+
+.achievement-stat-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Star Rewards in Donation History */
+.history-star-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+    animation: star-pulse 2s infinite;
+}
+
+@keyframes star-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.history-star-icon {
+    font-size: 1.2rem;
+    animation: star-twinkle 2s infinite;
+}
+
+@keyframes star-twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
 
 /* ==================== HEADER ==================== */
@@ -26,6 +169,7 @@ body {
     position: relative;
     overflow: hidden;
 }
+
 .dashboard-header::before {
     content: '';
     position: absolute;
@@ -36,6 +180,7 @@ body {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
 }
+
 .dashboard-header::after {
     content: '';
     position: absolute;
@@ -46,83 +191,270 @@ body {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 50%;
 }
-.header-content { position: relative; z-index:1; }
-.welcome-text { font-size:1.8rem; font-weight:700; color:white; margin-bottom:0.5rem; text-shadow:0 2px 4px rgba(0,0,0,0.1);}
-.location-text { color: rgba(255,255,255,0.9); font-size:1rem; }
+
+.header-content { 
+    position: relative; 
+    z-index:1; 
+}
+
+.welcome-text { 
+    font-size:1.8rem; 
+    font-weight:700; 
+    color:white; 
+    margin-bottom:0.5rem; 
+    text-shadow:0 2px 4px rgba(0,0,0,0.1);
+}
+
+.location-text { 
+    color: rgba(255,255,255,0.9); 
+    font-size:1rem; 
+}
 
 /* Blood Badge */
-.blood-badge { width:100px; height:100px; background:white; border-radius:50%;
-    display:inline-flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,0.2);
-    animation:pulse 2s infinite; position:relative;
+.blood-badge { 
+    width:100px; 
+    height:100px; 
+    background:white; 
+    border-radius:50%;
+    display:inline-flex; 
+    align-items:center; 
+    justify-content:center; 
+    box-shadow:0 8px 30px rgba(0,0,0,0.2);
+    animation:pulse 2s infinite; 
+    position:relative;
 }
-@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
-.blood-badge::before { content:''; position:absolute; inset:-5px; border-radius:50%;
+
+@keyframes pulse { 
+    0%,100%{transform:scale(1);} 
+    50%{transform:scale(1.05);} 
+}
+
+.blood-badge::before { 
+    content:''; 
+    position:absolute; 
+    inset:-5px; 
+    border-radius:50%;
     background:linear-gradient(45deg,var(--lifelink-blue),var(--lifelink-red));
-    opacity:0.3; animation:rotate 3s linear infinite;
+    opacity:0.3; 
+    animation:rotate 3s linear infinite;
 }
-@keyframes rotate { 100% { transform: rotate(360deg); } }
-.blood-type { font-size:2.5rem; font-weight:900; color:var(--lifelink-red); position:relative; z-index:1; }
+
+@keyframes rotate { 
+    100% { transform: rotate(360deg); } 
+}
+
+.blood-type { 
+    font-size:2.5rem; 
+    font-weight:900; 
+    color:var(--lifelink-red); 
+    position:relative; 
+    z-index:1; 
+}
+
+/* Donor Level Badge */
+.donor-level-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+    z-index: 10;
+}
+
+.level-stars {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.level-star {
+    color: white;
+    font-size: 1.2rem;
+    animation: star-twinkle 2s infinite;
+}
+
+.level-star:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.level-star:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+.level-star:nth-child(4) {
+    animation-delay: 0.9s;
+}
+
+.level-star:nth-child(5) {
+    animation-delay: 1.2s;
+}
+
+.level-text {
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
 /* ==================== CARDS ==================== */
-.info-card { background:white; border-radius:16px; padding:1.5rem; box-shadow:0 2px 12px rgba(0,0,0,0.06);
-    transition:all 0.3s ease; border:1px solid rgba(230,57,70,0.1); height:100%; animation: fadeInUp 0.6s ease-out; }
-.info-card:hover { transform: translateY(-4px); box-shadow:0 8px 24px rgba(230,57,70,0.15);}
-.stat-card { text-align:center; padding:1.5rem; position:relative; overflow:hidden; }
-.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background: linear-gradient(90deg, transparent, currentColor, transparent); }
-.stat-icon { font-size:2.8rem; margin-bottom:0.75rem; display:block; opacity:0.9; }
-.stat-number { font-size:2.8rem; font-weight:900; margin:0.5rem 0; line-height:1; }
-.stat-label { color:#6c757d; font-size:0.95rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+.info-card { 
+    background:white; 
+    border-radius:16px; 
+    padding:1.5rem; 
+    box-shadow:0 2px 12px rgba(0,0,0,0.06);
+    transition:all 0.3s ease; 
+    border:1px solid rgba(230,57,70,0.1); 
+    height:100%; 
+    animation: fadeInUp 0.6s ease-out; 
+}
+
+.info-card:hover { 
+    transform: translateY(-4px); 
+    box-shadow:0 8px 24px rgba(230,57,70,0.15);
+}
+
+.stat-card { 
+    text-align:center; 
+    padding:1.5rem; 
+    position:relative; 
+    overflow:hidden; 
+}
+
+.stat-card::before { 
+    content:''; 
+    position:absolute; 
+    top:0; 
+    left:0; 
+    right:0; 
+    height:4px; 
+    background: linear-gradient(90deg, transparent, currentColor, transparent); 
+}
+
+.stat-icon { 
+    font-size:2.8rem; 
+    margin-bottom:0.75rem; 
+    display:block; 
+    opacity:0.9; 
+}
+
+.stat-number { 
+    font-size:2.8rem; 
+    font-weight:900; 
+    margin:0.5rem 0; 
+    line-height:1; 
+}
+
+.stat-label { 
+    color:#6c757d; 
+    font-size:0.95rem; 
+    font-weight:600; 
+    text-transform:uppercase; 
+    letter-spacing:0.5px; 
+}
 
 /* ==================== EMERGENCY REQUEST ==================== */
-.request-card { background:white; border-radius:12px; padding:1.5rem; margin-bottom:1rem;
-    box-shadow:0 2px 10px rgba(0,0,0,0.06); transition:all 0.3s ease; border-left:5px solid var(--lifelink-red);
-    animation: fadeInUp 0.6s ease-out; }
-.request-card:hover { background:var(--lifelink-light-red); transform:translateX(8px); box-shadow:0 4px 16px rgba(230,57,70,0.2);}
+.request-card { 
+    background:white; 
+    border-radius:12px; 
+    padding:1.5rem; 
+    margin-bottom:1rem;
+    box-shadow:0 2px 10px rgba(0,0,0,0.06); 
+    transition:all 0.3s ease; 
+    border-left:5px solid var(--lifelink-red);
+    animation: fadeInUp 0.6s ease-out; 
+}
+
+.request-card:hover { 
+    background:var(--lifelink-light-red); 
+    transform:translateX(8px); 
+    box-shadow:0 4px 16px rgba(230,57,70,0.2);
+}
+
 .priority-critical{border-left-color:#DC3545;}
 .priority-high{border-left-color:#FFC107;}
 .priority-medium{border-left-color:#17A2B8;}
 .priority-low{border-left-color:#6C757D;}
-.emergency-badge { animation: blink 1.5s infinite; }
-@keyframes blink {0%,50%,100%{opacity:1;} 25%,75%{opacity:0.5;}}
 
-/* Notifications */
-.notification-item { padding:1rem; border-bottom:1px solid #e9ecef; transition:background 0.2s; border-radius:8px; margin-bottom:0.5rem; }
-.notification-item:hover { background: var(--lifelink-light-red); }
-.notification-item:last-child { border-bottom:none; }
+.emergency-badge { 
+    animation: blink 1.5s infinite; 
+}
+
+@keyframes blink {
+    0%,50%,100%{opacity:1;} 
+    25%,75%{opacity:0.5;}
+}
 
 /* Donation History */
-.history-item { padding:1rem; border-left:3px solid var(--lifelink-red); background:white; border-radius:8px;
-    margin-bottom:0.75rem; transition:all 0.3s ease;}
-.history-item:hover { background:var(--lifelink-light-red); transform:translateX(5px); }
+.history-item { 
+    padding:1rem; 
+    border-left:3px solid var(--lifelink-red); 
+    background:white; 
+    border-radius:8px;
+    margin-bottom:0.75rem; 
+    transition:all 0.3s ease;
+}
 
-/* Profile Avatar */
-.profile-avatar { width:130px; height:130px; background: var(--lifelink-gradient); border-radius:50%;
-    display:inline-flex; align-items:center; justify-content:center; position:relative; box-shadow:0 8px 30px rgba(230,57,70,0.3); margin-bottom:1rem;}
-.profile-avatar::before { content:''; position:absolute; inset:-8px; border-radius:50%; background: var(--lifelink-gradient); opacity:0.2; animation: pulse-ring 2s infinite;}
-@keyframes pulse-ring {0%,100%{transform:scale(1);opacity:0.2;}50%{transform:scale(1.1);opacity:0;}}
-.profile-avatar i { font-size:4.5rem; color:white; position:relative; z-index:1; }
+.history-item:hover { 
+    background:var(--lifelink-light-red); 
+    transform:translateX(5px); 
+}
 
-/* Status Badge */
-.status-badge { padding:0.6rem 1.5rem; border-radius:30px; font-weight:700; font-size:1rem; text-transform:uppercase; display:inline-block; letter-spacing:0.5px; }
+.history-item-new {
+    position: relative;
+    overflow: hidden;
+}
 
-/* Buttons */
-.btn-lifelink-primary{ background:var(--lifelink-gradient); border:none; color:white; font-weight:600; padding:0.65rem 1.5rem; border-radius:8px; transition:all 0.3s ease;}
-.btn-lifelink-primary:hover{ transform:translateY(-2px); box-shadow:0 6px 20px rgba(230,57,70,0.4); color:white; }
+.history-item-new::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
 
 /* Empty State */
-.empty-state { padding:3.5rem 2rem; text-align:center; color:#6c757d;}
-.empty-state i { font-size:5rem; opacity:0.2; color:var(--lifelink-red); margin-bottom:1.5rem; }
+.empty-state { 
+    padding:3.5rem 2rem; 
+    text-align:center; 
+    color:#6c757d;
+}
+
+.empty-state i { 
+    font-size:5rem; 
+    opacity:0.2; 
+    color:var(--lifelink-red); 
+    margin-bottom:1.5rem; 
+}
 
 @media(max-width:768px){
     .welcome-text{font-size:1.4rem;}
     .blood-badge{width:80px;height:80px;}
     .blood-type{font-size:2rem;}
     .stat-number{font-size:2.2rem;}
-    .profile-avatar{width:100px;height:100px;}
-    .profile-avatar i{font-size:3.5rem;}
+    .donor-level-badge {
+        position: static;
+        margin-top: 1rem;
+        justify-content: center;
+    }
 }
 
-@keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeInUp{
+    from{opacity:0;transform:translateY(20px);}
+    to{opacity:1;transform:translateY(0);}
+}
 </style>
 {% endblock %}
 
@@ -136,7 +468,16 @@ body {
                 <p class="location-text mb-0"><i class="bi bi-geo-alt-fill me-2"></i>{{ donor.address|default:"Location not set" }}</p>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <div class="blood-badge"><div class="blood-type">{{ donor.blood_type }}</div></div>
+                <div class="blood-badge">
+                    <div class="blood-type">{{ donor.blood_type }}</div>
+                </div>
+                <!-- Donor Level Badge -->
+                <div class="donor-level-badge">
+                    <div class="level-stars" id="headerStars">
+                        <!-- Stars will be added by JavaScript -->
+                    </div>
+                    <span class="level-text" id="headerLevel">Loading...</span>
+                </div>
             </div>
         </div>
     </div>
@@ -146,7 +487,7 @@ body {
 <section class="py-5">
     <div class="container">
         {% if not donor.latitude or not donor.longitude %}
-        <div class="alert-location">
+        <div class="alert alert-warning">
             <div class="d-flex align-items-center">
                 <i class="bi bi-exclamation-triangle-fill text-warning fs-2 me-3"></i>
                 <div class="flex-grow-1">
@@ -161,6 +502,45 @@ body {
         <div class="row g-4">
             <!-- LEFT COLUMN -->
             <div class="col-lg-8">
+                <!-- Achievement Banner -->
+                <div class="achievement-banner">
+                    <div class="achievement-content">
+                        <div class="star-display">
+                            <i class="bi bi-star-fill star-icon-large"></i>
+                            <div>
+                                <div class="star-count" id="totalStars">0</div>
+                                <div class="star-level-text" id="levelTitle">Hero in Training</div>
+                            </div>
+                        </div>
+                        
+                        <p class="mb-2" id="levelDescription">Keep donating to earn more stars and become a legend!</p>
+                        
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span style="font-weight: 600;">Next Star:</span>
+                            <span id="nextStarText">2 more donations needed</span>
+                        </div>
+                        
+                        <div class="next-star-progress">
+                            <div class="progress-fill" id="starProgress" style="width: 0%"></div>
+                        </div>
+
+                        <div class="achievement-stats">
+                            <div class="achievement-stat">
+                                <span class="achievement-stat-value" id="totalDonations">{{ history|length }}</span>
+                                <span class="achievement-stat-label">Total Donations</span>
+                            </div>
+                            <div class="achievement-stat">
+                                <span class="achievement-stat-value" id="totalUnits">{{ total_units|default:0 }}</span>
+                                <span class="achievement-stat-label">Units Donated</span>
+                            </div>
+                            <div class="achievement-stat">
+                                <span class="achievement-stat-value" id="livesSaved">{{ history|length|mul:3 }}</span>
+                                <span class="achievement-stat-label">Lives Saved</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Stats Cards -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-3 col-6">
@@ -186,9 +566,9 @@ body {
                     </div>
                     <div class="col-md-3 col-6">
                         <div class="info-card stat-card text-warning">
-                            <i class="bi bi-heart-pulse stat-icon"></i>
-                            <div class="stat-number">{{ total_units|default:0 }}</div>
-                            <p class="stat-label mb-0">Units</p>
+                            <i class="bi bi-star-fill stat-icon"></i>
+                            <div class="stat-number" id="statsStars">0</div>
+                            <p class="stat-label mb-0">Stars Earned</p>
                         </div>
                     </div>
                 </div>
@@ -219,10 +599,11 @@ body {
                                 <div class="col-md-4 mt-3 mt-md-0 d-grid gap-2">
                                     <a href="tel:{{ item.request.hospital.phone }}" class="btn btn-danger"><i class="bi bi-telephone-fill me-2"></i>Call Hospital</a>
                                     <a href="{% url 'view_blood_request_detail' item.request.id %}" class="btn btn-outline-danger"><i class="bi bi-eye me-2"></i>View Details</a>
-                                    <!-- Respond Button added -->
                                     <form method="POST" action="{% url 'respond_to_request' item.request.id %}">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-success"><i class="bi bi-check2-circle me-1"></i>Respond</button>
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="bi bi-check2-circle me-1"></i>Respond & Earn ⭐
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -233,13 +614,50 @@ body {
                         <a href="{% url 'find_nearby_hospitals' %}" class="btn btn-lifelink-primary"><i class="bi bi-search me-2"></i>View All Requests</a>
                     </div>
                     {% else %}
-                        <div class="empty-state"><i class="bi bi-inbox"></i><h5 class="fw-bold mt-3">No Emergency Requests</h5>
-                        <p class="text-muted mb-0">{% if donor.is_available %}You'll be notified when someone needs {{ donor.blood_type }} blood nearby{% else %}Set your status to "Available" to receive notifications{% endif %}</p></div>
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <h5 class="fw-bold mt-3">No Emergency Requests</h5>
+                            <p class="text-muted mb-0">{% if donor.is_available %}You'll be notified when someone needs {{ donor.blood_type }} blood nearby{% else %}Set your status to "Available" to receive notifications{% endif %}</p>
+                        </div>
                     {% endif %}
                 </div>
 
-                <!-- Donation History -->
-                {% include 'donors/donor_dashboard_history.html' %}
+                <!-- Enhanced Donation History with Stars -->
+                <div class="info-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="section-title mb-0"><i class="bi bi-clock-history me-2"></i>Your Donation History</h4>
+                        {% if history %}<span class="badge bg-success fs-6">{{ history|length }} Donation{{ history|length|pluralize }}</span>{% endif %}
+                    </div>
+
+                    {% if history %}
+                    <div class="vstack gap-3">
+                        {% for donation in history %}
+                        <div class="history-item {% if forloop.first %}history-item-new{% endif %}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <h6 class="fw-bold mb-0"><i class="bi bi-hospital text-primary me-1"></i>{{ donation.hospital.hospital_name }}</h6>
+                                        <span class="history-star-badge">
+                                            <i class="bi bi-star-fill history-star-icon"></i>
+                                            +1 Star Earned
+                                        </span>
+                                    </div>
+                                    <p class="mb-1 small"><i class="bi bi-calendar3 me-1"></i>{{ donation.donation_date|date:"F d, Y" }}</p>
+                                    <p class="mb-0 small text-muted"><i class="bi bi-droplet me-1"></i>{{ donation.units_donated }} unit{{ donation.units_donated|pluralize }} donated</p>
+                                </div>
+                                <span class="badge bg-success">Completed</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-heart-pulse"></i>
+                        <h5 class="fw-bold mt-3">No Donations Yet</h5>
+                        <p class="text-muted mb-0">Start saving lives and earn stars! Each donation earns you a ⭐</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
 
             <!-- RIGHT COLUMN -->
@@ -247,6 +665,73 @@ body {
         </div>
     </div>
 </section>
+
+<script>
+// Star System Logic
+function calculateStars(donations) {
+    // 1 star per 3 donations
+    return Math.floor(donations / 3);
+}
+
+function getLevelInfo(stars) {
+    if (stars === 0) return { title: 'Hero in Training', description: 'Start your journey by making your first donation!' };
+    if (stars === 1) return { title: 'Bronze Donor ⭐', description: 'You\'re on your way! Keep up the great work!' };
+    if (stars === 2) return { title: 'Silver Donor ⭐⭐', description: 'You\'re making a real difference!' };
+    if (stars === 3) return { title: 'Gold Donor ⭐⭐⭐', description: 'You\'re a true hero!' };
+    if (stars === 4) return { title: 'Platinum Donor ⭐⭐⭐⭐', description: 'Exceptional commitment to saving lives!' };
+    if (stars >= 5) return { title: 'Legend Donor ⭐⭐⭐⭐⭐', description: 'You are a living legend! Lives are being saved because of you!' };
+    return { title: 'Hero in Training', description: 'Keep donating!' };
+}
+
+function updateStarDisplay() {
+    const donations = parseInt(document.getElementById('totalDonations').textContent) || 0;
+    const stars = calculateStars(donations);
+    const levelInfo = getLevelInfo(stars);
+    
+    // Update main star count
+    document.getElementById('totalStars').textContent = stars;
+    document.getElementById('statsStars').textContent = stars;
+    
+    // Update level info
+    document.getElementById('levelTitle').textContent = levelInfo.title;
+    document.getElementById('levelDescription').textContent = levelInfo.description;
+    
+    // Update header stars
+    const headerStars = document.getElementById('headerStars');
+    headerStars.innerHTML = '';
+    const displayStars = Math.min(stars, 5);
+    for (let i = 0; i < displayStars; i++) {
+        const star = document.createElement('i');
+        star.className = 'bi bi-star-fill level-star';
+        headerStars.appendChild(star);
+    }
+    
+    // Update header level text
+    const headerLevel = document.getElementById('headerLevel');
+    if (stars === 0) headerLevel.textContent = 'New Hero';
+    else if (stars === 1) headerLevel.textContent = 'Bronze';
+    else if (stars === 2) headerLevel.textContent = 'Silver';
+    else if (stars === 3) headerLevel.textContent = 'Gold';
+    else if (stars === 4) headerLevel.textContent = 'Platinum';
+    else headerLevel.textContent = 'Legend';
+    
+    // Calculate progress to next star
+    const donationsForNextStar = ((stars + 1) * 3) - donations;
+    const progressPercent = ((donations % 3) / 3) * 100;
+    
+    document.getElementById('starProgress').style.width = progressPercent + '%';
+    
+    if (donationsForNextStar > 0) {
+        document.getElementById('nextStarText').textContent = 
+            donationsForNextStar + ' more donation' + (donationsForNextStar > 1 ? 's' : '') + ' needed';
+    } else {
+        document.getElementById('nextStarText').textContent = 'Congratulations! You\'ve earned a new star!';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', updateStarDisplay);
+</script>
 {% endblock %}
 
 {% block footer %}

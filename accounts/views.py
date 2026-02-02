@@ -1,3 +1,6 @@
+# accounts/views.py - UPDATED REGISTER VIEW WITH GEOCODING
+
+from logging import config
 from django.contrib.auth import authenticate, get_user_model, login as auth_login
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -8,10 +11,13 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout as auth_logout
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings  # ✅ ADDED
+from django.conf import settings
 from donors.models import DonorProfile
 from hospitals.models import HospitalProfile
+from decouple import config
 from accounts.decorators import role_required
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 import os
 
 User = get_user_model()
@@ -19,7 +25,7 @@ User = get_user_model()
 # ========================================
 # ADMIN SECRET KEY (from Django settings)
 # ========================================
-ADMIN_SECRET_KEY = getattr(settings, 'ADMIN_SECRET_KEY', None)  # ✅ ADDED
+SUPERUSER_SECRET_KEY = config('SUPERUSER_SECRET_KEY')
 
 # ========================================
 # HELPER: JWT TOKEN GENERATOR
@@ -34,6 +40,36 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
+
+# ========================================
+# HELPER: GEOCODE ADDRESS
+# ========================================
+def geocode_address(address):
+    """
+    Geocode an address and return (latitude, longitude, success)
+    Returns (None, None, False) if geocoding fails
+    """
+    if not address:
+        return None, None, False
+    
+    try:
+        geolocator = Nominatim(user_agent="lifelink_nepal")
+        # Add ", Nepal" to improve accuracy for Nepali addresses
+        location = geolocator.geocode(address + ", Nepal", timeout=10)
+        
+        if location:
+            print(f"✅ Geocoded: {address} -> {location.latitude}, {location.longitude}")
+            return location.latitude, location.longitude, True
+        else:
+            print(f"⚠️ Could not geocode address: {address}")
+            return None, None, False
+            
+    except (GeocoderTimedOut, GeocoderServiceError) as e:
+        print(f"⚠️ Geocoding service error: {str(e)}")
+        return None, None, False
+    except Exception as e:
+        print(f"⚠️ Unexpected geocoding error: {str(e)}")
+        return None, None, False
 
 # ========================================
 # PAGE VIEWS
@@ -67,7 +103,8 @@ def admin_register(request):
     email = request.data.get('email')
     password = request.data.get('password')
     secret_key = request.data.get('secret_key')
-    
+    user_type = 'super_admin'
+
     # Validate required fields
     if not all([username, email, password, secret_key]):
         return Response({
@@ -75,7 +112,7 @@ def admin_register(request):
         }, status=status.HTTP_400_BAD_REQUEST)
     
     # Verify secret key
-    if secret_key != ADMIN_SECRET_KEY:
+    if secret_key != SUPERUSER_SECRET_KEY:
         return Response({
             'error': '🔒 Invalid secret key. Only authorized personnel can create admin accounts.'
         }, status=status.HTTP_403_FORBIDDEN)
@@ -188,13 +225,14 @@ def admin_login(request):
     }, status=status.HTTP_200_OK)
 
 # ========================================
-# REGISTER API (DONOR & HOSPITAL)
+# REGISTER API (DONOR & HOSPITAL) - WITH GEOCODING
 # ========================================
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
     """
     Registers donor or hospital and returns JWT tokens
+    NOW WITH AUTOMATIC GEOCODING FOR HOSPITALS!
     """
     user_type = request.data.get('user_type')
     username = request.data.get('username')
@@ -254,22 +292,52 @@ def register(request):
             weight=request.data.get('weight'),
             medical_conditions=request.data.get('medical_conditions', '')
         )
+        
+        success_message = "✅ Donor registration successful! You can now login."
+        
     else:  # hospital
+        address = request.data['address']
+        
+        # ===== AUTOMATIC GEOCODING FOR HOSPITALS =====
+        latitude, longitude, geocoding_success = geocode_address(address)
+        
+        # Create hospital profile WITH coordinates (if geocoding succeeded)
         HospitalProfile.objects.create(
             user=user,
             hospital_name=request.data['hospital_name'],
             phone=request.data['phone'],
-            address=request.data['address']
+            address=address,
+            latitude=latitude,  # Will be None if geocoding failed
+            longitude=longitude,  # Will be None if geocoding failed
         )
+        
+        # Custom success message based on geocoding result
+        if geocoding_success:
+            success_message = (
+                f"✅ Hospital registered successfully! "
+                f"Location set to: {latitude:.4f}, {longitude:.4f}. "
+                f"Distance-based donor search is enabled!"
+            )
+        else:
+            success_message = (
+                "✅ Hospital registered successfully! "
+                "However, we couldn't automatically set your location. "
+                "Please update your profile with a valid address to enable distance-based searches."
+            )
 
     # JWT tokens
     tokens = get_tokens_for_user(user)
 
     return Response(
         {
-            "message": "Registration successful",
+            "message": success_message,
             "tokens": tokens,
-            "user_type": user.user_type
+            "user_type": user.user_type,
+            "geocoding_success": geocoding_success if user_type == 'hospital' else None,
+            "coordinates": {
+                "latitude": latitude,
+                "longitude": longitude
+            } if user_type == 'hospital' and geocoding_success else None
         },
         status=status.HTTP_201_CREATED
     )
