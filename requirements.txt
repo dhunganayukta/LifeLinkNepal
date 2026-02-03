@@ -13,4 +13,6 @@ python-decouple==3.8
 geopy==2.4.1
 djangorestframework==3.16.1
 dj-database-url==1.0.0
-psycopg[binary]
+pandas>=2.0.0
+openpyxl>=3.1.0
+psycopg2-binary>=2.9.0
