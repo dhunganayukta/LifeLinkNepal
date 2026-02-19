@@ -1,128 +1,217 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}All Blood Requests - Life Link Nepal{% endblock %}
+{% block title %}All Blood Requests — LifeLink Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+.dash-wrap { background: var(--ivory); min-height: 100vh; padding: 0 0 80px; }
+
+/* HERO */
+.dash-hero { background: var(--ink); padding: 40px 0; position: relative; overflow: hidden; margin-bottom: 48px; }
+.dash-hero::before { content:''; position:absolute; top:-100px; right:-100px; width:340px; height:340px; border-radius:50%; border:1px solid rgba(196,146,74,0.1); pointer-events:none; }
+.dash-hero::after  { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; border:1px solid rgba(196,146,74,0.06); pointer-events:none; }
+.dash-hero-crimson-bar { position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(90deg, var(--crimson), var(--gold), var(--crimson-light)); }
+.dash-hero-eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; }
+.dash-hero-eyebrow span { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; font-weight:600; color:var(--gold); }
+.dash-hero-eyebrow-line { width:20px; height:1px; background:var(--gold); opacity:0.5; }
+.dash-hero h2 { font-family:var(--font-display); font-size:clamp(26px,3.5vw,42px); font-weight:600; color:white; letter-spacing:-0.3px; line-height:1.15; margin-bottom:6px; }
+.dash-hero-sub { font-size:14px; color:rgba(240,232,222,0.55); display:flex; align-items:center; gap:6px; }
+.btn-new-request { display:inline-flex; align-items:center; gap:8px; padding:12px 26px; background:white; color:var(--crimson); font-size:13.5px; font-weight:700; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid white; }
+.btn-new-request:hover { background:var(--ivory); color:var(--crimson-mid); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.25); }
+.btn-hero-outline { display:inline-flex; align-items:center; gap:8px; padding:12px 26px; background:transparent; color:rgba(255,255,255,0.8); font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid rgba(255,255,255,0.3); }
+.btn-hero-outline:hover { background:rgba(255,255,255,0.1); color:white; border-color:rgba(255,255,255,0.5); }
+
+/* FILTER TABS */
+.filter-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; }
+.filter-tab { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; font-size:12.5px; font-weight:600; text-decoration:none; border:1.5px solid var(--border-subtle); color:var(--ink-muted); background:white; transition:all 0.2s ease; }
+body.dark-mode .filter-tab { background:#1a1410; border-color:rgba(255,255,255,0.08); color:var(--ink-muted); }
+.filter-tab:hover { border-color:var(--border); color:var(--ink); }
+.filter-tab.active { background:var(--crimson); color:white; border-color:var(--crimson); }
+
+/* CARDS */
+.dash-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; overflow:hidden; margin-bottom:24px; }
+body.dark-mode .dash-card { background:#1a1410; border-color:rgba(255,255,255,0.06); }
+.dash-card-header { padding:20px 24px; border-bottom:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:var(--ivory-mid); }
+body.dark-mode .dash-card-header { background:#221c17; border-color:rgba(255,255,255,0.05); }
+.dash-card-title { font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:10px; }
+.dash-card-title i { color:var(--crimson); font-size:16px; }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; letter-spacing:0.3px; }
+.tag-crimson { background:var(--crimson-pale); color:var(--crimson); border:1px solid var(--border); }
+.tag-gold    { background:var(--gold-pale);    color:var(--gold);    border:1px solid rgba(196,146,74,0.25); }
+.tag-ink     { background:rgba(28,20,16,0.06); color:var(--ink-mid); border:1px solid var(--border-subtle); }
+.tag-green   { background:rgba(74,222,128,0.1); color:#16a34a;       border:1px solid rgba(74,222,128,0.2); }
+.tag-blue    { background:rgba(59,130,246,0.1); color:#2563eb;       border:1px solid rgba(59,130,246,0.2); }
+
+/* TABLE */
+.dash-table { width:100%; border-collapse:collapse; font-size:13.5px; }
+.dash-table thead th { font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; color:var(--ink-muted); padding:12px 14px; border-bottom:1px solid var(--border-subtle); white-space:nowrap; }
+.dash-table tbody tr { border-bottom:1px solid var(--border-subtle); transition:background 0.2s ease; }
+.dash-table tbody tr:last-child { border-bottom:none; }
+.dash-table tbody tr:hover { background:rgba(155,23,40,0.03); }
+body.dark-mode .dash-table tbody tr:hover { background:rgba(155,23,40,0.07); }
+.dash-table td { padding:14px; color:var(--ink-mid); vertical-align:middle; }
+.dash-table td strong { color:var(--ink); font-weight:600; }
+.dash-table tr.row-critical td { background:rgba(155,23,40,0.04); }
+.dash-table tr.row-high td { background:rgba(196,146,74,0.04); }
+
+/* BUTTONS */
+.btn-tbl-view { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; background:transparent; color:var(--ink-mid); font-size:12px; font-weight:600; border-radius:6px; text-decoration:none; border:1.5px solid var(--border-subtle); transition:all 0.2s ease; }
+.btn-tbl-view:hover { border-color:var(--crimson); color:var(--crimson); background:var(--crimson-pale); }
+.btn-tbl-fulfill { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; background:transparent; color:#16a34a; font-size:12px; font-weight:600; border-radius:6px; border:1.5px solid rgba(74,222,128,0.3); cursor:pointer; transition:all 0.2s ease; }
+.btn-tbl-fulfill:hover { background:#16a34a; color:white; border-color:#16a34a; transform:translateY(-1px); }
+
+/* AI BADGE */
+.ai-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); border-radius:20px; font-size:11px; font-weight:700; color:#2563eb; letter-spacing:0.5px; }
+
+/* EMPTY STATE */
+.empty-state { text-align:center; padding:56px 24px; }
+.empty-state-icon { width:72px; height:72px; border-radius:50%; background:var(--ivory-mid); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:28px; color:var(--ink-muted); }
+.empty-state h6 { font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--ink); margin-bottom:6px; }
+.empty-state p { font-size:13.5px; color:var(--ink-muted); margin-bottom:20px; }
+.btn-create { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:var(--crimson); color:white; font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid var(--crimson); }
+.btn-create:hover { background:var(--crimson-mid); border-color:var(--crimson-mid); color:white; transform:translateY(-2px); box-shadow:0 6px 18px rgba(155,23,40,0.35); }
+
+body.dark-mode .dash-wrap { background:var(--ivory); }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.fulfill-form').forEach(function(form){
+        form.addEventListener('submit', function(e){
+            if (!confirm('Mark this request as fulfilled?')) e.preventDefault();
+        });
+    });
+});
+</script>
+{% endblock %}
 
 {% block content %}
-<!-- Header -->
-<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
-            <div>
-                <h2 class="fw-bold mb-1">
-                    <i class="bi bi-list-ul me-2"></i>All Blood Requests
-                </h2>
-                <p class="mb-0">Ranked by priority using AI algorithms</p>
-            </div>
-            <div>
-                <a href="{% url 'create_blood_request' %}" class="btn btn-light me-2">
-                    <i class="bi bi-plus-circle me-1"></i>New Request
-                </a>
-                <a href="{% url 'hospital_dashboard' %}" class="btn btn-outline-light">
-                    <i class="bi bi-arrow-left me-1"></i>Dashboard
-                </a>
+<div class="dash-wrap">
+
+    <!-- HERO -->
+    <div class="dash-hero">
+        <div class="dash-hero-crimson-bar"></div>
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <div class="dash-hero-eyebrow">
+                        <div class="dash-hero-eyebrow-line"></div>
+                        <span>Blood Requests</span>
+                        <div class="dash-hero-eyebrow-line"></div>
+                    </div>
+                    <h2>All Blood Requests</h2>
+                    <div class="dash-hero-sub">
+                        <i class="bi bi-cpu-fill"></i>
+                        Ranked by priority using AI algorithms
+                    </div>
+                </div>
+                <div class="col-lg-4 d-flex justify-content-lg-end gap-2 flex-wrap">
+                    <a href="{% url 'create_blood_request' %}" class="btn-new-request">
+                        <i class="bi bi-plus-circle-fill"></i> New Request
+                    </a>
+                    <a href="{% url 'hospital_dashboard' %}" class="btn-hero-outline">
+                        <i class="bi bi-arrow-left"></i> Dashboard
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-</section>
 
-<section class="py-5">
     <div class="container">
         {% if ranked_requests %}
-            <!-- Filter Tabs -->
-            <ul class="nav nav-pills mb-4">
-                <li class="nav-item">
-                    <a class="nav-link {% if status == 'all' or not status %}active{% endif %}" href="?status=all">
-                        All ({{ ranked_requests|length }})
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if status == 'pending' %}active{% endif %}" href="?status=pending">
-                        Pending
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if status == 'fulfilled' %}active{% endif %}" href="?status=fulfilled">
-                        Fulfilled
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if status == 'cancelled' %}active{% endif %}" href="?status=cancelled">
-                        Cancelled
-                    </a>
-                </li>
-            </ul>
 
-            <!-- Requests Table -->
-            <div class="info-card">
+        <!-- FILTER TABS -->
+        <div class="filter-tabs">
+            <a href="?status=all" class="filter-tab {% if status == 'all' or not status %}active{% endif %}">
+                <i class="bi bi-list-ul"></i> All <span style="opacity:0.7;">({{ ranked_requests|length }})</span>
+            </a>
+            <a href="?status=pending" class="filter-tab {% if status == 'pending' %}active{% endif %}">
+                <i class="bi bi-clock-history"></i> Pending
+            </a>
+            <a href="?status=fulfilled" class="filter-tab {% if status == 'fulfilled' %}active{% endif %}">
+                <i class="bi bi-check-circle"></i> Fulfilled
+            </a>
+            <a href="?status=cancelled" class="filter-tab {% if status == 'cancelled' %}active{% endif %}">
+                <i class="bi bi-x-circle"></i> Cancelled
+            </a>
+        </div>
+
+        <!-- TABLE CARD -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">
+                    <i class="bi bi-list-check"></i> Blood Requests
+                </div>
+                <span class="ai-badge"><i class="bi bi-cpu"></i> AI Ranked</span>
+            </div>
+            <div style="padding:0;">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="dash-table">
                         <thead>
                             <tr>
-                                <th>Patient</th>
-                                <th>Blood Type</th>
-                                <th>Units</th>
+                                <th style="padding-left:24px;">Patient</th>
+                                <th>Blood</th>
+                                <th class="d-none d-md-table-cell">Units</th>
                                 <th>Urgency</th>
-                                <th>Priority Score</th>
+                                <th class="d-none d-lg-table-cell">Score</th>
                                 <th>Status</th>
-                                <th>Created</th>
-                                <th>Actions</th>
+                                <th class="d-none d-md-table-cell">Date</th>
+                                <th style="padding-right:24px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in ranked_requests %}
-                            <tr class="
-                                {% if item.priority_level == 'critical' %}table-danger
-                                {% elif item.priority_level == 'high' %}table-warning
-                                {% endif %}">
-                                <td>
+                            <tr class="{% if item.priority_level == 'critical' %}row-critical{% elif item.priority_level == 'high' %}row-high{% endif %}">
+                                <td style="padding-left:24px;">
                                     <strong>{{ item.request.patient_name }}</strong><br>
-                                    <small class="text-muted">{{ item.request.patient_age|default:"N/A" }} yrs</small>
+                                    <small style="color:var(--ink-muted);">{{ item.request.patient_age|default:"N/A" }} yrs</small>
                                 </td>
-                                <td><span class="badge bg-danger fs-6">{{ item.request.blood_type }}</span></td>
-                                <td>{{ item.request.units_needed }}</td>
+                                <td><span class="tag tag-crimson">{{ item.request.blood_type }}</span></td>
+                                <td class="d-none d-md-table-cell"><strong>{{ item.request.units_needed }}</strong></td>
                                 <td>
-                                    <span class="badge 
-                                        {% if item.request.urgency_level == 'critical' %}bg-danger
-                                        {% elif item.request.urgency_level == 'urgent' %}bg-warning text-dark
-                                        {% else %}bg-success{% endif %}">
-                                        {{ item.request.urgency_level|upper }}
-                                    </span>
+                                    {% if item.request.urgency_level == 'critical' %}
+                                        <span class="tag tag-crimson">Critical</span>
+                                    {% elif item.request.urgency_level == 'urgent' %}
+                                        <span class="tag tag-gold">Urgent</span>
+                                    {% else %}
+                                        <span class="tag tag-green">{{ item.request.urgency_level|title }}</span>
+                                    {% endif %}
                                 </td>
-                                <td>
-                                    <span class="badge 
-                                        {% if item.priority_level == 'critical' %}bg-danger
-                                        {% elif item.priority_level == 'high' %}bg-warning text-dark
-                                        {% else %}bg-info{% endif %}">
+                                <td class="d-none d-lg-table-cell">
+                                    <span class="tag {% if item.priority_level == 'critical' %}tag-crimson{% elif item.priority_level == 'high' %}tag-gold{% elif item.priority_level == 'medium' %}tag-blue{% else %}tag-ink{% endif %}">
                                         {{ item.priority_score|floatformat:0 }}
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge 
-                                        {% if item.request.status == 'fulfilled' %}bg-success
-                                        {% elif item.request.status == 'pending' %}bg-warning text-dark
-                                        {% else %}bg-secondary{% endif %}">
-                                        {{ item.request.status|title }}
-                                    </span>
+                                    {% if item.request.status == 'fulfilled' %}
+                                        <span class="tag tag-green">Fulfilled</span>
+                                    {% elif item.request.status == 'pending' %}
+                                        <span class="tag tag-gold">Pending</span>
+                                    {% else %}
+                                        <span class="tag tag-ink">{{ item.request.get_status_display }}</span>
+                                    {% endif %}
                                 </td>
-                                <td>
-                                    <small>{{ item.request.created_at|date:"M d, Y" }}</small>
+                                <td class="d-none d-md-table-cell">
+                                    <small style="color:var(--ink-muted);">{{ item.request.created_at|date:"M d, Y" }}</small>
                                 </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{% url 'view_blood_request' item.request.id %}" 
-                                           class="btn btn-outline-primary" title="View">
+                                <td style="padding-right:24px;">
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <a href="{% url 'view_blood_request' item.request.id %}" class="btn-tbl-view">
                                             <i class="bi bi-eye"></i>
+                                            <span class="d-none d-sm-inline">View</span>
                                         </a>
                                         {% if item.request.status == 'pending' %}
-                                        <form method="POST" action="{% url 'mark_fulfilled' item.request.id %}" style="display: inline;">
+                                        <form method="POST" action="{% url 'mark_fulfilled' item.request.id %}" class="fulfill-form">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{{ request.path }}?status={{ status }}">
-                                            <button type="submit" 
-                                                    class="btn btn-outline-success" 
-                                                    title="Mark Fulfilled"
-                                                    onclick="return confirm('Mark this request as fulfilled?');">
+                                            <button type="submit" class="btn-tbl-fulfill">
                                                 <i class="bi bi-check-circle"></i>
+                                                <span class="d-none d-sm-inline">Fulfill</span>
                                             </button>
                                         </form>
                                         {% endif %}
@@ -133,57 +222,46 @@
                         </tbody>
                     </table>
                 </div>
+                <div style="padding:14px 24px; border-top:1px solid var(--border-subtle); background:var(--ivory-mid);">
+                    <small style="font-size:12px; color:var(--ink-muted);">
+                        <i class="bi bi-info-circle me-1" style="color:var(--gold);"></i>
+                        <strong style="color:var(--ink-light);">AI Ranking:</strong>
+                        Requests prioritized by urgency, waiting time, units needed, and blood rarity.
+                    </small>
+                </div>
             </div>
+        </div>
+
         {% else %}
-            <div class="text-center py-5">
-                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
-                <h4 class="text-muted mt-3">No Blood Requests Found</h4>
+        <div class="dash-card">
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
+                <h6>
+                    {% if status and status != 'all' %}
+                        No "{{ status|title }}" Requests Found
+                    {% else %}
+                        No Blood Requests Yet
+                    {% endif %}
+                </h6>
+                <p>
+                    {% if status and status != 'all' %}
+                        Try viewing all requests or create a new one.
+                    {% else %}
+                        Create your first blood request to get started.
+                    {% endif %}
+                </p>
                 {% if status and status != 'all' %}
-                    <p class="text-muted">No requests with status "{{ status }}"</p>
-                    <a href="?status=all" class="btn btn-primary mt-3">
-                        <i class="bi bi-list-ul me-1"></i>View All Requests
+                    <a href="?status=all" class="btn-create">
+                        <i class="bi bi-list-ul"></i> View All Requests
                     </a>
                 {% else %}
-                    <a href="{% url 'create_blood_request' %}" class="btn btn-danger mt-3">
-                        <i class="bi bi-plus-circle me-1"></i>Create First Request
+                    <a href="{% url 'create_blood_request' %}" class="btn-create">
+                        <i class="bi bi-plus-circle"></i> Create Request
                     </a>
                 {% endif %}
             </div>
+        </div>
         {% endif %}
     </div>
-</section>
-
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    .info-card {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
-    body.dark-mode .info-card {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
-    
-    .nav-pills .nav-link {
-        color: #6c757d;
-        border-radius: 10px;
-        padding: 10px 20px;
-        margin-right: 10px;
-        transition: all 0.3s ease;
-    }
-    
-    .nav-pills .nav-link:hover {
-        background-color: rgba(199, 30, 53, 0.1);
-        color: #c71e35;
-    }
-    
-    .nav-pills .nav-link.active {
-        background-color: #c71e35;
-        color: white;
-    }
-</style>
+</div>
 {% endblock %}

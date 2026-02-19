@@ -1,492 +1,306 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ donor.full_name }} - Donor Profile{% endblock %}
+{% block title %}{{ donor.full_name }} — Donor Profile{% endblock %}
 
 {% block extra_css %}
 <style>
-    :root {
-        --lifelink-red: #E63946;
-        --lifelink-blue: #1D70B8;
-        --lifelink-gradient: linear-gradient(135deg, #1D70B8 0%, #E63946 100%);
-    }
-    
-    body {
-        background-color: #F8F9FA;
-    }
-    
-    /* ==================== PAGE HEADER ==================== */
-    .page-header {
-        background: var(--lifelink-gradient);
-        padding: 2.5rem 0;
-        box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
-    }
-    
-    .page-title {
-        font-size: 2rem;
-        font-weight: 700;
-        color: white;
-        margin-bottom: 0.25rem;
-    }
-    
-    /* ==================== INFO CARDS ==================== */
-    .info-card {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-        border: 1px solid rgba(230, 57, 70, 0.1);
-        height: 100%;
-        transition: all 0.3s ease;
-    }
-    
-    .info-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(230, 57, 70, 0.15);
-    }
-    
-    /* ==================== PROFILE AVATAR ==================== */
-    .profile-avatar {
-        width: 130px;
-        height: 130px;
-        background: var(--lifelink-gradient);
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 30px rgba(230, 57, 70, 0.3);
-        margin-bottom: 1.5rem;
-        position: relative;
-    }
-    
-    .profile-avatar::before {
-        content: '';
-        position: absolute;
-        inset: -8px;
-        border-radius: 50%;
-        background: var(--lifelink-gradient);
-        opacity: 0.2;
-        animation: pulse-ring 2s infinite;
-    }
-    
-    @keyframes pulse-ring {
-        0%, 100% { transform: scale(1); opacity: 0.2; }
-        50% { transform: scale(1.1); opacity: 0; }
-    }
-    
-    .profile-avatar i {
-        font-size: 4.5rem;
-        color: white;
-        position: relative;
-        z-index: 1;
-    }
-    
-    /* ==================== BLOOD TYPE BADGE ==================== */
-    .blood-type-badge {
-        font-size: 2rem;
-        padding: 0.75rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 900;
-        box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
-    }
-    
-    /* ==================== STATUS BADGES ==================== */
-    .status-badge {
-        padding: 0.6rem 1.25rem;
-        border-radius: 25px;
-        font-weight: 700;
-        font-size: 1rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    /* ==================== ACTION BUTTONS ==================== */
-    .btn-lifelink-primary {
-        background: var(--lifelink-gradient);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-lifelink-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
-        color: white;
-    }
-    
-    .btn-danger {
-        background-color: var(--lifelink-red);
-        border-color: var(--lifelink-red);
-        font-weight: 600;
-    }
-    
-    .btn-danger:hover {
-        background-color: #CC2936;
-        transform: translateY(-2px);
-    }
-    
-    .btn-outline-danger {
-        color: var(--lifelink-red);
-        border-color: var(--lifelink-red);
-        font-weight: 600;
-    }
-    
-    .btn-outline-danger:hover {
-        background-color: var(--lifelink-red);
-        color: white;
-    }
-    
-    /* ==================== INFO SECTIONS ==================== */
-    .section-title {
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .section-title i {
-        color: var(--lifelink-red);
-        font-size: 1.5rem;
-    }
-    
-    .info-row {
-        padding: 0.75rem 0;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .info-row:last-child {
-        border-bottom: none;
-    }
-    
-    .info-label {
-        color: #6c757d;
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
-    
-    .info-value {
-        color: #2c3e50;
-        font-weight: 700;
-    }
-    
-    /* ==================== TABLE STYLING ==================== */
-    .table {
-        margin-bottom: 0;
-    }
-    
-    .table thead {
-        background: var(--lifelink-gradient);
-        color: white;
-    }
-    
-    .table thead th {
-        border: none;
-        font-weight: 600;
-        padding: 1rem;
-    }
-    
-    .table tbody tr:hover {
-        background-color: rgba(230, 57, 70, 0.05);
-    }
-    
-    /* ==================== STAT CARD ==================== */
-    .stat-item {
-        padding: 1rem;
-        text-align: center;
-        border-right: 1px solid #e9ecef;
-    }
-    
-    .stat-item:last-child {
-        border-right: none;
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--lifelink-red);
-        line-height: 1;
-    }
-    
-    .stat-label {
-        font-size: 0.85rem;
-        color: #6c757d;
-        font-weight: 600;
-        margin-top: 0.5rem;
-    }
-    
-    /* ==================== RESPONSIVE ==================== */
-    @media (max-width: 768px) {
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-        }
-        
-        .profile-avatar i {
-            font-size: 3.5rem;
-        }
-        
-        .blood-type-badge {
-            font-size: 1.5rem;
-        }
-    }
+.dash-wrap { background: var(--ivory); min-height: 100vh; padding: 48px 0 80px; }
+
+/* HERO */
+.dash-hero { background: var(--ink); border-radius: 16px; padding: 36px 40px; margin-bottom: 40px; position: relative; overflow: hidden; }
+.dash-hero::before { content:''; position:absolute; top:-80px; right:-80px; width:280px; height:280px; border-radius:50%; border:1px solid rgba(196,146,74,0.12); pointer-events:none; }
+.dash-hero::after  { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%; border:1px solid rgba(196,146,74,0.07); pointer-events:none; }
+.dash-hero-crimson-bar { position:absolute; top:0; left:0; width:4px; height:100%; background:linear-gradient(180deg, var(--crimson) 0%, var(--gold) 100%); border-radius:4px 0 0 4px; }
+.dash-hero-eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; }
+.dash-hero-eyebrow span { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; font-weight:600; color:var(--gold); }
+.dash-hero-eyebrow-line { width:20px; height:1px; background:var(--gold); opacity:0.6; }
+.dash-hero h2 { font-family:var(--font-display); font-size:clamp(28px,3.5vw,44px); font-weight:600; color:white; letter-spacing:-0.3px; line-height:1.15; margin-bottom:8px; }
+.dash-hero p { font-size:14.5px; color:rgba(240,232,222,0.6); margin:0; }
+.btn-dash-secondary { display:inline-flex; align-items:center; gap:8px; padding:9px 20px; background:transparent; color:rgba(240,232,222,0.75); font-size:13px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid rgba(240,232,222,0.2); }
+.btn-dash-secondary:hover { border-color:rgba(196,146,74,0.5); color:var(--gold-light); background:rgba(196,146,74,0.08); }
+
+/* CARDS */
+.dash-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; overflow:hidden; margin-bottom:24px; }
+body.dark-mode .dash-card { background:#1a1410; border-color:rgba(255,255,255,0.06); }
+.dash-card-header { padding:20px 24px; border-bottom:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:var(--ivory-mid); }
+body.dark-mode .dash-card-header { background:#221c17; border-color:rgba(255,255,255,0.05); }
+.dash-card-title { font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:10px; }
+.dash-card-title i { color:var(--crimson); font-size:16px; }
+.dash-card-body { padding:24px; }
+
+/* DONOR AVATAR */
+.donor-avatar-wrap { width:90px; height:90px; border-radius:50%; background:var(--crimson); display:inline-flex; align-items:center; justify-content:center; font-size:38px; color:white; margin:0 auto 16px; box-shadow:0 8px 24px rgba(155,23,40,0.35); position:relative; transition:transform 0.3s ease; }
+.donor-avatar-wrap:hover { transform:scale(1.05); }
+.donor-avatar-wrap::before { content:''; position:absolute; inset:-8px; border-radius:50%; background:var(--crimson); opacity:0.15; animation:pulse-ring 2s infinite; }
+@keyframes pulse-ring { 0%,100%{transform:scale(1);opacity:0.15;} 50%{transform:scale(1.12);opacity:0;} }
+
+/* BLOOD TYPE */
+.blood-badge-lg { width:72px; height:72px; border-radius:50%; background:var(--crimson); display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:22px; font-weight:700; color:white; box-shadow:0 6px 18px rgba(155,23,40,0.35); margin:0 auto 14px; }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; letter-spacing:0.3px; }
+.tag-crimson { background:var(--crimson-pale); color:var(--crimson); border:1px solid var(--border); }
+.tag-gold    { background:var(--gold-pale);    color:var(--gold);    border:1px solid rgba(196,146,74,0.25); }
+.tag-green   { background:rgba(74,222,128,0.1); color:#16a34a;       border:1px solid rgba(74,222,128,0.2); }
+.tag-ink     { background:rgba(28,20,16,0.06); color:var(--ink-mid); border:1px solid var(--border-subtle); }
+.tag-blue    { background:rgba(59,130,246,0.1); color:#2563eb;       border:1px solid rgba(59,130,246,0.2); }
+
+/* INFO ROWS */
+.info-row { display:flex; justify-content:space-between; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--border-subtle); }
+.info-row:last-child { border-bottom:none; padding-bottom:0; }
+.info-row:first-child { padding-top:0; }
+.info-label { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; font-weight:600; color:var(--ink-muted); }
+.info-value { font-size:13.5px; font-weight:600; color:var(--ink); text-align:right; }
+body.dark-mode .info-value { color:var(--ink); }
+
+/* STAT MINI */
+.stat-mini { text-align:center; padding:14px; border-right:1px solid var(--border-subtle); }
+.stat-mini:last-child { border-right:none; }
+.stat-mini-number { font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--crimson); line-height:1; }
+.stat-mini-label  { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; font-weight:600; color:var(--ink-muted); margin-top:4px; }
+
+/* ACTION BUTTONS */
+.btn-action-fill { display:flex; align-items:center; justify-content:center; gap:8px; padding:11px 20px; background:var(--crimson); color:white; font-size:13px; font-weight:700; border-radius:8px; border:1.5px solid var(--crimson); cursor:pointer; transition:all 0.25s ease; width:100%; text-decoration:none; }
+.btn-action-fill:hover { background:var(--crimson-mid); border-color:var(--crimson-mid); color:white; transform:translateY(-1px); box-shadow:0 6px 18px rgba(155,23,40,0.3); }
+.btn-action-outline { display:flex; align-items:center; justify-content:center; gap:8px; padding:11px 20px; background:transparent; color:var(--crimson); font-size:13px; font-weight:600; border-radius:8px; border:1.5px solid rgba(155,23,40,0.3); transition:all 0.25s ease; width:100%; text-decoration:none; }
+.btn-action-outline:hover { background:var(--crimson-pale); border-color:var(--crimson); color:var(--crimson); }
+.btn-action-blue { display:flex; align-items:center; justify-content:center; gap:8px; padding:11px 20px; background:transparent; color:#2563eb; font-size:13px; font-weight:600; border-radius:8px; border:1.5px solid rgba(59,130,246,0.3); transition:all 0.25s ease; width:100%; text-decoration:none; }
+.btn-action-blue:hover { background:rgba(59,130,246,0.08); border-color:#2563eb; color:#2563eb; }
+
+/* TABLE */
+.dash-table { width:100%; border-collapse:collapse; font-size:13.5px; }
+.dash-table thead th { font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; color:var(--ink-muted); padding:12px 14px; border-bottom:1px solid var(--border-subtle); white-space:nowrap; }
+.dash-table tbody tr { border-bottom:1px solid var(--border-subtle); transition:background 0.2s ease; }
+.dash-table tbody tr:last-child { border-bottom:none; }
+.dash-table tbody tr:hover { background:rgba(155,23,40,0.03); }
+.dash-table td { padding:13px 14px; color:var(--ink-mid); vertical-align:middle; }
+.dash-table td strong { color:var(--ink); font-weight:600; }
+
+/* EMPTY */
+.empty-state { text-align:center; padding:40px 24px; }
+.empty-state-icon { width:64px; height:64px; border-radius:50%; background:var(--ivory-mid); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px; color:var(--ink-muted); }
+.empty-state p { font-size:13px; color:var(--ink-muted); margin:0; }
+
+body.dark-mode .dash-wrap { background:var(--ivory); }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- ==================== PAGE HEADER ==================== -->
-<section class="page-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="page-title">
-                    <i class="bi bi-person-fill me-3"></i>Donor Profile
-                </h1>
-                <p class="text-white-50 mb-0">Detailed information about this donor</p>
+<div class="dash-wrap">
+<div class="container">
+
+    <!-- HERO -->
+    <div class="dash-hero">
+        <div class="dash-hero-crimson-bar"></div>
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="dash-hero-eyebrow">
+                    <div class="dash-hero-eyebrow-line"></div>
+                    <span>Donor Profile</span>
+                    <div class="dash-hero-eyebrow-line"></div>
+                </div>
+                <h2>{{ donor.full_name }}</h2>
+                <p>Detailed information about this donor</p>
             </div>
-            <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <a href="{% url 'hospital_donors' %}" class="btn btn-light btn-lg">
-                    <i class="bi bi-arrow-left me-2"></i>Back to Donors
+            <div class="col-lg-4 d-flex justify-content-lg-end">
+                <a href="{% url 'hospital_donors' %}" class="btn-dash-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Donors
                 </a>
             </div>
         </div>
     </div>
-</section>
 
-<!-- ==================== MAIN CONTENT ==================== -->
-<section class="py-5">
-    <div class="container">
-        <div class="row g-4">
-            <!-- Left Column - Profile Card -->
-            <div class="col-lg-4">
-                <!-- Profile Summary -->
-                <div class="info-card text-center mb-4">
-                    <div class="profile-avatar">
-                        <i class="bi bi-person-fill"></i>
-                    </div>
-                    
-                    <h3 class="fw-bold mb-2">{{ donor.full_name }}</h3>
-                    <p class="text-muted mb-3">{{ donor.age }} years old</p>
-                    
-                    <div class="mb-3">
-                        <span class="blood-type-badge bg-danger">
-                            {{ donor.blood_type }}
-                        </span>
-                    </div>
+    <div class="row g-4">
 
-                    <div class="mb-4">
+        <!-- LEFT: Profile Summary -->
+        <div class="col-lg-4">
+
+            <!-- Profile Card -->
+            <div class="dash-card">
+                <div class="dash-card-body text-center">
+                    <div class="donor-avatar-wrap"><i class="bi bi-person-fill" style="position:relative;z-index:1;"></i></div>
+                    <h4 style="font-family:var(--font-display); font-size:22px; font-weight:600; color:var(--ink); margin-bottom:4px;">{{ donor.full_name }}</h4>
+                    <p style="font-size:13px; color:var(--ink-muted); margin-bottom:14px;">{{ donor.age }} years old</p>
+                    <div class="blood-badge-lg">{{ donor.blood_type }}</div>
+                    <div style="margin-bottom:20px;">
                         {% if donor.is_available %}
-                            <span class="status-badge bg-success">
-                                <i class="bi bi-check-circle-fill"></i>
-                                Available to Donate
-                            </span>
+                            <span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Available to Donate</span>
                         {% else %}
-                            <span class="status-badge bg-secondary">
-                                <i class="bi bi-x-circle-fill"></i>
-                                Currently Unavailable
-                            </span>
+                            <span class="tag tag-ink"><i class="bi bi-x-circle-fill"></i> Currently Unavailable</span>
                         {% endif %}
                     </div>
-
                     <div class="d-grid gap-2">
-                        <a href="{% url 'notify_donor' donor.id %}" class="btn btn-danger">
-                            <i class="bi bi-bell-fill me-2"></i>Send Notification
+                        <a href="{% url 'notify_donor' donor.id %}" class="btn-action-fill">
+                            <i class="bi bi-bell-fill"></i> Send Notification
                         </a>
-                        <a href="tel:{{ donor.phone }}" class="btn btn-outline-danger">
-                            <i class="bi bi-telephone-fill me-2"></i>Call Donor
+                        <a href="tel:{{ donor.phone }}" class="btn-action-outline">
+                            <i class="bi bi-telephone-fill"></i> Call Donor
                         </a>
-                        <a href="mailto:{{ donor.user.email }}" class="btn btn-outline-primary">
-                            <i class="bi bi-envelope-fill me-2"></i>Send Email
+                        <a href="mailto:{{ donor.user.email }}" class="btn-action-blue">
+                            <i class="bi bi-envelope-fill"></i> Send Email
                         </a>
                     </div>
                 </div>
+            </div>
 
-                <!-- Quick Stats -->
-                <div class="info-card">
-                    <h5 class="section-title mb-3">
-                        <i class="bi bi-graph-up-arrow"></i>
-                        Donation Statistics
-                    </h5>
+            <!-- Donation Stats -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title"><i class="bi bi-graph-up-arrow"></i> Statistics</div>
+                </div>
+                <div class="dash-card-body" style="padding:0;">
                     <div class="row g-0">
                         <div class="col-12">
-                            <div class="stat-item">
-                                <div class="stat-number">{{ donor.donation_count|default:0 }}</div>
-                                <div class="stat-label">Total Donations</div>
+                            <div class="stat-mini" style="border-right:none;">
+                                <div class="stat-mini-number">{{ donor.donation_count|default:0 }}</div>
+                                <div class="stat-mini-label">Total Donations</div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="mt-3 pt-3 border-top">
+                    <div style="padding:16px 20px; border-top:1px solid var(--border-subtle);">
                         {% if donor.last_donation_date %}
                         <div class="info-row">
-                            <div class="info-label">Last Donation</div>
-                            <div class="info-value">{{ donor.last_donation_date|date:"M d, Y" }}</div>
+                            <span class="info-label">Last Donation</span>
+                            <span class="info-value">{{ donor.last_donation_date|date:"M d, Y" }}</span>
                         </div>
                         {% endif %}
                         {% if distance %}
                         <div class="info-row">
-                            <div class="info-label">Distance from Hospital</div>
-                            <div class="info-value">
-                                <span class="badge bg-info">{{ distance }} km</span>
-                            </div>
+                            <span class="info-label">Distance</span>
+                            <span class="info-value"><span class="tag tag-blue">{{ distance }} km</span></span>
                         </div>
                         {% endif %}
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column - Detailed Information -->
-            <div class="col-lg-8">
-                <!-- Contact Information -->
-                <div class="info-card mb-4">
-                    <h5 class="section-title">
-                        <i class="bi bi-telephone-fill"></i>
-                        Contact Information
-                    </h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="info-label mb-1">Phone Number</div>
-                            <div class="info-value">
-                                <a href="tel:{{ donor.phone }}" class="text-decoration-none">
-                                    {{ donor.phone }}
-                                </a>
+        </div>
+
+        <!-- RIGHT: Details -->
+        <div class="col-lg-8">
+
+            <!-- Contact Info -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title"><i class="bi bi-telephone-fill"></i> Contact Information</div>
+                </div>
+                <div class="dash-card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="info-label" style="margin-bottom:6px;">Phone Number</div>
+                            <div class="info-value" style="text-align:left;">
+                                <a href="tel:{{ donor.phone }}" style="color:var(--crimson); font-weight:600; text-decoration:none;">{{ donor.phone }}</a>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="info-label mb-1">Email Address</div>
-                            <div class="info-value">
-                                <a href="mailto:{{ donor.user.email }}" class="text-decoration-none">
-                                    {{ donor.user.email }}
-                                </a>
+                        <div class="col-md-6">
+                            <div class="info-label" style="margin-bottom:6px;">Email Address</div>
+                            <div class="info-value" style="text-align:left;">
+                                <a href="mailto:{{ donor.user.email }}" style="color:var(--ink); text-decoration:none; font-weight:600;">{{ donor.user.email }}</a>
                             </div>
                         </div>
                         <div class="col-12">
-                            <div class="info-label mb-1">Address</div>
-                            <div class="info-value">
-                                <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+                            <div class="info-label" style="margin-bottom:6px;">Address</div>
+                            <div style="font-size:13.5px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:6px;">
+                                <i class="bi bi-geo-alt-fill" style="color:var(--gold);"></i>
                                 {{ donor.address }}
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Health Information -->
-                <div class="info-card mb-4">
-                    <h5 class="section-title">
-                        <i class="bi bi-heart-pulse-fill"></i>
-                        Health Information
-                    </h5>
-                    <div class="row">
+            <!-- Health Info -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title"><i class="bi bi-heart-pulse-fill"></i> Health Information</div>
+                </div>
+                <div class="dash-card-body" style="padding-top:8px; padding-bottom:8px;">
+                    <div class="row g-0">
                         <div class="col-md-6">
-                            <div class="info-row">
-                                <div class="info-label">Blood Type</div>
-                                <div class="info-value">
-                                    <span class="badge bg-danger fs-6">{{ donor.blood_type }}</span>
-                                </div>
+                            <div class="info-row" style="padding-right:16px;">
+                                <span class="info-label">Blood Type</span>
+                                <span class="tag tag-crimson">{{ donor.blood_type }}</span>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="info-row">
-                                <div class="info-label">Age</div>
-                                <div class="info-value">{{ donor.age }} years</div>
+                            <div class="info-row" style="padding-left:16px;">
+                                <span class="info-label">Age</span>
+                                <span class="info-value">{{ donor.age }} years</span>
                             </div>
                         </div>
                         {% if donor.weight %}
                         <div class="col-md-6">
-                            <div class="info-row">
-                                <div class="info-label">Weight</div>
-                                <div class="info-value">{{ donor.weight }} kg</div>
+                            <div class="info-row" style="padding-right:16px;">
+                                <span class="info-label">Weight</span>
+                                <span class="info-value">{{ donor.weight }} kg</span>
                             </div>
                         </div>
                         {% endif %}
                         <div class="col-md-6">
-                            <div class="info-row">
-                                <div class="info-label">Eligibility Status</div>
-                                <div class="info-value">
-                                    {% if donor.can_donate %}
-                                        <span class="badge bg-success">
-                                            <i class="bi bi-check-circle-fill me-1"></i>
-                                            Eligible to Donate
-                                        </span>
-                                    {% else %}
-                                        <span class="badge bg-warning text-dark">
-                                            <i class="bi bi-clock me-1"></i>
-                                            90-day Wait Period
-                                        </span>
-                                    {% endif %}
-                                </div>
+                            <div class="info-row" {% if donor.weight %}style="padding-left:16px;"{% endif %}>
+                                <span class="info-label">Eligibility</span>
+                                {% if donor.can_donate %}
+                                    <span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Eligible</span>
+                                {% else %}
+                                    <span class="tag tag-gold"><i class="bi bi-clock"></i> 90-day Wait</span>
+                                {% endif %}
                             </div>
                         </div>
                         {% if donor.medical_conditions %}
                         <div class="col-12">
                             <div class="info-row">
-                                <div class="info-label">Medical Conditions</div>
-                                <div class="info-value text-muted">{{ donor.medical_conditions }}</div>
+                                <span class="info-label">Medical Conditions</span>
+                                <span style="font-size:13px; color:var(--ink-muted);">{{ donor.medical_conditions }}</span>
                             </div>
                         </div>
                         {% endif %}
                     </div>
                 </div>
-
-                <!-- Donation History -->
-                <div class="info-card">
-                    <h5 class="section-title">
-                        <i class="bi bi-clock-history"></i>
-                        Donation History
-                    </h5>
-                    {% if donor.donation_history.all %}
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Hospital</th>
-                                        <th>Units Donated</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for donation in donor.donation_history.all %}
-                                    <tr>
-                                        <td>
-                                            <i class="bi bi-calendar3 text-danger me-2"></i>
-                                            {{ donation.date_donated|date:"M d, Y" }}
-                                        </td>
-                                        <td>
-                                            <i class="bi bi-hospital text-primary me-2"></i>
-                                            {{ donation.hospital.hospital_name|default:"N/A" }}
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-danger">
-                                                {{ donation.units_donated }} unit{{ donation.units_donated|pluralize }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-success">
-                                                <i class="bi bi-check-circle-fill me-1"></i>
-                                                Completed
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="text-center py-5">
-                            <i class="bi bi-clipboard-data text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
-                            <p class="text-muted mt-3 mb-0">No donation history available</p>
-                            <small class="text-muted">This donor hasn't made any donations yet</small>
-                        </div>
-                    {% endif %}
-                </div>
             </div>
+
+            <!-- Donation History Table -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title"><i class="bi bi-clock-history"></i> Donation History</div>
+                </div>
+                {% if donor.donation_history.all %}
+                <div style="padding:0;">
+                    <div class="table-responsive">
+                        <table class="dash-table">
+                            <thead>
+                                <tr>
+                                    <th style="padding-left:24px;">Date</th>
+                                    <th>Hospital</th>
+                                    <th>Units</th>
+                                    <th style="padding-right:24px;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for donation in donor.donation_history.all %}
+                                <tr>
+                                    <td style="padding-left:24px;">
+                                        <strong>{{ donation.date_donated|date:"M d, Y" }}</strong>
+                                    </td>
+                                    <td>{{ donation.hospital.hospital_name|default:"N/A" }}</td>
+                                    <td><span class="tag tag-crimson">{{ donation.units_donated }} unit{{ donation.units_donated|pluralize }}</span></td>
+                                    <td style="padding-right:24px;"><span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Completed</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-clipboard-data"></i></div>
+                    <p>No donation history available for this donor yet.</p>
+                </div>
+                {% endif %}
+            </div>
+
         </div>
     </div>
-</section>
+</div>
+</div>
 {% endblock %}

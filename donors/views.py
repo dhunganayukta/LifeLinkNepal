@@ -1,4 +1,4 @@
-# donors/views.py (CORRECTED VERSION)
+# donors/views.py (FIXED VERSION - Simplified Permission Checks)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
@@ -102,10 +102,11 @@ def donor_dashboard(request):
         'total_units': total_units,
         'ranked_requests': ranked_requests_data,
         'leaderboard': leaderboard,
-        'active_notifications': active_notifications,  # CHANGED: Show active notifications
+        'active_notifications': active_notifications,
         'past_notifications': past_notifications,
         'can_donate': donor.can_donate,
         'days_until_eligible': get_days_until_eligible(donor),
+        'lives_saved': len(history) * 3,
     }
     return render(request, 'donors/donor_dashboard.html', context)
 
@@ -133,13 +134,13 @@ def view_notification_detail(request, notification_id):
         'notification': notification,
         'blood_request': blood_request,
         'hospital': hospital,
-        'can_respond': notification.status == 'notified',  # Can only respond if status is 'notified'
+        'can_respond': notification.status == 'notified',
     }
     return render(request, 'donors/notification_detail.html', context)
 
 
 # ============================================
-# ACCEPT BLOOD REQUEST (NEW - USES NOTIFICATION_ID)
+# ACCEPT BLOOD REQUEST (FIXED - SIMPLIFIED)
 # ============================================
 @role_required('donor')
 def accept_blood_request(request, notification_id):
@@ -150,6 +151,7 @@ def accept_blood_request(request, notification_id):
     - Notifies hospital (limited info: username, blood type, distance)
     - Notifies admin
     """
+    # Get notification - automatically checks it belongs to logged-in donor
     notification = get_object_or_404(
         DonorNotification,
         id=notification_id,
@@ -158,7 +160,14 @@ def accept_blood_request(request, notification_id):
     
     # Check if notification is still active
     if notification.status != 'notified':
-        messages.error(request, "This notification is no longer active.")
+        if notification.status == 'accepted':
+            messages.warning(request, "You have already accepted this request.")
+        elif notification.status == 'rejected':
+            messages.warning(request, "You have already rejected this request.")
+        elif notification.status == 'cancelled':
+            messages.info(request, "This request has been cancelled or fulfilled by another donor.")
+        else:
+            messages.error(request, "This notification is no longer active.")
         return redirect('donor_dashboard')
     
     if request.method == 'POST':
@@ -208,7 +217,7 @@ def accept_blood_request(request, notification_id):
 
 
 # ============================================
-# REJECT BLOOD REQUEST (NEW - USES NOTIFICATION_ID)
+# REJECT BLOOD REQUEST (FIXED - SIMPLIFIED)
 # ============================================
 @role_required('donor')
 def reject_blood_request(request, notification_id):
@@ -217,6 +226,7 @@ def reject_blood_request(request, notification_id):
     - Updates notification status to 'rejected'
     - Notifies admin to trigger next donor notification
     """
+    # Get notification - automatically checks it belongs to logged-in donor
     notification = get_object_or_404(
         DonorNotification,
         id=notification_id,
@@ -225,7 +235,14 @@ def reject_blood_request(request, notification_id):
     
     # Check if notification is still active
     if notification.status != 'notified':
-        messages.error(request, "This notification is no longer active.")
+        if notification.status == 'accepted':
+            messages.warning(request, "You have already accepted this request.")
+        elif notification.status == 'rejected':
+            messages.warning(request, "You have already rejected this request.")
+        elif notification.status == 'cancelled':
+            messages.info(request, "This request has been cancelled or fulfilled by another donor.")
+        else:
+            messages.error(request, "This notification is no longer active.")
         return redirect('donor_dashboard')
     
     if request.method == 'POST':
@@ -259,41 +276,12 @@ def reject_blood_request(request, notification_id):
         
         return redirect('donor_dashboard')
     
+    # If GET request, show confirmation page (optional - can skip if using inline forms)
     context = {
         'notification': notification,
         'blood_request': notification.blood_request,
     }
     return render(request, 'donors/confirm_reject.html', context)
-
-
-# ============================================
-# DECLINE BLOOD REQUEST (OLD - Keep for backward compatibility)
-# ============================================
-@role_required('donor')
-def decline_blood_request(request, request_id):
-    """OLD VERSION - kept for backward compatibility with old URLs"""
-    if request.method != 'POST':
-        return redirect('donor_dashboard')
-
-    donor = request.user.donor_profile
-    blood_request = get_object_or_404(BloodRequest, id=request_id)
-
-    DonorResponse.objects.create(
-        donor=donor,
-        blood_request=blood_request,
-        status='declined',
-        response_notes=request.POST.get('reason', '')
-    )
-
-    DonorNotification.objects.filter(donor=donor, blood_request=blood_request).update(
-        is_read=True, 
-        responded=True,
-        status='rejected',
-        responded_at=timezone.now()
-    )
-
-    messages.info(request, "You declined the request.")
-    return redirect('donor_dashboard')
 
 
 # ============================================
@@ -378,7 +366,7 @@ def donation_history(request):
 
 
 # ============================================
-# FIND NEARBY HOSPITALS
+# VIEW DONOR DETAIL (for hospitals)
 # ============================================
 @role_required('hospital')
 def view_donor_detail(request, donor_id):
@@ -400,6 +388,10 @@ def view_donor_detail(request, donor_id):
     }
     return render(request, 'donors/view_donor_detail.html', context)
 
+
+# ============================================
+# FIND NEARBY HOSPITALS
+# ============================================
 @role_required('donor')
 def find_nearby_hospitals(request):
     donor = request.user.donor_profile
@@ -456,7 +448,7 @@ def mark_all_notifications_read(request):
 
 
 # ============================================
-# NOTIFICATION UTILITY FUNCTIONS (NEW)
+# NOTIFICATION UTILITY FUNCTIONS
 # ============================================
 def send_hospital_acceptance_notification(donor, blood_request, distance):
     """

@@ -1,101 +1,63 @@
 {% extends 'base.html' %}
 
-{% block title %}Login - Life Link Nepal{% endblock %}
+{% block title %}Login - LifeLink Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
-/* ========================================
-   LOGIN PAGE - LIFELINK NEPAL THEME
-   ======================================== */
+/* ═══════════════════════════════════════════════════════════
+   LOGIN PAGE — matches base.html design system
+   Palette : ivory + crimson + gold + ink
+   Type    : Cormorant Garamond display · Jost body
+   ═══════════════════════════════════════════════════════════ */
 
-:root {
-    /* Brand Colors from Logo */
-    --primary-blue: #1e88e5;
-    --primary-red: #e53935;
-    --gradient-heart: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
-    
-    /* Supporting Colors */
-    --white: #ffffff;
-    --light-bg: #f5f7fa;
-    --text-dark: #2c3e50;
-    --text-muted: #6c757d;
-    --border-color: #e1e8ed;
-    
-    /* Shadows */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.15);
-}
-
-/* Background Section */
 .login-section {
     min-height: 100vh;
-    background: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
+    background: var(--ivory);
     padding: 60px 20px;
-    position: relative;
-    overflow: hidden;
     display: flex;
     align-items: center;
+    position: relative;
 }
 
+/* Decorative background elements */
 .login-section::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: float 20s ease-in-out infinite;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, var(--crimson-pale) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, var(--gold-pale) 0%, transparent 50%);
+    pointer-events: none;
+    opacity: 0.4;
 }
 
-.login-section::after {
-    content: '';
-    position: absolute;
-    bottom: -50%;
-    left: -50%;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-    animation: float 25s ease-in-out infinite reverse;
-}
-
-@keyframes float {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(50px, 50px); }
-}
-
-/* Login Card */
 .login-card {
-    background: var(--white);
-    border-radius: 24px;
-    box-shadow: var(--shadow-lg);
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
     overflow: hidden;
+    box-shadow: var(--shadow-lift);
     position: relative;
     z-index: 1;
-    animation: slideUp 0.6s ease-out;
+    animation: slideUp 0.5s ease-out;
+}
+
+body.dark-mode .login-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.06);
 }
 
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.login-card-body {
-    padding: 0;
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Login Header */
 .login-header {
-    background: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
-    color: var(--white);
-    padding: 50px 40px;
+    background: var(--ink);
+    color: white;
+    padding: 48px 40px;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -104,136 +66,175 @@
 .login-header::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: rotate 30s linear infinite;
+    top: -50%; right: -50%;
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    border: 1px solid rgba(196,146,74,0.1);
+    pointer-events: none;
 }
 
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+/* Crimson accent bar */
+.login-header-accent {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--crimson) 0%, var(--gold) 50%, var(--crimson) 100%);
 }
 
 /* Icon Wrapper */
-.icon-wrapper {
-    width: 90px;
-    height: 90px;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
+.icon-wrap {
+    width: 90px; height: 90px;
+    background: rgba(196,146,74,0.12);
+    border: 2px solid rgba(196,146,74,0.25);
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 24px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    animation: pulse 2s ease-in-out infinite;
+    margin-bottom: 20px;
+    animation: pulse-glow 2s ease-in-out infinite;
     position: relative;
     z-index: 1;
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+@keyframes pulse-glow {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(196,146,74,0.4); }
+    50% { transform: scale(1.03); box-shadow: 0 0 0 12px rgba(196,146,74,0); }
 }
 
-.icon-wrapper i {
-    font-size: 44px;
-    color: var(--white);
+.icon-wrap i {
+    font-size: 42px;
+    color: var(--gold-light);
 }
 
 .login-header h3 {
+    font-family: var(--font-display);
     font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 12px;
+    font-weight: 600;
+    color: white;
     letter-spacing: -0.5px;
-    position: relative;
-    z-index: 1;
+    margin-bottom: 10px;
 }
 
 .login-header p {
-    font-size: 16px;
-    opacity: 0.95;
-    margin-bottom: 0;
-    font-weight: 300;
-    position: relative;
-    z-index: 1;
+    font-size: 14.5px;
+    color: rgba(240,232,222,0.6);
+    margin: 0;
 }
 
 /* Form Container */
-form {
+.login-form {
     padding: 40px;
 }
 
 /* Form Labels */
 .form-label {
     font-weight: 600;
-    color: var(--text-dark);
+    color: var(--ink);
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: 13.5px;
     display: flex;
     align-items: center;
+    gap: 6px;
 }
 
+body.dark-mode .form-label { color: var(--ink); }
+
 .form-label i {
-    color: var(--primary-red);
-    font-size: 16px;
+    color: var(--crimson);
+    font-size: 14px;
+}
+
+/* Helper Text */
+.form-text-helper {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+    display: block;
+    font-style: italic;
+}
+
+/* Password Wrapper */
+.password-wrapper {
+    position: relative;
 }
 
 /* Form Controls */
 .form-control {
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 15px;
-    transition: all 0.3s ease;
-    background-color: var(--light-bg);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: all 0.25s ease;
+    background-color: var(--ivory-mid);
+}
+
+body.dark-mode .form-control {
+    background: #221c17;
+    border-color: rgba(255,255,255,0.06);
+    color: var(--ink);
 }
 
 .form-control:focus {
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.1);
-    background-color: var(--white);
-    transform: translateY(-2px);
+    border-color: var(--crimson);
+    box-shadow: 0 0 0 3px var(--crimson-pale);
+    background-color: white;
+    transform: translateY(-1px);
+}
+
+body.dark-mode .form-control:focus {
+    background: #1a1410;
 }
 
 .form-control::placeholder {
-    color: #adb5bd;
-    font-size: 14px;
+    color: var(--ink-muted);
+    font-size: 13px;
 }
+
+/* Password Toggle */
+.password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--ink-muted);
+    cursor: pointer;
+    padding: 6px;
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover { color: var(--crimson); }
+.password-toggle i { font-size: 16px; }
 
 /* Login Button */
 .btn-login {
-    background: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
+    background: var(--crimson);
     border: none;
-    border-radius: 12px;
-    padding: 16px 32px;
-    font-size: 16px;
+    border-radius: 10px;
+    padding: 14px 28px;
+    font-size: 14.5px;
     font-weight: 600;
-    color: var(--white);
+    color: white;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 20px rgba(30, 136, 229, 0.3);
-    margin-top: 10px;
+    box-shadow: 0 6px 16px rgba(155,23,40,0.3);
+    margin-top: 8px;
 }
 
 .btn-login::before {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255,255,255,0.2);
     transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+    transition: width 0.5s, height 0.5s;
 }
 
 .btn-login:hover::before {
@@ -242,45 +243,47 @@ form {
 }
 
 .btn-login:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(30, 136, 229, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(155,23,40,0.4);
+    background: var(--crimson-mid);
 }
 
 .btn-login:active {
-    transform: translateY(-1px);
+    transform: translateY(0);
 }
 
 /* Divider */
 .divider {
     text-align: center;
     position: relative;
-    margin: 30px 40px;
+    margin: 32px 40px;
 }
 
 .divider::before {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
+    top: 50%; left: 0; right: 0;
     height: 1px;
-    background: var(--border-color);
+    background: linear-gradient(90deg, transparent, var(--border-subtle) 20%, var(--border-subtle) 80%, transparent);
 }
 
 .divider span {
-    background: var(--white);
-    padding: 0 20px;
+    background: white;
+    padding: 0 16px;
     position: relative;
-    color: var(--text-muted);
-    font-size: 14px;
+    color: var(--ink-muted);
+    font-size: 13px;
     font-weight: 500;
+    letter-spacing: 0.3px;
 }
+
+body.dark-mode .divider span { background: #1a1410; }
 
 /* Register Options */
 .register-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
     padding: 0 40px 40px;
 }
 
@@ -288,39 +291,48 @@ form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 24px 16px;
-    border: 2px solid var(--border-color);
-    border-radius: 16px;
+    padding: 20px 16px;
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 12px;
     text-decoration: none;
-    transition: all 0.3s ease;
-    background: var(--light-bg);
+    transition: all 0.25s ease;
+    background: var(--ivory-mid);
+}
+
+body.dark-mode .register-option {
+    background: #221c17;
+    border-color: rgba(255,255,255,0.06);
 }
 
 .register-option:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-warm);
+    border-color: var(--crimson);
+    background: var(--crimson-pale);
+}
+
+body.dark-mode .register-option:hover {
+    background: rgba(155,23,40,0.12);
 }
 
 .register-option i {
-    font-size: 40px;
-    margin-bottom: 12px;
-    background: linear-gradient(135deg, #1e88e5 0%, #e53935 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 36px;
+    margin-bottom: 10px;
+    color: var(--crimson);
 }
 
 .option-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 8px;
+    color: var(--ink);
+    margin-bottom: 4px;
 }
 
+body.dark-mode .option-title { color: var(--ink); }
+
 .option-desc {
-    font-size: 13px;
-    color: var(--text-muted);
+    font-size: 12px;
+    color: var(--ink-muted);
     margin: 0;
     text-align: center;
 }
@@ -328,13 +340,13 @@ form {
 /* Alert Messages */
 #responseMessage {
     padding: 0 40px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .alert {
-    border-radius: 12px;
-    padding: 16px 20px;
-    font-size: 14px;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13.5px;
     font-weight: 500;
     border: none;
     animation: slideDown 0.3s ease-out;
@@ -342,96 +354,46 @@ form {
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .alert-success {
-    background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
-    color: #1b5e20;
+    background: #edf7f0;
+    color: #1a5c35;
+    border-left: 3px solid #28a745;
 }
 
 .alert-danger {
-    background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);
-    color: #b71c1c;
+    background: var(--crimson-pale);
+    color: var(--crimson);
+    border-left: 3px solid var(--crimson);
 }
 
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
-    .login-section {
-        padding: 30px 15px;
-    }
-
-    .login-header {
-        padding: 40px 30px;
-    }
-
-    .login-header h3 {
-        font-size: 26px;
-    }
-
-    .icon-wrapper {
-        width: 80px;
-        height: 80px;
-    }
-
-    .icon-wrapper i {
-        font-size: 38px;
-    }
-
-    form {
-        padding: 30px;
-    }
-
-    .divider {
-        margin: 25px 30px;
-    }
-
-    .register-options {
-        padding: 0 30px 30px;
-    }
-
-    #responseMessage {
-        padding: 0 30px;
-    }
+    .login-section { padding: 40px 15px; }
+    .login-header { padding: 40px 30px; }
+    .login-header h3 { font-size: 28px; }
+    .icon-wrap { width: 80px; height: 80px; }
+    .icon-wrap i { font-size: 36px; }
+    .login-form { padding: 30px; }
+    .divider { margin: 28px 30px; }
+    .register-options { padding: 0 30px 30px; }
+    #responseMessage { padding: 0 30px; }
 }
 
 @media (max-width: 576px) {
-    .login-header h3 {
-        font-size: 24px;
-    }
-
-    .login-header p {
-        font-size: 14px;
-    }
-
-    form {
-        padding: 25px;
-    }
-
+    .login-header h3 { font-size: 24px; }
+    .login-header p { font-size: 13px; }
+    .login-form { padding: 25px; }
     .register-options {
         grid-template-columns: 1fr;
         padding: 0 25px 25px;
     }
-
-    .divider {
-        margin: 20px 25px;
-    }
-
-    #responseMessage {
-        padding: 0 25px;
-    }
-
-    .btn-login {
-        padding: 14px 24px;
-        font-size: 15px;
-    }
+    .divider { margin: 24px 25px; }
+    #responseMessage { padding: 0 25px; }
+    .btn-login { padding: 12px 24px; font-size: 13.5px; }
 }
 </style>
 {% endblock %}
@@ -440,58 +402,64 @@ form {
 <div class="login-section">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
+            <div class="col-md-8 col-lg-6 col-xl-5">
                 <div class="login-card">
-                    <div class="login-card-body">
-                        <div class="login-header">
-                            <div class="icon-wrapper">
-                                <i class="bi bi-shield-fill-check"></i>
-                            </div>
-                            <h3>Welcome Back</h3>
-                            <p>Login to continue saving lives</p>
+                    <div class="login-header">
+                        <div class="login-header-accent"></div>
+                        <div class="icon-wrap">
+                            <i class="bi bi-shield-fill-check"></i>
+                        </div>
+                        <h3>Welcome Back</h3>
+                        <p>Login to continue saving lives</p>
+                    </div>
+
+                    <div id="responseMessage"></div>
+
+                    <form id="loginForm" class="login-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="bi bi-person-fill"></i>Username or Email
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   placeholder="Enter your username or email" required autofocus>
+                            <small class="form-text-helper">You can use either your username or email address</small>
                         </div>
 
-                        <div id="responseMessage"></div>
-
-                        <form id="loginForm">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label for="username" class="form-label">
-                                    <i class="bi bi-person-fill me-2"></i>Username
-                                </label>
-                                <input type="text" class="form-control" id="username" name="username" 
-                                       placeholder="Enter your username" required autofocus>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">
-                                    <i class="bi bi-lock-fill me-2"></i>Password
-                                </label>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock-fill"></i>Password
+                            </label>
+                            <div class="password-wrapper">
                                 <input type="password" class="form-control" id="password" name="password" 
                                        placeholder="Enter your password" required>
+                                <button type="button" class="password-toggle" id="togglePassword" title="Show password">
+                                    <i class="bi bi-eye" id="toggleIcon"></i>
+                                </button>
                             </div>
-
-                            <button type="submit" class="btn btn-login btn-primary w-100">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>Login
-                            </button>
-                        </form>
-
-                        <div class="divider">
-                            <span>Don't have an account?</span>
+                            <small class="form-text-helper">Click eye icon to show/hide password</small>
                         </div>
 
-                        <div class="register-options">
-                            <a href="{% url 'accounts:register_page' %}?type=donor" class="register-option">
-                                <i class="bi bi-heart-pulse-fill"></i>
-                                <div class="option-title">Donor</div>
-                                <p class="option-desc">Register to donate blood</p>
-                            </a>
-                            <a href="{% url 'accounts:register_page' %}?type=hospital" class="register-option">
-                                <i class="bi bi-hospital-fill"></i>
-                                <div class="option-title">Hospital</div>
-                                <p class="option-desc">Register your hospital</p>
-                            </a>
-                        </div>
+                        <button type="submit" class="btn btn-login w-100">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <span>Don't have an account?</span>
+                    </div>
+
+                    <div class="register-options">
+                        <a href="{% url 'accounts:register_page' %}?type=donor" class="register-option">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                            <div class="option-title">Donor</div>
+                            <p class="option-desc">Register to donate blood</p>
+                        </a>
+                        <a href="{% url 'accounts:register_page' %}?type=hospital" class="register-option">
+                            <i class="bi bi-hospital-fill"></i>
+                            <div class="option-title">Hospital</div>
+                            <p class="option-desc">Register your hospital</p>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -500,19 +468,54 @@ form {
 </div>
 
 <script>
+// Password toggle
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordField = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.className = 'bi bi-eye-slash';
+        this.title = 'Hide password';
+    } else {
+        passwordField.type = 'password';
+        toggleIcon.className = 'bi bi-eye';
+        this.title = 'Show password';
+    }
+});
+
+// Get CSRF token from cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Login form submission
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const form = e.target;
     const data = Object.fromEntries(new FormData(form).entries());
+    delete data.csrfmiddlewaretoken;
 
     try {
         const response = await fetch("{% url 'accounts:login' %}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': getCookie('csrftoken')
             },
+            credentials: 'include',
             body: JSON.stringify(data)
         });
 
@@ -520,35 +523,30 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         const msgDiv = document.getElementById('responseMessage');
 
         if (response.ok) {
-            // Save JWT token to localStorage
             localStorage.setItem('accessToken', result.access);
             localStorage.setItem('refreshToken', result.refresh);
             localStorage.setItem('userType', result.user_type);
 
             msgDiv.innerHTML = `<div class="alert alert-success">Login successful! Redirecting...</div>`;
             
-            // Redirect to dashboard or home
             setTimeout(() => {
                 if (result.user_type === 'donor') {
                     window.location.href = "{% url 'donor_dashboard' %}";
-                    return;
-                }
-                else if (result.user_type === 'hospital') {
+                } else if (result.user_type === 'hospital') {
                     window.location.href = "{% url 'hospital_dashboard' %}";
-                    return;
+                } else {
+                    window.location.href = "{% url 'accounts:login_page' %}";
                 }
-               else {
-                   window.location.href = "{% url 'accounts:login_page' %}";
-               }
-
             }, 1000);
         } else {
-            let errors = result.detail || JSON.stringify(result);
+            let errors = result.detail || result.error || JSON.stringify(result);
             msgDiv.innerHTML = `<div class="alert alert-danger">${errors}</div>`;
         }
 
     } catch (err) {
         console.error(err);
+        const msgDiv = document.getElementById('responseMessage');
+        msgDiv.innerHTML = `<div class="alert alert-danger">An error occurred. Please try again.</div>`;
     }
 });
 </script>

@@ -1,237 +1,682 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Contact Us — Life Link Nepal{% endblock %}
+
 {% block extra_css %}
 <style>
-    :root {
-        --primary-red: #c71e35;
-        --secondary-red: #e53949;
-        --dark-red: #a01828;
-    }
+/* ════════════════════════════════════════════════════════════
+   CONTACT PAGE — matching base.html editorial aesthetic
+   ════════════════════════════════════════════════════════════ */
 
-    .contact-hero {
-        background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
-        padding: 5rem 0 3rem;
-        position: relative;
-        overflow: hidden;
-    }
+/* ── PAGE HERO ───────────────────────────────────────────── */
+.contact-hero {
+    background: var(--ivory-mid);
+    padding: 80px 0 72px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-subtle);
+}
 
-    .contact-hero::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
+body.dark-mode .contact-hero {
+    background: var(--ivory-mid);
+    border-bottom-color: var(--border);
+}
 
-    .contact-hero h1 {
-        font-size: 3.5rem;
-        font-weight: 900;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    }
+.contact-hero-rule {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--crimson) 0%, var(--gold) 100%);
+}
 
-    .contact-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2.5rem;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        height: 100%;
-        border: 2px solid transparent;
-    }
+.contact-hero-bg-text {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-display);
+    font-size: 200px;
+    font-weight: 700;
+    color: rgba(155, 23, 40, 0.04);
+    pointer-events: none;
+    white-space: nowrap;
+    line-height: 1;
+    letter-spacing: -4px;
+    user-select: none;
+}
 
-    .contact-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 50px rgba(199, 30, 53, 0.2);
-        border-color: var(--secondary-red);
-    }
+body.dark-mode .contact-hero-bg-text {
+    color: rgba(196, 146, 74, 0.05);
+}
 
-    .contact-icon {
-        width: 70px;
-        height: 70px;
-        background: linear-gradient(135deg, var(--primary-red), var(--secondary-red));
-        border-radius: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.8rem;
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-    }
+.hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
 
-    .contact-card:hover .contact-icon {
-        transform: scale(1.1) rotate(5deg);
-    }
+.hero-eyebrow-line {
+    width: 28px;
+    height: 1.5px;
+    background: var(--crimson);
+}
 
-    .form-container {
-        background: white;
-        border-radius: 20px;
-        padding: 3rem;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
+.hero-eyebrow span {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--crimson);
+}
 
-    .form-label {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 0.5rem;
-    }
+.contact-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(38px, 4.5vw, 64px);
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    margin-bottom: 18px;
+}
 
-    .form-control, .form-select {
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-    }
+body.dark-mode .contact-hero h1 { color: var(--ink); }
 
-    .form-control:focus, .form-select:focus {
-        border-color: var(--secondary-red);
-        box-shadow: 0 0 0 0.2rem rgba(229, 57, 73, 0.15);
-    }
+.contact-hero h1 em {
+    font-style: italic;
+    color: var(--crimson);
+}
 
-    .btn-submit {
-        background: linear-gradient(135deg, var(--primary-red), var(--secondary-red));
-        color: white;
-        border: none;
-        padding: 1rem 3rem;
-        font-weight: 700;
-        border-radius: 50px;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 8px 25px rgba(199, 30, 53, 0.3);
-    }
+.contact-hero-desc {
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--ink-light);
+    max-width: 500px;
+}
 
-    .btn-submit:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(199, 30, 53, 0.4);
-    }
+/* ── EMERGENCY BANNER ────────────────────────────────────── */
+.emergency-banner {
+    background: var(--crimson-pale);
+    border: 1px solid rgba(155, 23, 40, 0.18);
+    border-left: 4px solid var(--crimson);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.2s ease;
+}
 
-    .alert-custom {
-        border-radius: 15px;
-        border: 2px solid #ffc107;
-        background: #fff3cd;
-        padding: 1.25rem;
-    }
+body.dark-mode .emergency-banner {
+    background: rgba(155, 23, 40, 0.12);
+    border-color: rgba(155, 23, 40, 0.25);
+    border-left-color: var(--crimson-light);
+}
 
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+.emergency-banner:hover {
+    background: rgba(155, 23, 40, 0.1);
+}
 
-    .fade-in-up {
-        animation: fadeInUp 0.8s ease-out;
-    }
+.emergency-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--crimson);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    flex-shrink: 0;
+}
 
-    @media (max-width: 768px) {
-        .contact-hero h1 {
-            font-size: 2.5rem;
-        }
-        
-        .form-container {
-            padding: 2rem;
-        }
-    }
+.emergency-text {
+    flex: 1;
+}
+
+.emergency-text strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--crimson);
+    display: block;
+    margin-bottom: 2px;
+}
+
+body.dark-mode .emergency-text strong { color: var(--crimson-light); }
+
+.emergency-text span {
+    font-size: 13px;
+    color: var(--ink-light);
+}
+
+.emergency-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--crimson);
+    color: white;
+    font-size: 12.5px;
+    font-weight: 700;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.emergency-link:hover {
+    background: var(--crimson-mid);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(155, 23, 40, 0.3);
+}
+
+/* ── CONTACT SECTION ─────────────────────────────────────── */
+.contact-section {
+    background: var(--ivory);
+    padding: 80px 0 96px;
+}
+
+body.dark-mode .contact-section { background: var(--ivory); }
+
+/* Info Cards */
+.info-card {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    transition: all 0.25s ease;
+    margin-bottom: 14px;
+    text-decoration: none;
+}
+
+body.dark-mode .info-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.info-card:hover {
+    border-color: var(--border);
+    transform: translateX(6px);
+    box-shadow: var(--shadow-warm);
+}
+
+.info-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--crimson-pale);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--crimson);
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.info-card:hover .info-card-icon {
+    background: var(--crimson);
+    border-color: var(--crimson);
+    color: white;
+}
+
+.info-card-label {
+    font-size: 10.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.info-card-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.6;
+}
+
+body.dark-mode .info-card-value { color: var(--ink); }
+
+.info-card-value a {
+    color: var(--ink);
+    text-decoration: none;
+    display: block;
+    transition: color 0.2s;
+}
+
+body.dark-mode .info-card-value a { color: var(--ink); }
+
+.info-card:hover .info-card-value a,
+.info-card-value a:hover {
+    color: var(--crimson);
+}
+
+/* Office hours special card */
+.hours-card {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+}
+
+body.dark-mode .hours-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.hours-title {
+    font-size: 10.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hours-title i { color: var(--gold); }
+
+.hours-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 13.5px;
+}
+
+.hours-row:last-child { border-bottom: none; padding-bottom: 0; }
+.hours-row:first-child { padding-top: 0; }
+
+.hours-day { color: var(--ink-light); font-weight: 500; }
+
+body.dark-mode .hours-day { color: var(--ink-light); }
+
+.hours-time { color: var(--ink); font-weight: 600; }
+
+body.dark-mode .hours-time { color: var(--ink); }
+
+.hours-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    background: rgba(42, 140, 110, 0.1);
+    border: 1px solid rgba(42, 140, 110, 0.2);
+    border-radius: 20px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #2a8c6e;
+    letter-spacing: 0.5px;
+}
+
+.hours-badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #2a8c6e;
+    animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* ── CONTACT FORM ────────────────────────────────────────── */
+.form-panel {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: var(--shadow-warm);
+}
+
+body.dark-mode .form-panel {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.07);
+}
+
+.form-panel-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.form-panel-eyebrow {
+    font-size: 10.5px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-panel-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+    margin: 0;
+}
+
+body.dark-mode .form-panel-title { color: var(--ink); }
+
+/* Form fields */
+.field-group {
+    margin-bottom: 22px;
+}
+
+.field-label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.field-input,
+.field-select,
+.field-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--ivory);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    transition: all 0.2s ease;
+    outline: none;
+    appearance: none;
+}
+
+body.dark-mode .field-input,
+body.dark-mode .field-select,
+body.dark-mode .field-textarea {
+    background: #0e0b09;
+    border-color: rgba(255,255,255,0.08);
+    color: var(--ink);
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder {
+    color: var(--ink-muted);
+    font-weight: 400;
+}
+
+.field-input:focus,
+.field-select:focus,
+.field-textarea:focus {
+    border-color: rgba(155, 23, 40, 0.4);
+    box-shadow: 0 0 0 3px rgba(155, 23, 40, 0.08);
+    background: white;
+}
+
+body.dark-mode .field-input:focus,
+body.dark-mode .field-select:focus,
+body.dark-mode .field-textarea:focus {
+    background: #160f0c;
+    box-shadow: 0 0 0 3px rgba(155, 23, 40, 0.15);
+}
+
+.field-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239c8e87' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+.field-textarea {
+    resize: vertical;
+    min-height: 148px;
+    line-height: 1.65;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px 28px;
+    background: var(--crimson);
+    color: white;
+    border: 1.5px solid var(--crimson);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: 0.3px;
+}
+
+.btn-submit:hover {
+    background: var(--crimson-mid);
+    border-color: var(--crimson-mid);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(155, 23, 40, 0.35);
+}
+
+/* ── MAP SECTION ─────────────────────────────────────────── */
+.map-section {
+    background: var(--ivory-mid);
+    padding: 0;
+    border-top: 1px solid var(--border-subtle);
+}
+
+body.dark-mode .map-section {
+    background: var(--ivory-dark);
+    border-color: var(--border);
+}
+
+.map-header {
+    padding: 48px 0 0;
+    text-align: center;
+}
+
+.map-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+
+body.dark-mode .map-title { color: var(--ink); }
+
+.map-sub {
+    font-size: 14px;
+    color: var(--ink-muted);
+    margin-bottom: 28px;
+}
+
+.map-frame {
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+}
+
+/* ── SCROLL REVEAL ───────────────────────────────────────── */
+.reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .field-row { grid-template-columns: 1fr; }
+    .form-panel { padding: 28px 20px; }
+    .emergency-link { display: none; }
+    .emergency-banner { flex-wrap: wrap; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="contact-hero text-white text-center position-relative">
-    <div class="container position-relative" style="z-index: 1;">
-        <div class="fade-in-up">
-            <h1 class="mb-3">Get in Touch</h1>
-            <p class="lead fs-4 opacity-90">Have questions? We'd love to hear from you.</p>
+
+<!-- ── HERO ───────────────────────────────────────────────────── -->
+<section class="contact-hero">
+    <div class="contact-hero-rule"></div>
+    <div class="contact-hero-bg-text">Contact</div>
+    <div class="container">
+        <div class="hero-eyebrow reveal">
+            <div class="hero-eyebrow-line"></div>
+            <span>Reach Out</span>
         </div>
+        <h1 class="reveal reveal-delay-1">
+            We're here.<br>
+            <em>Get in touch.</em>
+        </h1>
+        <p class="contact-hero-desc reveal reveal-delay-2">
+            Questions, partnerships, or feedback — we read everything and respond within one business day.
+        </p>
     </div>
 </section>
 
-<!-- Contact Section -->
-<section class="py-5 bg-light">
+<!-- ── CONTACT SECTION ────────────────────────────────────────── -->
+<section class="contact-section">
     <div class="container">
-        <!-- Emergency Alert -->
-        <div class="row mb-5">
-            <div class="col-lg-8 mx-auto fade-in-up">
-                <div class="alert alert-custom text-center" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-                    <strong>Emergency Blood Needed?</strong> Don't use this form. 
-                    <a href="{% url 'create_request' %}" class="alert-link fw-bold">Create Emergency Request →</a>
+
+        <!-- Emergency Banner -->
+        <div class="mb-5 reveal">
+            <div class="emergency-banner">
+                <div class="emergency-icon">
+                    <i class="bi bi-exclamation-octagon-fill"></i>
                 </div>
+                <div class="emergency-text">
+                    <strong>Emergency Blood Request?</strong>
+                    <span>Don't use this form — go directly to the emergency request system for immediate action.</span>
+                </div>
+                <a href="{% url 'create_request' %}" class="emergency-link">
+                    <i class="bi bi-arrow-right-circle-fill"></i>
+                    Emergency Request
+                </a>
             </div>
         </div>
 
         <div class="row g-5">
-            <!-- Contact Info -->
+
+            <!-- Left: Contact Info -->
             <div class="col-lg-4">
-                <div class="contact-card fade-in-up">
-                    <div class="contact-icon mx-auto">
-                        <i class="bi bi-geo-alt-fill"></i>
+
+                <div class="reveal">
+                    <p style="font-size: 10.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 20px;">Contact Details</p>
+
+                    <div class="info-card">
+                        <div class="info-card-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div>
+                            <div class="info-card-label">Location</div>
+                            <div class="info-card-value">Kathmandu, Nepal<br>Bagmati Province</div>
+                        </div>
                     </div>
-                    <h5 class="fw-bold mb-2">Our Location</h5>
-                    <p class="text-muted mb-0">Kathmandu, Nepal<br>Bagmati Province</p>
+
+                    <div class="info-card">
+                        <div class="info-card-icon"><i class="bi bi-envelope-fill"></i></div>
+                        <div>
+                            <div class="info-card-label">Email</div>
+                            <div class="info-card-value">
+                                <a href="mailto:support@lifelinknepal.com.np">support@lifelinknepal.com.np</a>
+                                <a href="mailto:info@lifelinknepal.com.np">info@lifelinknepal.com.np</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-icon"><i class="bi bi-telephone-fill"></i></div>
+                        <div>
+                            <div class="info-card-label">Phone</div>
+                            <div class="info-card-value">
+                                <a href="tel:015789081">01-5789081</a>
+                                <a href="tel:+9779862890129">+977-9862890129</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="contact-card fade-in-up mt-4" style="animation-delay: 0.15s;">
-                    <div class="contact-icon mx-auto">
-                        <i class="bi bi-envelope-at-fill"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">Email Us</h5>
-                    <p class="text-muted mb-0">
-                        <a href="mailto:support@lifelinknepal.com.np" class="text-decoration-none text-muted">support@lifelinknepal.com.np</a><br>
-                        <a href="mailto:info@lifelinknepal.com.np" class="text-decoration-none text-muted">info@lifelinknepal.com.np</a>
-                    </p>
-                </div>
-
-                <div class="contact-card fade-in-up mt-4" style="animation-delay: 0.3s;">
-                    <div class="contact-icon mx-auto">
-                        <i class="bi bi-telephone-fill"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">Call Us</h5>
-                    <p class="text-muted mb-0">
-                        <a href="tel:015789081" class="text-decoration-none text-muted">01-5789081</a><br>
-                        <a href="tel:+9779862890129" class="text-decoration-none text-muted">+977-9862890129</a>
-                    </p>
-                </div>
-
-                <div class="contact-card fade-in-up mt-4" style="animation-delay: 0.45s;">
-                    <div class="contact-icon mx-auto">
+                <div class="hours-card reveal reveal-delay-1">
+                    <div class="hours-title">
                         <i class="bi bi-clock-fill"></i>
+                        Office Hours
                     </div>
-                    <h5 class="fw-bold mb-2">Working Hours</h5>
-                    <p class="text-muted mb-0">
-                        24/7 Emergency Support<br>
-                        Office: Sun-Fri, 9 AM - 5 PM
-                    </p>
+                    <div class="hours-row">
+                        <span class="hours-day">Emergency Line</span>
+                        <span class="hours-badge">
+                            <span class="hours-badge-dot"></span>
+                            24 / 7
+                        </span>
+                    </div>
+                    <div class="hours-row">
+                        <span class="hours-day">Sunday – Friday</span>
+                        <span class="hours-time">9:00 AM – 5:00 PM</span>
+                    </div>
+                    <div class="hours-row">
+                        <span class="hours-day">Saturday</span>
+                        <span class="hours-time">Closed</span>
+                    </div>
                 </div>
+
             </div>
 
-            <!-- Contact Form -->
-            <div class="col-lg-8">
-                <div class="form-container fade-in-up">
-                    <h3 class="fw-bold mb-4">Send Us a Message</h3>
-                    <form method="POST" action="{% url 'create_request' %}">
+            <!-- Right: Form -->
+            <div class="col-lg-8 reveal reveal-delay-1">
+                <div class="form-panel">
+                    <div class="form-panel-header">
+                        <div class="form-panel-eyebrow">Message Us</div>
+                        <h2 class="form-panel-title">Send a Message</h2>
+                    </div>
+
+                    <form method="POST">
                         {% csrf_token %}
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Your Name *</label>
-                                <input type="text" name="name" class="form-control" placeholder="Enter your full name" required>
+
+                        <div class="field-row">
+                            <div class="field-group">
+                                <label class="field-label">Full Name <span style="color: var(--crimson);">*</span></label>
+                                <input type="text" name="name" class="field-input" placeholder="Your full name" required>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email Address *</label>
-                                <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
+                            <div class="field-group">
+                                <label class="field-label">Email Address <span style="color: var(--crimson);">*</span></label>
+                                <input type="email" name="email" class="field-input" placeholder="name@example.com" required>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Phone Number</label>
-                                <input type="tel" name="phone" class="form-control" placeholder="+977-9800000000">
+                        </div>
+
+                        <div class="field-row">
+                            <div class="field-group">
+                                <label class="field-label">Phone Number</label>
+                                <input type="tel" name="phone" class="field-input" placeholder="+977-9800000000">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Subject *</label>
-                                <select name="subject" class="form-select" required>
-                                    <option value="">Choose a subject...</option>
+                            <div class="field-group">
+                                <label class="field-label">Subject <span style="color: var(--crimson);">*</span></label>
+                                <select name="subject" class="field-select" required>
+                                    <option value="">Choose a subject…</option>
                                     <option value="general">General Inquiry</option>
                                     <option value="hospital">Hospital Partnership</option>
                                     <option value="volunteer">Volunteer Opportunities</option>
@@ -240,38 +685,58 @@
                                     <option value="other">Other</option>
                                 </select>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Message *</label>
-                                <textarea name="message" class="form-control" rows="6" placeholder="How can we help you?" required></textarea>
-
-                            </div>
-                              <div class="col-12 mt-4">
-        <button type="submit" class="btn btn-submit w-100">
-            <i class="bi bi-send-fill me-2"></i>Send Message
-        </button>
-    </div>
-                          
-                            </div>
                         </div>
+
+                        <div class="field-group">
+                            <label class="field-label">Message <span style="color: var(--crimson);">*</span></label>
+                            <textarea name="message" class="field-textarea" placeholder="How can we help you? Please be as detailed as possible…" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class="bi bi-send-fill"></i>
+                            Send Message
+                        </button>
+
                     </form>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
 
-<!-- Map Section -->
-<section class="py-0">
-    <div class="container-fluid p-0">
-        <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d56516.27689990882!2d85.29111040725022!3d27.70903193330228!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb198a307baabf%3A0xb5137c1bf18db1ea!2sKathmandu%2044600!5e0!3m2!1sen!2snp!4v1234567890123!5m2!1sen!2snp" 
-            width="100%" 
-            height="400" 
-            style="border:0;" 
-            allowfullscreen="" 
-            loading="lazy" 
+<!-- ── MAP ────────────────────────────────────────────────────── -->
+<section class="map-section">
+    <div class="container">
+        <div class="map-header reveal">
+            <p style="font-size: 10.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 8px;">Find Us</p>
+            <div class="map-title">Kathmandu, Nepal</div>
+            <p class="map-sub">Bagmati Province · Central Nepal</p>
+        </div>
+    </div>
+    <div class="map-frame">
+        <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d56516.27689990882!2d85.29111040725022!3d27.70903193330228!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb198a307baabf%3A0xb5137c1bf18db1ea!2sKathmandu%2044600!5e0!3m2!1sen!2snp!4v1234567890123!5m2!1sen!2snp"
+            width="100%"
+            height="380"
+            style="border: 0; display: block;"
+            allowfullscreen=""
+            loading="lazy"
             referrerpolicy="no-referrer-when-downgrade">
         </iframe>
     </div>
 </section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+document.querySelectorAll('.contact-hero .reveal').forEach(el => el.classList.add('visible'));
+</script>
 {% endblock %}

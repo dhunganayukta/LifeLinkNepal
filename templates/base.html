@@ -9,466 +9,844 @@
     <!-- Bootstrap CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     {% block extra_css %}{% endblock %}
 
     <style>
         :root {
-            --primary-red: #c71e35;
-            --secondary-red: #e53949;
-            --dark-red: #9b1728;
-            --facebook: #1877f2;
-            --twitter: #1da1f2;
-            --linkedin: #0a66c2;
-            --instagram: #e4405f;
-            --youtube: #ff0000;
+            --crimson:       #9b1728;
+            --crimson-mid:   #b81e32;
+            --crimson-light: #d4364f;
+            --crimson-pale:  rgba(155, 23, 40, 0.08);
+
+            --ivory:         #faf7f2;
+            --ivory-mid:     #f2ede4;
+            --ivory-dark:    #e8e0d4;
+
+            --ink:           #1c1410;
+            --ink-mid:       #3a2e28;
+            --ink-light:     #6b5c52;
+            --ink-muted:     #9c8e87;
+
+            --gold:          #c4924a;
+            --gold-light:    #e8b96a;
+            --gold-pale:     rgba(196, 146, 74, 0.15);
+
+            --border:        rgba(155, 23, 40, 0.12);
+            --border-subtle: rgba(28, 20, 16, 0.08);
+
+            --shadow-warm:   0 4px 24px rgba(28, 20, 16, 0.1);
+            --shadow-lift:   0 12px 40px rgba(28, 20, 16, 0.15);
+
+            --font-display:  'Cormorant Garamond', Georgia, serif;
+            --font-body:     'Jost', sans-serif;
+
+            --navbar-h:      72px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            transition: background 0.3s, color 0.3s;
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--ivory);
+            color: var(--ink);
             overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
-        .dark-mode { 
-            background: #1a1a1a; 
-            color: #e0e0e0; 
+        /* ─── DARK MODE ─────────────────────────────────── */
+        body.dark-mode {
+            --ivory:         #0e0b09;
+            --ivory-mid:     #1a1410;
+            --ivory-dark:    #221c17;
+            --ink:           #f0e8de;
+            --ink-mid:       #d4c8be;
+            --ink-light:     #a09080;
+            --ink-muted:     #6a5e56;
+            --border:        rgba(196, 146, 74, 0.15);
+            --border-subtle: rgba(240, 232, 222, 0.06);
+            background: var(--ivory);
+            color: var(--ink);
         }
 
-        /* Enhanced Navbar */
-        .navbar { 
-            padding: 1.2rem 0; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            background-color: white !important;
+        body.dark-mode .navbar {
+            background: #100d0a !important;
+            border-bottom-color: rgba(196, 146, 74, 0.15) !important;
+        }
+
+        body.dark-mode .nav-link            { color: var(--ink) !important; }
+        body.dark-mode .navbar-brand span   { color: var(--crimson-light) !important; }
+        body.dark-mode .dropdown-menu       { background: #1a1410; border-color: rgba(196, 146, 74, 0.15); }
+        body.dark-mode .dropdown-item       { color: var(--ink-mid); }
+        body.dark-mode .dropdown-item:hover { background: var(--gold-pale); color: var(--gold-light); }
+
+        /* ─── TOP BAR ───────────────────────────────────── */
+        .top-bar {
+            background: var(--ink);
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(196, 146, 74, 0.2);
+        }
+
+        .top-bar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .top-bar-left { display: flex; align-items: center; gap: 20px; }
+
+        .top-bar-notice {
+            font-size: 11.5px;
+            color: rgba(240, 232, 222, 0.55);
+            letter-spacing: 0.8px;
+            font-weight: 400;
+        }
+
+        .top-bar-emergency {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            color: var(--gold-light);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .top-bar-emergency span.pulse-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--crimson-light);
+            display: inline-block;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(212, 54, 79, 0.5); }
+            50%       { opacity: 0.7; box-shadow: 0 0 0 5px rgba(212, 54, 79, 0); }
+        }
+
+        .top-bar-right { display: flex; align-items: center; gap: 4px; }
+
+        .admin-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 500;
+            color: rgba(196, 146, 74, 0.75);
+            border: 1px solid rgba(196, 146, 74, 0.2);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .admin-pill:hover {
+            color: var(--gold-light);
+            border-color: rgba(196, 146, 74, 0.5);
+            background: rgba(196, 146, 74, 0.08);
+        }
+
+        .admin-pill i { font-size: 11px; }
+
+        .admin-sep { color: rgba(196, 146, 74, 0.25); font-size: 12px; padding: 0 2px; }
+
+        /* ─── NAVBAR ────────────────────────────────────── */
+        .navbar {
+            height: var(--navbar-h);
+            background: var(--ivory) !important;
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0;
             transition: all 0.3s ease;
+            position: sticky;
+            top: 0;
+            z-index: 900;
         }
 
         .navbar.scrolled {
-            padding: 0.8rem 0;
-            box-shadow: 0 6px 25px rgba(0,0,0,0.12);
+            box-shadow: var(--shadow-warm);
+            border-bottom-color: var(--border);
         }
 
-        .navbar-brand { 
-            font-weight: 800; 
-            color: var(--primary-red) !important; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px;
-            font-size: 1.4rem;
-            transition: all 0.3s ease;
-        }
+        .navbar .container { height: 100%; display: flex; align-items: center; }
 
-        .navbar-brand:hover {
-            transform: scale(1.05);
-        }
-
-        .navbar-brand img {
-            transition: transform 0.3s ease;
-        }
-
-        .navbar-brand:hover img {
-            transform: rotate(5deg);
-        }
-
-        .nav-link { 
-            color: #212529 !important; 
-            font-weight: 600; 
-            margin: 0 0.8rem;
-            position: relative;
-            transition: color 0.3s ease;
-            font-size: 1rem;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            width: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-red), var(--secondary-red));
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-            border-radius: 2px;
-        }
-
-        .nav-link:hover {
-            color: var(--primary-red) !important;
-        }
-
-        .nav-link:hover::after {
-            width: 80%;
-        }
-
-        .btn-primary { 
-            background: linear-gradient(135deg, var(--primary-red) 0%, var(--secondary-red) 100%);
-            border: none;
-            font-weight: 600;
-            padding: 0.6rem 1.5rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover { 
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(199, 30, 53, 0.4);
-            background: linear-gradient(135deg, var(--dark-red) 0%, var(--primary-red) 100%);
-        }
-
-        /* Enhanced Footer */
-        footer { 
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: white; 
-            padding: 4rem 0 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-red), var(--secondary-red), var(--primary-red));
-        }
-
-        footer h5 {
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: white;
-            position: relative;
-            display: inline-block;
-        }
-
-        footer h5::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-red), var(--secondary-red));
-            border-radius: 2px;
-        }
-
-        footer a { 
-            color: #d0d0d0; 
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        footer a:hover { 
-            color: var(--secondary-red);
-            transform: translateX(5px);
-        }
-
-        footer ul li {
-            margin-bottom: 0.8rem;
-        }
-
-        footer ul li i {
-            width: 20px;
-            color: var(--secondary-red);
-        }
-
-        /* Social Media Icons */
-        .social-links {
+        .navbar-brand {
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
         }
 
-        .social-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
+        /* ── LOGO FIX: explicit size, no filter, object-fit ── */
+        .brand-logo-wrap {
+            height: 48px;
+            width: 48px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
+            border: 1px solid var(--border-subtle);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .navbar-brand:hover .brand-logo-wrap {
+            box-shadow: 0 0 0 2px var(--crimson-pale);
+        }
+
+        .brand-logo-wrap img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* In dark mode keep logo readable */
+        body.dark-mode .brand-logo-wrap {
+            background: white;
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        /* Brand text next to logo */
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .brand-name {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--crimson);
+            letter-spacing: 0.2px;
+        }
+
+        .brand-tagline {
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            font-weight: 500;
+        }
+
+        body.dark-mode .brand-name    { color: var(--crimson-light); }
+        body.dark-mode .brand-tagline { color: var(--ink-muted); }
+
+        /* Nav Links */
+        .navbar-nav .nav-link {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--ink-mid) !important;
+            padding: 0 0 3px !important;
+            margin: 0 14px;
+            letter-spacing: 0.3px;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0;
+            width: 0; height: 1.5px;
+            background: var(--crimson);
+            transition: width 0.25s ease;
+        }
+
+        .navbar-nav .nav-link:hover             { color: var(--ink) !important; }
+        .navbar-nav .nav-link:hover::after      { width: 100%; }
+
+        .nav-btn-login {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink-mid) !important;
+            border: 1.5px solid var(--border-subtle);
+            padding: 7px 18px !important;
+            border-radius: 6px;
+            margin-left: 8px;
+            transition: all 0.2s ease;
             text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn-login:hover {
+            border-color: var(--crimson-mid);
+            color: var(--crimson) !important;
+            background: var(--crimson-pale);
+        }
+
+        .nav-btn-register {
+            font-size: 13px;
+            font-weight: 600;
+            color: white !important;
+            background: var(--crimson);
+            padding: 8px 20px !important;
+            border-radius: 6px;
+            margin-left: 6px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1.5px solid var(--crimson);
+        }
+
+        .nav-btn-register:hover {
+            background: var(--crimson-mid);
+            border-color: var(--crimson-mid);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(155, 23, 40, 0.3);
+        }
+
+        .dropdown-menu {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px;
+            box-shadow: var(--shadow-lift);
+            background: var(--ivory);
+            margin-top: 6px !important;
+        }
+
+        .dropdown-item {
+            border-radius: 6px;
+            padding: 9px 14px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--ink-mid);
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-item:hover { background: var(--crimson-pale); color: var(--crimson); }
+
+        /* Dark mode toggle */
+        .dm-toggle-wrap { display: flex; align-items: center; gap: 8px; margin-left: 12px; }
+        .dm-icon         { font-size: 13px; color: var(--ink-muted); }
+
+        .dm-switch { position: relative; width: 38px; height: 20px; cursor: pointer; }
+        .dm-switch input { opacity: 0; width: 0; height: 0; }
+
+        .dm-track {
+            position: absolute; inset: 0;
+            background: var(--ivory-dark);
+            border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+            transition: all 0.3s ease;
+        }
+
+        .dm-thumb {
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 14px; height: 14px;
+            background: var(--ink-muted);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .dm-switch input:checked ~ .dm-track  { background: var(--ink); border-color: var(--gold); }
+        .dm-switch input:checked ~ .dm-thumb  { left: 21px; background: var(--gold); }
+
+        /* Messages */
+        .messages-wrap { padding: 12px 0 0; }
+
+        .alert {
+            border: none; border-radius: 10px;
+            padding: 12px 18px; font-size: 13.5px; font-weight: 500;
+            box-shadow: var(--shadow-warm);
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .alert-success { background: #edf7f0; color: #1a5c35; }
+        .alert-danger  { background: #fdf0f1; color: var(--crimson); }
+        .alert-warning { background: #fdf6ec; color: #7c4a0a; }
+        .alert-info    { background: #edf3fd; color: #1a3c6e; }
+
+        /* ─── FOOTER ────────────────────────────────────── */
+        footer {
+            background: var(--ink);
+            color: rgba(240, 232, 222, 0.8);
             position: relative;
             overflow: hidden;
         }
 
-        .social-icon::before {
+        .footer-top-rule {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), var(--crimson-light), var(--gold), transparent);
+        }
+
+        .footer-body { padding: 64px 0 48px; }
+
+        /* Footer logo — show cleanly on dark background */
+        .footer-logo-wrap {
+            height: 52px;
+            width: 52px;
+            border-radius: 10px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .footer-logo-wrap img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .footer-desc {
+            font-size: 13.5px;
+            line-height: 1.8;
+            color: rgba(240, 232, 222, 0.55);
+            margin-bottom: 28px;
+            max-width: 300px;
+        }
+
+        /* ── SOCIAL ICONS — brand colours ── */
+        .social-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .soc-btn {
+            width: 38px; height: 38px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            border: 1px solid transparent;
+        }
+
+        /* Facebook — #1877F2 */
+        .soc-btn.soc-facebook {
+            color: #1877F2;
+            background: rgba(24, 119, 242, 0.1);
+            border-color: rgba(24, 119, 242, 0.25);
+        }
+        .soc-btn.soc-facebook:hover {
+            background: #1877F2;
+            color: white;
+            border-color: #1877F2;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(24, 119, 242, 0.4);
+        }
+
+        /* X / Twitter — #000000 (official) / use light version on dark bg */
+        .soc-btn.soc-twitter {
+            color: rgba(255,255,255,0.75);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        .soc-btn.soc-twitter:hover {
+            background: #000;
+            color: white;
+            border-color: #555;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+        }
+
+        /* LinkedIn — #0A66C2 */
+        .soc-btn.soc-linkedin {
+            color: #0A66C2;
+            background: rgba(10, 102, 194, 0.1);
+            border-color: rgba(10, 102, 194, 0.25);
+        }
+        .soc-btn.soc-linkedin:hover {
+            background: #0A66C2;
+            color: white;
+            border-color: #0A66C2;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(10, 102, 194, 0.4);
+        }
+
+        /* Instagram — gradient #E1306C → #F77737 */
+        .soc-btn.soc-instagram {
+            color: #E1306C;
+            background: rgba(225, 48, 108, 0.1);
+            border-color: rgba(225, 48, 108, 0.25);
+        }
+        .soc-btn.soc-instagram:hover {
+            background: linear-gradient(135deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #F77737, #FCAF45);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(225, 48, 108, 0.45);
+        }
+
+        /* YouTube — #FF0000 */
+        .soc-btn.soc-youtube {
+            color: #FF0000;
+            background: rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.25);
+        }
+        .soc-btn.soc-youtube:hover {
+            background: #FF0000;
+            color: white;
+            border-color: #FF0000;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(255, 0, 0, 0.4);
+        }
+
+        /* Footer headings */
+        .footer-col-title {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.2px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(196, 146, 74, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-col-title::before {
             content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            padding: 2px;
-            background: linear-gradient(45deg, rgba(255,255,255,0.3), transparent);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            display: block;
+            width: 3px; height: 14px;
+            background: var(--gold);
+            border-radius: 2px;
+            flex-shrink: 0;
         }
 
-        .social-icon:hover {
-            transform: translateY(-5px) scale(1.1);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        .footer-links { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 10px; }
+
+        .footer-links a {
+            font-size: 13.5px;
+            color: rgba(240, 232, 222, 0.55);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .social-icon:hover::before {
-            opacity: 1;
+        .footer-links a:hover { color: var(--gold-light); gap: 12px; }
+        .footer-links a i     { font-size: 11px; opacity: 0.6; }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 13.5px;
+            color: rgba(240, 232, 222, 0.55);
         }
 
-        .social-icon.facebook { background: var(--facebook); }
-        .social-icon.twitter { background: var(--twitter); }
-        .social-icon.linkedin { background: var(--linkedin); }
-        .social-icon.instagram { background: var(--instagram); }
-        .social-icon.youtube { background: var(--youtube); }
+        .footer-contact-item .fc-icon {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            background: rgba(196, 146, 74, 0.12);
+            border: 1px solid rgba(196, 146, 74, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gold); font-size: 12px;
+            flex-shrink: 0; margin-top: 1px;
+        }
 
-        /* Footer Bottom */
+        .footer-contact-item a {
+            color: rgba(240, 232, 222, 0.55);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-contact-item a:hover { color: var(--gold-light); }
+
         .footer-bottom {
-            background: rgba(0,0,0,0.2);
-            padding: 1.5rem 0;
-            margin-top: 3rem;
+            background: rgba(0,0,0,0.25);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 18px 0;
         }
 
         .footer-bottom p {
-            margin: 0;
-            color: #fffefe;
+            font-size: 12.5px;
+            color: rgba(240, 232, 222, 0.35);
+            margin: 0; letter-spacing: 0.3px;
         }
 
-        /* Dark Mode Toggle */
-        .dark-mode-toggle { 
-            position: relative; 
-            display: inline-block; 
-            width: 60px; 
-            height: 30px; 
+        .footer-bottom strong { color: rgba(240, 232, 222, 0.6); font-weight: 600; }
+
+        /* ─── UTILITIES ─────────────────────────────────── */
+        .navbar-toggler {
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: var(--ink-mid);
         }
 
-        .dark-mode-toggle input { 
-            opacity: 0; 
-            width: 0; 
-            height: 0; 
-        }
+        .navbar-toggler:focus { box-shadow: none; }
 
-        .slider { 
-            position: absolute; 
-            cursor: pointer; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
-            background-color: #ccc; 
-            border-radius: 30px; 
-            transition: 0.4s; 
-        }
-
-        .slider:before { 
-            position: absolute; 
-            content: ""; 
-            height: 22px; 
-            width: 22px; 
-            left: 4px; 
-            bottom: 4px; 
-            background-color: white; 
-            border-radius: 50%; 
-            transition: 0.4s; 
-        }
-
-        input:checked + .slider { 
-            background: linear-gradient(135deg, var(--primary-red), var(--secondary-red));
-        }
-
-        input:checked + .slider:before { 
-            transform: translateX(30px); 
-        }
-
-        /* Messages Alert Enhancement */
-        .alert {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+        @media (max-width: 992px) {
+            .navbar-collapse {
+                background: var(--ivory);
+                padding: 20px;
+                border-top: 1px solid var(--border-subtle);
+                border-radius: 0 0 12px 12px;
+                box-shadow: var(--shadow-warm);
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+
+            body.dark-mode .navbar-collapse { background: #100d0a; }
+
+            .navbar-nav .nav-link { margin: 4px 0; padding: 10px 0 !important; font-size: 15px; }
+            .nav-btn-login, .nav-btn-register { margin: 8px 0 0 0; display: block; text-align: center; }
+            .dm-toggle-wrap { margin: 12px 0 0; }
+            .top-bar-left .top-bar-notice { display: none; }
         }
 
-        .fade-in {
-            animation: fadeIn 0.6s ease-out;
+        @media (max-width: 576px) {
+            .top-bar   { display: none; }
+            .footer-body { padding: 40px 0 32px; }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg sticky-top">
+
+    <!-- ── TOP BAR ─────────────────────────────────────────── -->
+    <div class="top-bar">
         <div class="container">
+            <div class="top-bar-inner">
+                <div class="top-bar-left">
+                    <span class="top-bar-notice">Lifelinknepal</span>
+                    <div class="top-bar-emergency">
+                        <span class="pulse-dot"></span>
+                        24/7 Emergency: +01-57894567
+                    </div>
+                </div>
+                <div class="top-bar-right">
+                    <a href="{% url 'accounts:admin_login_page' %}" class="admin-pill">
+                        <i class="bi bi-shield-lock"></i> Admin Login
+                    </a>
+                    <span class="admin-sep">·</span>
+                    <a href="{% url 'accounts:admin_register_page' %}" class="admin-pill">
+                        <i class="bi bi-key"></i> Admin Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── NAVBAR ──────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg" id="mainNavbar">
+        <div class="container">
+
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'images/logo.jpeg' %}" alt="Logo" style="height:45px; border-radius: 8px;">
-                <span>LifeLink Nepal</span>
+                <!-- Logo in a white-bg square so it always shows clearly -->
+                <div class="brand-logo-wrap">
+                    <img src="{% static 'images/logo.jpeg' %}"
+                         alt="LifeLink Nepal"
+                         width="44" height="44">
+                </div>
+                <!-- Text beside logo -->
+                <div class="brand-text">
+                    <span class="brand-name">LifeLink</span>
+                    <span class="brand-tagline">Nepal · Donor Network</span>
+                </div>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+
+            <button class="navbar-toggler ms-auto" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-expanded="false">
+                <i class="bi bi-list" style="font-size:20px;"></i>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav mx-auto align-items-lg-center">
                     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
 
                     {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="dashboardDropdown" role="button" data-bs-toggle="dropdown">
-                                Dashboard
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="dashboardDropdown">
-                                {% if user.is_donor %}
-                                    <li><a class="dropdown-item" href="{% url 'donor_dashboard' %}">Donor Dashboard</a></li>
-                                {% elif user.is_hospital %}
-                                    <li><a class="dropdown-item" href="{% url 'hospital_dashboard' %}">Hospital Dashboard</a></li>
-                                {% endif %}
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" href="{% url 'accounts:logout' %}">
-                                <i class="bi bi-box-arrow-right me-1"></i>Logout
-                            </a>
-                        </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="dashDD" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-grid-1x2 me-1" style="font-size:12px;"></i>Dashboard
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dashDD">
+                            {% if user.is_donor %}
+                            <li><a class="dropdown-item" href="{% url 'donor_dashboard' %}">
+                                <i class="bi bi-heart-pulse"></i> Donor Dashboard
+                            </a></li>
+                            {% elif user.is_hospital %}
+                            <li><a class="dropdown-item" href="{% url 'hospital_dashboard' %}">
+                                <i class="bi bi-building-fill-cross"></i> Hospital Dashboard
+                            </a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <div class="d-flex align-items-lg-center flex-column flex-lg-row gap-2">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:logout' %}" class="nav-btn-login"
+                       style="color:var(--crimson) !important; border-color:var(--border);">
+                        <i class="bi bi-box-arrow-right me-1"></i> Logout
+                    </a>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login_page' %}">Login</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="btn btn-primary dropdown-toggle ms-2" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown">
-                                Register
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="registerDropdown">
-                                <li><a class="dropdown-item" href="{% url 'accounts:register_page' %}?type=donor">Become a Donor</a></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:register_page' %}?type=hospital">Register Hospital</a></li>
-                            </ul>
-                        </li>
+                    <a href="{% url 'accounts:login_page' %}" class="nav-btn-login">Sign In</a>
+                    <div class="dropdown">
+                        <a href="#" class="nav-btn-register dropdown-toggle"
+                           id="regDD" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-plus"></i> Register
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="regDD">
+                            <li><a class="dropdown-item" href="{% url 'accounts:register_page' %}?type=donor">
+                                <i class="bi bi-heart-pulse"></i> Become a Donor
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:register_page' %}?type=hospital">
+                                <i class="bi bi-hospital"></i> Register Hospital
+                            </a></li>
+                        </ul>
+                    </div>
                     {% endif %}
 
-                    <li class="nav-item ms-3">
-                        <label class="dark-mode-toggle">
+                    <!-- Dark Mode Toggle -->
+                    <div class="dm-toggle-wrap">
+                        <i class="bi bi-sun dm-icon"></i>
+                        <label class="dm-switch">
                             <input type="checkbox" id="darkModeToggle">
-                            <span class="slider"></span>
+                            <div class="dm-track"></div>
+                            <div class="dm-thumb"></div>
                         </label>
-                    </li>
-                </ul>
+                        <i class="bi bi-moon dm-icon"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Messages -->
+    <!-- ── MESSAGES ────────────────────────────────────────── -->
     {% if messages %}
-        <div class="container mt-3">
+    <div class="messages-wrap">
+        <div class="container">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show fade-in" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'danger' %}exclamation-circle-fill{% elif message.tags == 'warning' %}exclamation-triangle-fill{% else %}info-circle-fill{% endif %}"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                        style="margin-left:auto; font-size:11px;"></button>
+            </div>
             {% endfor %}
         </div>
+    </div>
     {% endif %}
 
-    <!-- Main content -->
+    <!-- ── MAIN CONTENT ────────────────────────────────────── -->
     <main>
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Enhanced Footer -->
+    <!-- ── FOOTER ──────────────────────────────────────────── -->
     <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <h5>Life Link Nepal</h5>
-                    <p style="line-height: 1.8; color: rgba(255, 255, 255, 0.9);">Connecting blood donors with those in need across Nepal. Every drop counts, every donation saves lives. Join us in building a healthier Nepal.</p>
-                    <div class="social-links mt-4">
-                        <a href="https://www.facebook.com" target="_blank" class="social-icon facebook" aria-label="Facebook">
-                            <i class="bi bi-facebook"></i>
-                        </a>
-                        <a href="https://www.twitter.com" target="_blank" class="social-icon twitter" aria-label="Twitter">
-                            <i class="bi bi-twitter-x"></i>
-                        </a>
-                        <a href="https://www.linkedin.com" target="_blank" class="social-icon linkedin" aria-label="LinkedIn">
-                            <i class="bi bi-linkedin"></i>
-                        </a>
-                        <a href="https://www.instagram.com" target="_blank" class="social-icon instagram" aria-label="Instagram">
-                            <i class="bi bi-instagram"></i>
-                        </a>
-                        <a href="https://www.youtube.com" target="_blank" class="social-icon youtube" aria-label="YouTube">
-                            <i class="bi bi-youtube"></i>
-                        </a>
+        <div class="footer-top-rule"></div>
+        <div class="footer-body">
+            <div class="container">
+                <div class="row g-5">
+
+                    <!-- Brand -->
+                    <div class="col-lg-4 col-md-12">
+                        <!-- Logo in white box so it shows on dark footer -->
+                        <div class="footer-logo-wrap">
+                            <img src="{% static 'images/logo.jpeg' %}"
+                                 alt="LifeLink Nepal" width="48" height="48">
+                        </div>
+                        <p class="footer-desc">
+                            Bridging the distance between those who can give life and those who need it most. Every donation carries hope.
+                        </p>
+
+                        <!-- Social icons with brand colours -->
+                        <div class="social-row">
+                            <a href="https://www.facebook.com" target="_blank"
+                               class="soc-btn soc-facebook" aria-label="Facebook">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                            <a href="https://www.twitter.com" target="_blank"
+                               class="soc-btn soc-twitter" aria-label="X / Twitter">
+                                <i class="bi bi-twitter-x"></i>
+                            </a>
+                            <a href="https://www.linkedin.com" target="_blank"
+                               class="soc-btn soc-linkedin" aria-label="LinkedIn">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
+                            <a href="https://www.instagram.com" target="_blank"
+                               class="soc-btn soc-instagram" aria-label="Instagram">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+                            <a href="https://www.youtube.com" target="_blank"
+                               class="soc-btn soc-youtube" aria-label="YouTube">
+                                <i class="bi bi-youtube"></i>
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'home' %}"><i class="bi bi-chevron-right me-2"></i>Home</a></li>
-                        <li><a href="{% url 'about' %}"><i class="bi bi-chevron-right me-2"></i>About Us</a></li>
-                        <li><a href="{% url 'accounts:register' %}?type=donor"><i class="bi bi-chevron-right me-2"></i>Become Donor</a></li>
-                        <li><a href="{% url 'accounts:register' %}?type=hospital"><i class="bi bi-chevron-right me-2"></i>Register Hospital</a></li>
-                        <li><a href="{% url 'contact' %}"><i class="bi bi-chevron-right me-2"></i>Contact</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5>Resources</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#"><i class="bi bi-chevron-right me-2"></i>Blood Donation Guide</a></li>
-                        <li><a href="#"><i class="bi bi-chevron-right me-2"></i>Eligibility Criteria</a></li>
-                        <li><a href="#"><i class="bi bi-chevron-right me-2"></i>FAQs</a></li>
-                        <li><a href="#"><i class="bi bi-chevron-right me-2"></i>Privacy Policy</a></li>
-                        <li><a href="#"><i class="bi bi-chevron-right me-2"></i>Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5>Contact Info</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-3">
-                            <i class="bi bi-geo-alt-fill me-2"></i>
+
+                    <!-- Quick Links -->
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <div class="footer-col-title">Navigation</div>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'home' %}"><i class="bi bi-chevron-right"></i> Home</a></li>
+                            <li><a href="{% url 'about' %}"><i class="bi bi-chevron-right"></i> About Us</a></li>
+                            <li><a href="{% url 'accounts:register_page' %}?type=donor"><i class="bi bi-chevron-right"></i> Become a Donor</a></li>
+                            <li><a href="{% url 'accounts:register_page' %}?type=hospital"><i class="bi bi-chevron-right"></i> Register Hospital</a></li>
+                            <li><a href="{% url 'contact' %}"><i class="bi bi-chevron-right"></i> Contact</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Resources -->
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <div class="footer-col-title">Resources</div>
+                        <ul class="footer-links">
+                            <li><a href="#"><i class="bi bi-chevron-right"></i> Donation Guide</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i> Eligibility</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i> FAQs</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i> Privacy Policy</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i> Terms of Service</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="col-lg-4 col-md-4">
+                        <div class="footer-col-title">Get in Touch</div>
+                        <div class="footer-contact-item">
+                            <div class="fc-icon"><i class="bi bi-geo-alt-fill"></i></div>
                             <span>Kathmandu, Nepal</span>
-                        </li>
-                        <li class="mb-3">
-                            <i class="bi bi-telephone-fill me-2"></i>
+                        </div>
+                        <div class="footer-contact-item">
+                            <div class="fc-icon"><i class="bi bi-telephone-fill"></i></div>
                             <a href="tel:+015789456">+01-57894567</a>
-                        </li>
-                        <li class="mb-3">
-                            <i class="bi bi-envelope-fill me-2"></i>
+                        </div>
+                        <div class="footer-contact-item">
+                            <div class="fc-icon"><i class="bi bi-envelope-fill"></i></div>
                             <a href="mailto:info@lifelinknepal.com.np">info@lifelinknepal.com.np</a>
-                        </li>
-                        <li>
-                            <i class="bi bi-clock-fill me-2"></i>
+                        </div>
+                        <div class="footer-contact-item">
+                            <div class="fc-icon"><i class="bi bi-clock-fill"></i></div>
                             <span>24/7 Emergency Support</span>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
+
         <div class="footer-bottom">
             <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-12 text-center">
-    <p class="mb-0">© 2026 Life Link Nepal. All Rights Reserved.</p>
-</div>
-
-                    
+                <div class="text-center">
+                    <p>© 2026 <strong>Life Link Nepal</strong>. All rights reserved. &nbsp;·&nbsp; Designed with purpose, built for life.</p>
+                </div>
             </div>
         </div>
     </footer>
@@ -476,36 +854,31 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Dark Mode & Scroll Effects -->
     <script>
-        // Dark Mode Toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const body = document.body;
-        
-        if(localStorage.getItem('darkMode') === 'enabled'){
-            body.classList.add('dark-mode'); 
-            darkModeToggle.checked = true;
+        // ── DARK MODE ──────────────────────────────────────────
+        const toggle = document.getElementById('darkModeToggle');
+        const body   = document.body;
+
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggle.checked = true;
         }
-        
-        darkModeToggle.addEventListener('change', () => {
-            if(darkModeToggle.checked){
-                body.classList.add('dark-mode'); 
-                localStorage.setItem('darkMode','enabled');
+
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
             } else {
-                body.classList.remove('dark-mode'); 
-                localStorage.setItem('darkMode','disabled');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
             }
         });
 
-        // Navbar Scroll Effect
+        // ── NAVBAR SCROLL SHADOW ───────────────────────────────
+        const navbar = document.getElementById('mainNavbar');
         window.addEventListener('scroll', () => {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
+            navbar.classList.toggle('scrolled', window.scrollY > 40);
+        }, { passive: true });
     </script>
 
     {% block extra_js %}{% endblock %}

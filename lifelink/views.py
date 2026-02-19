@@ -1,4 +1,4 @@
-# lifelink/views.py - CORRECTED VERSION
+# lifelink/views.py
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -6,16 +6,24 @@ from django.contrib.auth.decorators import login_required
 
 from .models import ContactRequest
 
+
 # ========================================
 # PUBLIC PAGES
 # ========================================
 
 def home(request):
     """Home page with blood types"""
-    blood_types = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
-    return render(request, "home.html", {
-        "blood_types": blood_types
-    })
+    blood_types = [
+        ("A+",  "Type A Positive",  "Donates to A+ and AB+",         None),
+        ("A−",  "Type A Negative",  "Donates to A+, A−, AB+, AB−",  None),
+        ("B+",  "Type B Positive",  "Donates to B+ and AB+",         None),
+        ("B−",  "Type B Negative",  "Donates to B+, B−, AB+, AB−",  None),
+        ("O+",  "Type O Positive",  "Most common blood type",         None),
+        ("O−",  "Type O Negative",  "Donates to all blood types",     "Universal Donor"),
+        ("AB+", "Type AB Positive", "Receives from all types",        "Universal Recipient"),
+        ("AB−", "Type AB Negative", "Rare — only 1% of people",       None),
+    ]
+    return render(request, 'home.html', {'blood_types': blood_types})
 
 
 def about(request):
@@ -31,9 +39,9 @@ def contact(request):
 def create_request(request):
     """Handle contact form submission"""
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
+        name    = request.POST.get('name')
+        email   = request.POST.get('email')
+        phone   = request.POST.get('phone')
         subject = request.POST.get('subject')
         message = request.POST.get('message')
 
@@ -42,7 +50,7 @@ def create_request(request):
             email=email,
             phone=phone,
             subject=subject,
-            message=message
+            message=message,
         )
 
         messages.success(request, "Your message has been sent successfully!")
@@ -58,17 +66,16 @@ def create_request(request):
 @login_required
 def super_admin_dashboard(request):
     """
-    Super Admin Dashboard - Only accessible to staff/superuser
-    Shows ALL donors, hospitals, and blood requests
+    Super Admin Dashboard — only accessible to staff/superuser.
+    Shows all donors, hospitals, and blood requests.
     """
-    # Security check: Only staff/superuser can access
     if not (request.user.is_staff or request.user.is_superuser):
         messages.error(request, "⛔ Access denied. Admin privileges required.")
-        return redirect('home')  # ✅ Changed from 'dashboard_router' to 'home'
-    
+        return redirect('home')
+
     context = {
         'user_type': 'super_admin',
-        'user': request.user,
+        'user':       request.user,
         'admin_name': request.user.username,
     }
     return render(request, 'super_admin_dashboard.html', context)
@@ -80,8 +87,8 @@ def super_admin_dashboard(request):
 
 def check_user_type(user):
     """
-    Helper function to determine user type
-    Returns: 'super_admin', 'donor', 'hospital', or None
+    Helper to determine user type.
+    Returns: 'super_admin', 'donor', 'hospital', or None.
     """
     if user.is_staff or user.is_superuser:
         return 'super_admin'
@@ -89,5 +96,4 @@ def check_user_type(user):
         return 'donor'
     elif hasattr(user, 'hospital_profile'):
         return 'hospital'
-    else:
-        return None
+    return None

@@ -1,210 +1,218 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Donation History - Life Link Nepal{% endblock %}
+{% block title %}Donation History — LifeLink Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
-    .history-header {
-        background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);
-        padding: 3rem 0;
-        color: white;
-    }
-    
-    .stats-card {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        text-align: center;
-        transition: transform 0.3s;
-    }
-    
-    .stats-card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .stats-number {
-        font-size: 3rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #c71e35, #e53949);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    
-    .timeline {
-        position: relative;
-        padding: 2rem 0;
-    }
-    
-    .timeline-item {
-        position: relative;
-        padding-left: 3rem;
-        margin-bottom: 2rem;
-        border-left: 3px solid #c71e35;
-    }
-    
-    .timeline-item::before {
-        content: '';
-        position: absolute;
-        left: -9px;
-        top: 0;
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-        background: #c71e35;
-        border: 3px solid white;
-        box-shadow: 0 0 0 3px #c71e35;
-    }
-    
-    .donation-card {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        transition: all 0.3s;
-    }
-    
-    .donation-card:hover {
-        box-shadow: 0 8px 25px rgba(199, 30, 53, 0.15);
-        transform: translateX(10px);
-    }
-    
-    .year-badge {
-        background: linear-gradient(135deg, #c71e35, #e53949);
-        color: white;
-        padding: 0.5rem 1.5rem;
-        border-radius: 25px;
-        font-weight: 700;
-        display: inline-block;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 10px rgba(199, 30, 53, 0.3);
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: #6c757d;
-    }
-    
-    .empty-state i {
-        font-size: 5rem;
-        opacity: 0.3;
-        margin-bottom: 1.5rem;
-    }
+.dash-wrap { background: var(--ivory); min-height: 100vh; padding: 48px 0 80px; }
+
+/* HERO */
+.dash-hero { background: var(--ink); border-radius: 16px; padding: 36px 40px; margin-bottom: 40px; position: relative; overflow: hidden; }
+.dash-hero::before { content:''; position:absolute; top:-80px; right:-80px; width:280px; height:280px; border-radius:50%; border:1px solid rgba(196,146,74,0.12); pointer-events:none; }
+.dash-hero::after  { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%; border:1px solid rgba(196,146,74,0.07); pointer-events:none; }
+.dash-hero-crimson-bar { position:absolute; top:0; left:0; width:4px; height:100%; background:linear-gradient(180deg, var(--crimson) 0%, var(--gold) 100%); border-radius:4px 0 0 4px; }
+.dash-hero-eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; }
+.dash-hero-eyebrow span { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; font-weight:600; color:var(--gold); }
+.dash-hero-eyebrow-line { width:20px; height:1px; background:var(--gold); opacity:0.6; }
+.dash-hero h2 { font-family:var(--font-display); font-size:clamp(28px,3.5vw,44px); font-weight:600; color:white; letter-spacing:-0.3px; line-height:1.15; margin-bottom:8px; }
+.dash-hero h2 em { font-style:italic; color:var(--crimson-light); }
+.dash-hero p { font-size:14.5px; color:rgba(240,232,222,0.6); margin:0; }
+.btn-dash-secondary { display:inline-flex; align-items:center; gap:8px; padding:9px 20px; background:transparent; color:rgba(240,232,222,0.75); font-size:13px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid rgba(240,232,222,0.2); }
+.btn-dash-secondary:hover { border-color:rgba(196,146,74,0.5); color:var(--gold-light); background:rgba(196,146,74,0.08); }
+
+/* STAT CARDS */
+.stat-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; padding:24px; text-align:center; height:100%; transition:all 0.3s ease; position:relative; overflow:hidden; }
+body.dark-mode .stat-card { background:#1a1410; border-color:rgba(255,255,255,0.06); }
+.stat-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(90deg, var(--crimson), var(--gold)); transform:scaleX(0); transform-origin:left; transition:transform 0.35s ease; }
+.stat-card:hover::after { transform:scaleX(1); }
+.stat-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-lift); border-color:var(--border); }
+.stat-icon { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 16px; transition:all 0.3s ease; }
+.stat-icon.crimson { background:var(--crimson-pale); color:var(--crimson); border:1px solid var(--border); }
+.stat-icon.green   { background:rgba(74,222,128,0.1); color:#16a34a;       border:1px solid rgba(74,222,128,0.2); }
+.stat-icon.blue    { background:rgba(59,130,246,0.1); color:#2563eb;       border:1px solid rgba(59,130,246,0.2); }
+.stat-card:hover .stat-icon.crimson { background:var(--crimson); color:white; }
+.stat-card:hover .stat-icon.green   { background:#16a34a; color:white; }
+.stat-card:hover .stat-icon.blue    { background:#2563eb; color:white; }
+.stat-number { font-family:var(--font-display); font-size:38px; font-weight:700; color:var(--ink); line-height:1; letter-spacing:-0.5px; margin-bottom:4px; }
+.stat-label  { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-muted); font-weight:600; }
+
+/* CARDS */
+.dash-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; overflow:hidden; margin-bottom:24px; }
+body.dark-mode .dash-card { background:#1a1410; border-color:rgba(255,255,255,0.06); }
+.dash-card-header { padding:20px 24px; border-bottom:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:var(--ivory-mid); }
+body.dark-mode .dash-card-header { background:#221c17; border-color:rgba(255,255,255,0.05); }
+.dash-card-title { font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:10px; }
+.dash-card-title i { color:var(--crimson); font-size:16px; }
+.dash-card-body { padding:24px; }
+
+/* YEAR BADGE */
+.year-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 18px; background:var(--ink); color:var(--gold); font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; border-radius:20px; margin-bottom:20px; }
+
+/* TIMELINE */
+.timeline-wrap { padding-left: 28px; }
+.tl-item { position:relative; padding-bottom:24px; }
+.tl-item:last-child { padding-bottom:0; }
+.tl-item::before { content:''; position:absolute; left:-20px; top:6px; width:12px; height:12px; border-radius:50%; background:var(--crimson); box-shadow:0 0 0 3px rgba(155,23,40,0.15); }
+.tl-item::after  { content:''; position:absolute; left:-15px; top:20px; width:1px; bottom:0; background:var(--border-subtle); }
+.tl-item:last-child::after { display:none; }
+
+/* DONATION ENTRY CARD */
+.donation-entry { background:white; border:1px solid var(--border-subtle); border-radius:12px; padding:20px 22px; transition:all 0.25s ease; }
+body.dark-mode .donation-entry { background:#221c17; border-color:rgba(255,255,255,0.06); }
+.donation-entry:hover { border-color:var(--border); transform:translateX(6px); box-shadow:var(--shadow-warm); }
+.donation-hospital { font-family:var(--font-display); font-size:16px; font-weight:600; color:var(--ink); margin-bottom:4px; display:flex; align-items:center; gap:7px; }
+.donation-hospital i { color:var(--crimson); font-size:14px; }
+.donation-address { font-size:12.5px; color:var(--ink-muted); margin-bottom:8px; display:flex; align-items:center; gap:5px; }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; letter-spacing:0.3px; }
+.tag-crimson { background:var(--crimson-pale); color:var(--crimson); border:1px solid var(--border); }
+.tag-blue    { background:rgba(59,130,246,0.1); color:#2563eb;       border:1px solid rgba(59,130,246,0.2); }
+.tag-green   { background:rgba(74,222,128,0.1); color:#16a34a;       border:1px solid rgba(74,222,128,0.2); }
+
+/* DATE */
+.donation-date-block { text-align:right; }
+.donation-date { font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--ink); }
+.donation-ago  { font-size:12px; color:var(--ink-muted); margin-top:2px; }
+
+/* EMPTY STATE */
+.empty-state { text-align:center; padding:56px 24px; }
+.empty-state-icon { width:72px; height:72px; border-radius:50%; background:var(--ivory-mid); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:28px; color:var(--ink-muted); }
+.empty-state h6 { font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--ink); margin-bottom:6px; }
+.empty-state p { font-size:13.5px; color:var(--ink-muted); margin-bottom:20px; }
+.btn-create { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:var(--crimson); color:white; font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid var(--crimson); }
+.btn-create:hover { background:var(--crimson-mid); color:white; transform:translateY(-2px); box-shadow:0 6px 18px rgba(155,23,40,0.35); }
+
+/* BACK LINK */
+.btn-back-link { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:transparent; color:var(--ink-mid); font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; border:1.5px solid var(--border-subtle); transition:all 0.2s ease; }
+.btn-back-link:hover { border-color:var(--border); color:var(--ink); }
+
+body.dark-mode .dash-wrap { background:var(--ivory); }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Header -->
-<section class="history-header">
-    <div class="container">
-        <div class="text-center">
-            <h1 class="fw-bold mb-2">Your Donation Journey</h1>
-            <p class="lead mb-0">Every donation is a life saved. Thank you for being a hero!</p>
+<div class="dash-wrap">
+<div class="container">
+
+    <!-- HERO -->
+    <div class="dash-hero">
+        <div class="dash-hero-crimson-bar"></div>
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="dash-hero-eyebrow">
+                    <div class="dash-hero-eyebrow-line"></div>
+                    <span>Donation History</span>
+                    <div class="dash-hero-eyebrow-line"></div>
+                </div>
+                <h2>Your Donation <em>Journey</em></h2>
+                <p>Every donation is a life saved. Thank you for being a hero!</p>
+            </div>
+            <div class="col-lg-4 d-flex justify-content-lg-end">
+                <a href="{% url 'donor_dashboard' %}" class="btn-dash-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
         </div>
     </div>
-</section>
 
-<!-- Statistics -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <i class="bi bi-droplet-fill text-danger fs-1 mb-3"></i>
-                    <div class="stats-number">{{ total_donations }}</div>
-                    <p class="text-muted mb-0 fw-semibold">Total Donations</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <i class="bi bi-heart-pulse-fill text-success fs-1 mb-3"></i>
-                    <div class="stats-number">{{ total_units }}</div>
-                    <p class="text-muted mb-0 fw-semibold">Units Donated</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <i class="bi bi-hospital-fill text-primary fs-1 mb-3"></i>
-                    <div class="stats-number">{{ total_units }}</div>
-                    <p class="text-muted mb-0 fw-semibold">Lives Saved</p>
-                </div>
+    <!-- STAT CARDS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon crimson"><i class="bi bi-droplet-fill"></i></div>
+                <div class="stat-number">{{ total_donations }}</div>
+                <div class="stat-label">Total Donations</div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="bi bi-heart-pulse-fill"></i></div>
+                <div class="stat-number">{{ total_units }}</div>
+                <div class="stat-label">Units Donated</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
+                <div class="stat-number">{{ total_units }}</div>
+                <div class="stat-label">Lives Saved</div>
+            </div>
+        </div>
+    </div>
 
-        <!-- Timeline -->
-        {% if history %}
-            <div class="row">
-                <div class="col-12">
-                    <h3 class="fw-bold mb-4">
-                        <i class="bi bi-clock-history text-danger me-2"></i>
-                        Donation Timeline
-                    </h3>
-                    
-                    {% for year, donations in history_by_year.items %}
-                        <div class="mb-5">
-                            <div class="year-badge">{{ year }}</div>
-                            
-                            <div class="timeline">
-                                {% for donation in donations %}
-                                    <div class="timeline-item">
-                                        <div class="donation-card">
-                                            <div class="row align-items-center">
-                                                <div class="col-md-8">
-                                                    <h5 class="fw-bold mb-2">
-                                                        <i class="bi bi-hospital text-danger me-2"></i>
-                                                        {{ donation.hospital.hospital_name }}
-                                                    </h5>
-                                                    <p class="mb-1 text-muted">
-                                                        <i class="bi bi-geo-alt me-1"></i>
-                                                        {{ donation.hospital.address }}
-                                                    </p>
-                                                    <p class="mb-1">
-                                                        <span class="badge bg-danger">{{ donor.blood_type }}</span>
-                                                        <span class="badge bg-info">{{ donation.units_donated }} unit(s)</span>
-                                                    </p>
-                                                    {% if donation.notes %}
-                                                    <p class="mb-0 small text-muted fst-italic">
-                                                        <i class="bi bi-chat-quote me-1"></i>
-                                                        {{ donation.notes }}
-                                                    </p>
-                                                    {% endif %}
-                                                </div>
-                                                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                                                    <div class="text-muted fw-bold mb-2">
-                                                        {{ donation.date_donated|date:"F j, Y" }}
-                                                    </div>
-                                                    <small class="text-muted">
-                                                        {{ donation.date_donated|timesince }} ago
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </div>
+    <!-- TIMELINE -->
+    {% if history %}
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <div class="dash-card-title">
+                <i class="bi bi-clock-history"></i> Donation Timeline
+            </div>
+        </div>
+        <div class="dash-card-body">
+            {% for year, donations in history_by_year.items %}
+            <div class="mb-5">
+                <div class="year-badge"><i class="bi bi-calendar3"></i> {{ year }}</div>
+                <div class="timeline-wrap">
+                    {% for donation in donations %}
+                    <div class="tl-item">
+                        <div class="donation-entry">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md-8">
+                                    <div class="donation-hospital">
+                                        <i class="bi bi-hospital-fill"></i>
+                                        {{ donation.hospital.hospital_name }}
                                     </div>
-                                {% endfor %}
+                                    <div class="donation-address">
+                                        <i class="bi bi-geo-alt-fill" style="color:var(--gold);"></i>
+                                        {{ donation.hospital.address }}
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                        <span class="tag tag-crimson">{{ donor.blood_type }}</span>
+                                        <span class="tag tag-blue">{{ donation.units_donated }} unit{{ donation.units_donated|pluralize }}</span>
+                                        <span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Completed</span>
+                                    </div>
+                                    {% if donation.notes %}
+                                    <div style="font-size:12px; color:var(--ink-muted); margin-top:8px; font-style:italic;">
+                                        <i class="bi bi-chat-quote me-1"></i>{{ donation.notes }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="donation-date-block">
+                                        <div class="donation-date">{{ donation.date_donated|date:"F j, Y" }}</div>
+                                        <div class="donation-ago">{{ donation.date_donated|timesince }} ago</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
-        {% else %}
-            <div class="empty-state">
-                <i class="bi bi-clipboard-heart"></i>
-                <h4 class="fw-bold mb-2">No Donation History Yet</h4>
-                <p class="text-muted mb-4">Start your life-saving journey today!</p>
-                <a href="{% url 'donor_dashboard' %}" class="btn btn-danger btn-lg">
-                    <i class="bi bi-search me-2"></i>Find Blood Requests
-                </a>
-            </div>
-        {% endif %}
-
-        <!-- Back to Dashboard -->
-        <div class="text-center mt-5">
-            <a href="{% url 'donor_dashboard' %}" class="btn btn-outline-danger btn-lg">
-                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="dash-card">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="bi bi-clipboard-heart"></i></div>
+            <h6>No Donation History Yet</h6>
+            <p>Start your life-saving journey today!</p>
+            <a href="{% url 'donor_dashboard' %}" class="btn-create">
+                <i class="bi bi-search"></i> Find Blood Requests
             </a>
         </div>
     </div>
-</section>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{% url 'donor_dashboard' %}" class="btn-back-link">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+</div>
+</div>
 {% endblock %}

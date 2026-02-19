@@ -475,6 +475,7 @@
         <div id="success-message" class="message success-message"></div>
 
         <form id="adminLoginForm">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="username">Administrator Username</label>
                 <input 
@@ -530,12 +531,29 @@
             successDiv.style.display = 'none';
         }
 
+        // Get CSRF token from cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideMessages();
 
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
+            const csrftoken = getCookie('csrftoken');
 
             // Add loading state
             submitBtn.classList.add('loading');
@@ -546,6 +564,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,  // 🔥 CSRF TOKEN ADDED
                     },
                     body: JSON.stringify({ username, password })
                 });

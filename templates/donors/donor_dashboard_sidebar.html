@@ -1,26 +1,199 @@
+{% load static %}
 <!-- Partial: donor_dashboard_sidebar.html -->
-<div class="dashboard-sidebar">
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6 class="card-title">Your Profile</h6>
-            <p class="mb-1"><strong>{{ donor.full_name }}</strong></p>
-            <p class="small text-muted">Blood Type: {{ donor.blood_type }}</p>
-            <p class="small text-muted">Last Donation: {% if donor.last_donation_date %}{{ donor.last_donation_date|date:"M d, Y" }}{% else %}Never{% endif %}</p>
-            <a href="{% url 'edit_profile' %}" class="btn btn-outline-secondary btn-sm mt-2">Edit Profile</a>
+<style>
+/* ── SIDEBAR PROFILE CARD ─────────────────────────── */
+.sidebar-blood-badge {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: var(--crimson);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 700;
+    color: white;
+    margin: 0 auto 14px;
+    box-shadow: 0 6px 18px rgba(155,23,40,0.35);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-blood-badge:hover { transform: scale(1.07); }
+
+.sidebar-donor-name {
+    font-family: var(--font-display);
+    font-size: 17px; font-weight: 600;
+    color: var(--ink); margin-bottom: 12px;
+    text-align: center;
+}
+
+.sidebar-info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 13px;
+}
+
+.sidebar-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+.sidebar-info-row:first-child { padding-top: 0; }
+
+.sidebar-info-label {
+    color: var(--ink-muted);
+    font-weight: 500;
+    display: flex; align-items: center; gap: 5px;
+}
+
+.sidebar-info-label i { color: var(--crimson); font-size: 12px; }
+
+.sidebar-info-value {
+    font-weight: 600; color: var(--ink);
+}
+
+.tag-crimson-sm {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 8px;
+    background: var(--crimson-pale); color: var(--crimson);
+    border: 1px solid var(--border);
+    border-radius: 20px; font-size: 11px; font-weight: 700;
+}
+
+/* ── EDIT PROFILE BUTTON ──────────────────────────── */
+.btn-sidebar-edit {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 9px 16px;
+    background: var(--crimson); color: white;
+    font-size: 13px; font-weight: 700;
+    border-radius: 8px; text-decoration: none;
+    transition: all 0.25s ease;
+    border: 1.5px solid var(--crimson);
+    width: 100%;
+    margin-top: 14px;
+}
+
+.btn-sidebar-edit:hover {
+    background: var(--crimson-mid); color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(155,23,40,0.3);
+}
+
+/* ── NOTIFICATION ITEMS ───────────────────────────── */
+.sidebar-notif-item {
+    padding: 10px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 9px;
+    margin-bottom: 8px;
+    background: white;
+    transition: all 0.2s ease;
+    display: flex; align-items: flex-start; gap: 10px;
+}
+
+body.dark-mode .sidebar-notif-item {
+    background: #221c17;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.sidebar-notif-item:hover {
+    border-color: var(--border);
+    transform: translateX(3px);
+}
+
+.sidebar-notif-item:last-child { margin-bottom: 0; }
+
+.sidebar-notif-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--crimson);
+    box-shadow: 0 0 0 2px rgba(155,23,40,0.15);
+    margin-top: 4px; flex-shrink: 0;
+}
+
+.sidebar-notif-hospital {
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    margin-bottom: 2px;
+}
+
+.sidebar-notif-date {
+    font-size: 11px; color: var(--ink-muted);
+    display: flex; align-items: center; gap: 3px;
+}
+
+/* ── EMPTY STATE ──────────────────────────────────── */
+.sidebar-empty {
+    text-align: center;
+    padding: 16px;
+    font-size: 13px;
+    color: var(--ink-muted);
+}
+
+.sidebar-empty i {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 6px;
+    opacity: 0.4;
+}
+</style>
+
+<!-- Profile Card -->
+<div class="dash-card" style="margin-bottom:16px;">
+    <div class="dash-card-header">
+        <div class="dash-card-title">
+            <i class="bi bi-person-circle"></i> Your Profile
         </div>
     </div>
-    <div class="card">
-        <div class="card-body">
-            <h6 class="card-title">Notifications</h6>
-            {% if notifications %}
-                <ul class="list-unstyled small">
-                    {% for n in notifications|slice:":5" %}
-                        <li class="mb-2">{{ n.blood_request.hospital.hospital_name }} • {{ n.sent_at|date:"M d" }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-muted small">No notifications</p>
-            {% endif %}
+    <div class="dash-card-body text-center">
+        <div class="sidebar-blood-badge">{{ donor.blood_type }}</div>
+        <div class="sidebar-donor-name">{{ donor.full_name }}</div>
+        <div>
+            <div class="sidebar-info-row">
+                <span class="sidebar-info-label"><i class="bi bi-droplet-fill"></i> Blood Type</span>
+                <span class="tag-crimson-sm">{{ donor.blood_type }}</span>
+            </div>
+            <div class="sidebar-info-row">
+                <span class="sidebar-info-label"><i class="bi bi-calendar-heart"></i> Last Donation</span>
+                <span class="sidebar-info-value">
+                    {% if donor.last_donation_date %}
+                        {{ donor.last_donation_date|date:"M d, Y" }}
+                    {% else %}
+                        <span style="color:var(--ink-muted); font-weight:500;">Never</span>
+                    {% endif %}
+                </span>
+            </div>
         </div>
+        <a href="{% url 'edit_profile' %}" class="btn-sidebar-edit">
+            <i class="bi bi-pencil-square"></i> Edit Profile
+        </a>
+    </div>
+</div>
+
+<!-- Notifications Card -->
+<div class="dash-card">
+    <div class="dash-card-header">
+        <div class="dash-card-title">
+            <i class="bi bi-bell-fill"></i> Notifications
+        </div>
+        {% if notifications %}
+        <span style="display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;background:var(--crimson-pale);border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:700;color:var(--crimson);">
+            {{ notifications|length }}
+        </span>
+        {% endif %}
+    </div>
+    <div class="dash-card-body" style="padding:16px;">
+        {% if notifications %}
+            {% for n in notifications|slice:":5" %}
+            <div class="sidebar-notif-item">
+                <div class="sidebar-notif-dot"></div>
+                <div>
+                    <div class="sidebar-notif-hospital">
+                        <i class="bi bi-hospital-fill" style="color:var(--crimson);font-size:11px;margin-right:3px;"></i>
+                        {{ n.blood_request.hospital.hospital_name }}
+                    </div>
+                    <div class="sidebar-notif-date">
+                        <i class="bi bi-clock"></i> {{ n.sent_at|date:"M d" }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="sidebar-empty">
+            <i class="bi bi-inbox"></i>
+            No notifications yet.
+        </div>
+        {% endif %}
     </div>
 </div>

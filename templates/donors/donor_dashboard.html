@@ -1,750 +1,1080 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Donor Dashboard - LifeLink Nepal{% endblock %}
+{% block title %}Donor Dashboard — LifeLink Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
-:root {
-    --lifelink-red: #E63946;
-    --lifelink-blue: #1D70B8;
-    --lifelink-dark-blue: #003A70;
-    --lifelink-light-red: #FFE5E8;
-    --lifelink-gradient: linear-gradient(135deg, #1D70B8 0%, #E63946 100%);
-    --gold: #fbbf24;
+/* ═══════════════════════════════════════════════════════════
+   DONOR DASHBOARD — matches base.html + home.html design
+   Palette : ivory + crimson + gold + ink
+   Type    : Cormorant Garamond display · Jost body
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── PAGE WRAPPER ─────────────────────────────────────────── */
+.dash-wrap {
+    background: var(--ivory);
+    min-height: 100vh;
+    padding: 48px 0 80px;
 }
 
-body {
-    background-color: #F8F9FA;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Star Achievement Banner */
-.achievement-banner {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+/* ── HERO BANNER ──────────────────────────────────────────── */
+.dash-hero {
+    background: var(--ink);
     border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 8px 30px rgba(251, 191, 36, 0.3);
+    padding: 36px 40px;
+    margin-bottom: 40px;
     position: relative;
     overflow: hidden;
 }
 
-.achievement-banner::before {
+.dash-hero::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 300px;
-    height: 300px;
-    background: rgba(255, 255, 255, 0.1);
+    top: -80px; right: -80px;
+    width: 280px; height: 280px;
     border-radius: 50%;
+    border: 1px solid rgba(196,146,74,0.12);
+    pointer-events: none;
 }
 
-.achievement-content {
-    position: relative;
-    z-index: 1;
-    color: white;
+.dash-hero::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    border: 1px solid rgba(196,146,74,0.07);
+    pointer-events: none;
 }
 
-.star-display {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+.dash-hero-crimson-bar {
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, var(--crimson) 0%, var(--gold) 100%);
+    border-radius: 4px 0 0 4px;
 }
 
-.star-count {
-    font-size: 4rem;
-    font-weight: 900;
-    color: white;
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: star-glow 2s infinite;
-}
-
-@keyframes star-glow {
-    0%, 100% { text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
-    50% { text-shadow: 0 4px 20px rgba(255, 255, 255, 0.6); }
-}
-
-.star-icon-large {
-    font-size: 5rem;
-    animation: star-spin 4s linear infinite;
-}
-
-@keyframes star-spin {
-    0% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(90deg) scale(1.1); }
-    50% { transform: rotate(180deg) scale(1); }
-    75% { transform: rotate(270deg) scale(1.1); }
-    100% { transform: rotate(360deg) scale(1); }
-}
-
-.star-level-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
-
-.next-star-progress {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 20px;
-    height: 12px;
-    overflow: hidden;
-    margin-top: 1rem;
-}
-
-.progress-fill {
-    background: white;
-    height: 100%;
-    border-radius: 20px;
-    transition: width 1s ease;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-.achievement-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.achievement-stat {
-    text-align: center;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-}
-
-.achievement-stat-value {
-    font-size: 2rem;
-    font-weight: 800;
-    color: white;
-    display: block;
-}
-
-.achievement-stat-label {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.9);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Star Rewards in Donation History */
-.history-star-badge {
+.dash-hero-eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.dash-hero-eyebrow span {
+    font-size: 10.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--gold);
+}
+
+.dash-hero-eyebrow-line {
+    width: 20px; height: 1px;
+    background: var(--gold);
+    opacity: 0.6;
+}
+
+.dash-hero h2 {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 600;
     color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
-    animation: star-pulse 2s infinite;
+    letter-spacing: -0.3px;
+    line-height: 1.15;
+    margin-bottom: 8px;
 }
 
-@keyframes star-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+.dash-hero h2 em { font-style: italic; color: var(--crimson-light); }
+
+.dash-hero p {
+    font-size: 14.5px;
+    color: rgba(240,232,222,0.6);
+    margin: 0;
+    line-height: 1.7;
 }
 
-.history-star-icon {
-    font-size: 1.2rem;
-    animation: star-twinkle 2s infinite;
+.dash-hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-@keyframes star-twinkle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+.btn-dash-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px;
+    background: white; color: var(--crimson);
+    font-size: 13px; font-weight: 700;
+    border-radius: 8px; text-decoration: none;
+    transition: all 0.25s ease; border: 1.5px solid white;
 }
 
-/* ==================== HEADER ==================== */
-.dashboard-header {
-    background: var(--lifelink-gradient);
-    padding: 2.5rem 0;
-    box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+.btn-dash-primary:hover {
+    background: var(--ivory); color: var(--crimson-mid);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.btn-dash-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 20px;
+    background: transparent; color: rgba(240,232,222,0.75);
+    font-size: 13px; font-weight: 600;
+    border-radius: 8px; text-decoration: none;
+    transition: all 0.25s ease;
+    border: 1.5px solid rgba(240,232,222,0.2);
+}
+
+.btn-dash-secondary:hover {
+    border-color: rgba(196,146,74,0.5);
+    color: var(--gold-light);
+    background: rgba(196,146,74,0.08);
+}
+
+/* ── STAT CARDS ───────────────────────────────────────────── */
+.stat-card {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 24px;
+    height: 100%;
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
 
-.dashboard-header::before {
+body.dark-mode .stat-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.stat-card::after {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 300px;
-    height: 300px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
 }
 
-.dashboard-header::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -5%;
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
+.stat-card:hover::after { transform: scaleX(1); }
+
+.stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lift);
+    border-color: var(--border);
 }
 
-.header-content { 
-    position: relative; 
-    z-index:1; 
+.stat-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
 }
 
-.welcome-text { 
-    font-size:1.8rem; 
-    font-weight:700; 
-    color:white; 
-    margin-bottom:0.5rem; 
-    text-shadow:0 2px 4px rgba(0,0,0,0.1);
+.stat-icon.crimson { background: var(--crimson-pale); color: var(--crimson); border: 1px solid var(--border); }
+.stat-icon.gold    { background: var(--gold-pale);    color: var(--gold);    border: 1px solid rgba(196,146,74,0.2); }
+.stat-icon.green   { background: rgba(74,222,128,0.1); color: #16a34a;       border: 1px solid rgba(74,222,128,0.2); }
+.stat-icon.ink     { background: rgba(28,20,16,0.06);  color: var(--ink-mid); border: 1px solid var(--border-subtle); }
+
+.stat-card:hover .stat-icon.crimson { background: var(--crimson); color: white; }
+.stat-card:hover .stat-icon.gold    { background: var(--gold);    color: white; }
+.stat-card:hover .stat-icon.green   { background: #16a34a;        color: white; }
+.stat-card:hover .stat-icon.ink     { background: var(--ink-mid); color: white; }
+
+.stat-number {
+    font-family: var(--font-display);
+    font-size: 38px; font-weight: 700;
+    color: var(--ink); line-height: 1;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
 }
 
-.location-text { 
-    color: rgba(255,255,255,0.9); 
-    font-size:1rem; 
+body.dark-mode .stat-number { color: var(--ink); }
+
+.stat-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 600;
 }
 
-/* Blood Badge */
-.blood-badge { 
-    width:100px; 
-    height:100px; 
-    background:white; 
-    border-radius:50%;
-    display:inline-flex; 
-    align-items:center; 
-    justify-content:center; 
-    box-shadow:0 8px 30px rgba(0,0,0,0.2);
-    animation:pulse 2s infinite; 
-    position:relative;
-}
-
-@keyframes pulse { 
-    0%,100%{transform:scale(1);} 
-    50%{transform:scale(1.05);} 
-}
-
-.blood-badge::before { 
-    content:''; 
-    position:absolute; 
-    inset:-5px; 
-    border-radius:50%;
-    background:linear-gradient(45deg,var(--lifelink-blue),var(--lifelink-red));
-    opacity:0.3; 
-    animation:rotate 3s linear infinite;
-}
-
-@keyframes rotate { 
-    100% { transform: rotate(360deg); } 
-}
-
-.blood-type { 
-    font-size:2.5rem; 
-    font-weight:900; 
-    color:var(--lifelink-red); 
-    position:relative; 
-    z-index:1; 
-}
-
-/* Donor Level Badge */
-.donor-level-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+/* ── ELIGIBILITY ALERT ────────────────────────────────────── */
+.eligibility-bar {
+    border-radius: 12px;
+    padding: 18px 24px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    padding: 0.75rem 1.5rem;
-    border-radius: 30px;
-    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
-    z-index: 10;
+    gap: 16px;
+    margin-bottom: 32px;
+    border: 1px solid;
 }
 
-.level-stars {
-    display: flex;
-    gap: 0.25rem;
+.eligibility-bar.eligible {
+    background: rgba(74,222,128,0.07);
+    border-color: rgba(74,222,128,0.25);
 }
 
-.level-star {
-    color: white;
-    font-size: 1.2rem;
-    animation: star-twinkle 2s infinite;
+.eligibility-bar.ineligible {
+    background: rgba(196,146,74,0.07);
+    border-color: rgba(196,146,74,0.25);
 }
 
-.level-star:nth-child(2) {
-    animation-delay: 0.3s;
+.eligibility-bar-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
 }
 
-.level-star:nth-child(3) {
-    animation-delay: 0.6s;
-}
+.eligible .eligibility-bar-icon   { background: rgba(74,222,128,0.15); color: #16a34a; }
+.ineligible .eligibility-bar-icon { background: var(--gold-pale);       color: var(--gold); }
 
-.level-star:nth-child(4) {
-    animation-delay: 0.9s;
-}
-
-.level-star:nth-child(5) {
-    animation-delay: 1.2s;
-}
-
-.level-text {
-    color: white;
+.eligibility-bar-text strong {
+    font-size: 14px;
     font-weight: 700;
-    font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 2px;
 }
 
-/* ==================== CARDS ==================== */
-.info-card { 
-    background:white; 
-    border-radius:16px; 
-    padding:1.5rem; 
-    box-shadow:0 2px 12px rgba(0,0,0,0.06);
-    transition:all 0.3s ease; 
-    border:1px solid rgba(230,57,70,0.1); 
-    height:100%; 
-    animation: fadeInUp 0.6s ease-out; 
+body.dark-mode .eligibility-bar-text strong { color: var(--ink); }
+
+.eligibility-bar-text small {
+    font-size: 13px;
+    color: var(--ink-light);
 }
 
-.info-card:hover { 
-    transform: translateY(-4px); 
-    box-shadow:0 8px 24px rgba(230,57,70,0.15);
+/* ── SECTION CARDS ────────────────────────────────────────── */
+.dash-card {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 24px;
 }
 
-.stat-card { 
-    text-align:center; 
-    padding:1.5rem; 
-    position:relative; 
-    overflow:hidden; 
+body.dark-mode .dash-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.06);
 }
 
-.stat-card::before { 
-    content:''; 
-    position:absolute; 
-    top:0; 
-    left:0; 
-    right:0; 
-    height:4px; 
-    background: linear-gradient(90deg, transparent, currentColor, transparent); 
+.dash-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--ivory-mid);
 }
 
-.stat-icon { 
-    font-size:2.8rem; 
-    margin-bottom:0.75rem; 
-    display:block; 
-    opacity:0.9; 
+body.dark-mode .dash-card-header {
+    background: #221c17;
+    border-color: rgba(255,255,255,0.05);
 }
 
-.stat-number { 
-    font-size:2.8rem; 
-    font-weight:900; 
-    margin:0.5rem 0; 
-    line-height:1; 
+.dash-card-title {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.stat-label { 
-    color:#6c757d; 
-    font-size:0.95rem; 
-    font-weight:600; 
-    text-transform:uppercase; 
-    letter-spacing:0.5px; 
+body.dark-mode .dash-card-title { color: var(--ink); }
+
+.dash-card-title i { color: var(--crimson); font-size: 16px; }
+
+.dash-card-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 26px; height: 26px;
+    padding: 0 8px;
+    background: var(--crimson-pale);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    color: var(--crimson);
 }
 
-/* ==================== EMERGENCY REQUEST ==================== */
-.request-card { 
-    background:white; 
-    border-radius:12px; 
-    padding:1.5rem; 
-    margin-bottom:1rem;
-    box-shadow:0 2px 10px rgba(0,0,0,0.06); 
-    transition:all 0.3s ease; 
-    border-left:5px solid var(--lifelink-red);
-    animation: fadeInUp 0.6s ease-out; 
-}
+.dash-card-body { padding: 20px 24px; }
 
-.request-card:hover { 
-    background:var(--lifelink-light-red); 
-    transform:translateX(8px); 
-    box-shadow:0 4px 16px rgba(230,57,70,0.2);
-}
-
-.priority-critical{border-left-color:#DC3545;}
-.priority-high{border-left-color:#FFC107;}
-.priority-medium{border-left-color:#17A2B8;}
-.priority-low{border-left-color:#6C757D;}
-
-.emergency-badge { 
-    animation: blink 1.5s infinite; 
-}
-
-@keyframes blink {
-    0%,50%,100%{opacity:1;} 
-    25%,75%{opacity:0.5;}
-}
-
-/* Donation History */
-.history-item { 
-    padding:1rem; 
-    border-left:3px solid var(--lifelink-red); 
-    background:white; 
-    border-radius:8px;
-    margin-bottom:0.75rem; 
-    transition:all 0.3s ease;
-}
-
-.history-item:hover { 
-    background:var(--lifelink-light-red); 
-    transform:translateX(5px); 
-}
-
-.history-item-new {
+/* ── NOTIFICATION ITEMS ───────────────────────────────────── */
+.notif-item {
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    background: white;
+    transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
 }
 
-.history-item-new::after {
+body.dark-mode .notif-item {
+    background: #221c17;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.notif-item.unread {
+    border-left: 3px solid var(--crimson);
+    background: linear-gradient(90deg, rgba(155,23,40,0.03) 0%, white 40%);
+}
+
+body.dark-mode .notif-item.unread {
+    background: linear-gradient(90deg, rgba(155,23,40,0.08) 0%, #221c17 40%);
+}
+
+.notif-item:hover {
+    border-color: var(--border);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-warm);
+}
+
+.notif-item:last-child { margin-bottom: 0; }
+
+/* Priority dot */
+.priority-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+}
+
+.priority-dot.critical { background: var(--crimson); box-shadow: 0 0 0 3px rgba(155,23,40,0.15); animation: pulse-dot 1.6s infinite; }
+.priority-dot.high     { background: var(--gold);    box-shadow: 0 0 0 3px rgba(196,146,74,0.15); }
+.priority-dot.medium   { background: #3b82f6; }
+.priority-dot.low      { background: var(--ink-muted); }
+
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(155,23,40,0.15); }
+    50%       { box-shadow: 0 0 0 6px rgba(155,23,40,0); }
+}
+
+/* Tags / Badges */
+.tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.tag-crimson { background: var(--crimson-pale); color: var(--crimson); border: 1px solid var(--border); }
+.tag-gold    { background: var(--gold-pale);    color: var(--gold);    border: 1px solid rgba(196,146,74,0.25); }
+.tag-ink     { background: rgba(28,20,16,0.06); color: var(--ink-mid); border: 1px solid var(--border-subtle); }
+.tag-green   { background: rgba(74,222,128,0.1); color: #16a34a;       border: 1px solid rgba(74,222,128,0.25); }
+
+/* Action buttons inside notifs */
+.btn-notif-view {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: transparent;
+    color: var(--ink-mid);
+    font-size: 12.5px; font-weight: 600;
+    border-radius: 7px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1.5px solid var(--border-subtle);
+}
+
+.btn-notif-view:hover {
+    border-color: var(--crimson);
+    color: var(--crimson);
+    background: var(--crimson-pale);
+}
+
+.btn-notif-accept {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: #16a34a; color: white;
+    font-size: 12.5px; font-weight: 600;
+    border-radius: 7px; border: none; cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-notif-accept:hover {
+    background: #15803d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+}
+
+.btn-notif-reject {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: var(--crimson-pale); color: var(--crimson);
+    font-size: 12.5px; font-weight: 600;
+    border-radius: 7px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-notif-reject:hover {
+    background: var(--crimson); color: white;
+    border-color: var(--crimson);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(155,23,40,0.3);
+}
+
+/* ── EMPTY STATE ──────────────────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+}
+
+.empty-state-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: var(--ivory-mid);
+    border: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+    color: var(--ink-muted);
+}
+
+.empty-state h6 {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 600;
+    color: var(--ink); margin-bottom: 6px;
+}
+
+.empty-state p {
+    font-size: 13.5px; color: var(--ink-muted); margin: 0;
+}
+
+/* ── PROFILE CARD (right sidebar) ─────────────────────────── */
+.blood-type-badge {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: var(--crimson);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 30px; font-weight: 700;
+    color: white;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 24px rgba(155,23,40,0.35);
+    transition: transform 0.3s ease;
+}
+
+.blood-type-badge:hover { transform: scale(1.07); }
+
+.profile-table td {
+    padding: 8px 0;
+    font-size: 13.5px;
+    border: none;
+    vertical-align: middle;
+}
+
+.profile-table td:first-child {
+    color: var(--ink-muted);
+    font-weight: 500;
+    width: 90px;
+    padding-right: 12px;
+}
+
+.profile-table td:last-child {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+body.dark-mode .profile-table td:last-child { color: var(--ink); }
+
+/* ── LEADERBOARD CARD ─────────────────────────────────────── */
+.leaderboard-card {
+    background: var(--ink);
+    border-radius: 14px;
+    padding: 28px 24px;
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.leaderboard-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: -50px; right: -50px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 1px solid rgba(196,146,74,0.12);
+    pointer-events: none;
+}
+
+.trophy-wrap {
+    font-size: 42px;
+    margin-bottom: 10px;
+    animation: trophy-bounce 2.5s ease-in-out infinite;
+}
+
+@keyframes trophy-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+}
+
+.leaderboard-card h5 {
+    font-family: var(--font-display);
+    font-size: 13px; font-weight: 600;
+    color: var(--gold); letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 6px;
+}
+
+.leaderboard-card h4 {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 600;
+    color: white; margin-bottom: 8px;
+}
+
+/* ── DONATION TIMELINE ────────────────────────────────────── */
+.timeline-item {
+    position: relative;
+    padding-left: 24px;
+    padding-bottom: 18px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 4px; top: 6px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--crimson);
+    box-shadow: 0 0 0 3px rgba(155,23,40,0.15);
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: 8px; top: 18px;
+    width: 1px;
     bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.2), transparent);
-    animation: shimmer 2s infinite;
+    background: var(--border-subtle);
 }
 
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+.timeline-item:last-child::after { display: none; }
+
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-date {
+    font-size: 13px; font-weight: 700;
+    color: var(--ink); margin-bottom: 2px;
 }
 
-/* Empty State */
-.empty-state { 
-    padding:3.5rem 2rem; 
-    text-align:center; 
-    color:#6c757d;
+body.dark-mode .timeline-date { color: var(--ink); }
+
+.timeline-sub {
+    font-size: 12px; color: var(--ink-muted); line-height: 1.5;
 }
 
-.empty-state i { 
-    font-size:5rem; 
-    opacity:0.2; 
-    color:var(--lifelink-red); 
-    margin-bottom:1.5rem; 
+/* ── QUICK ACTIONS ────────────────────────────────────────── */
+.quick-action-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--ink-mid);
+    font-size: 13.5px; font-weight: 600;
+    transition: all 0.25s ease;
+    width: 100%;
 }
 
-@media(max-width:768px){
-    .welcome-text{font-size:1.4rem;}
-    .blood-badge{width:80px;height:80px;}
-    .blood-type{font-size:2rem;}
-    .stat-number{font-size:2.2rem;}
-    .donor-level-badge {
-        position: static;
-        margin-top: 1rem;
-        justify-content: center;
-    }
+body.dark-mode .quick-action-btn {
+    background: #221c17;
+    border-color: rgba(255,255,255,0.06);
+    color: var(--ink-mid);
 }
 
-@keyframes fadeInUp{
-    from{opacity:0;transform:translateY(20px);}
-    to{opacity:1;transform:translateY(0);}
+.quick-action-btn i {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: var(--crimson-pale);
+    color: var(--crimson);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
 }
+
+.quick-action-btn:hover {
+    border-color: var(--crimson);
+    color: var(--crimson);
+    background: var(--crimson-pale);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-warm);
+}
+
+.quick-action-btn:hover i {
+    background: var(--crimson);
+    color: white;
+}
+
+/* ── STATUS TOGGLE ────────────────────────────────────────── */
+.availability-toggle {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    border: none; cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.availability-toggle.available {
+    background: rgba(74,222,128,0.12);
+    color: #16a34a;
+    border: 1.5px solid rgba(74,222,128,0.3);
+}
+
+.availability-toggle.unavailable {
+    background: var(--gold-pale);
+    color: var(--gold);
+    border: 1.5px solid rgba(196,146,74,0.3);
+}
+
+.availability-toggle:hover { opacity: 0.8; transform: scale(0.97); }
+
+/* ── SECTION DIVIDER ──────────────────────────────────────── */
+.section-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-subtle) 30%, var(--border-subtle) 70%, transparent);
+    margin: 32px 0;
+}
+
+/* ── DARK MODE ────────────────────────────────────────────── */
+body.dark-mode .dash-wrap     { background: var(--ivory); }
+body.dark-mode .notif-item    { color: var(--ink); }
+body.dark-mode .eligibility-bar { border-color: rgba(255,255,255,0.08); }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- DASHBOARD HEADER -->
-<section class="dashboard-header">
-    <div class="container">
-        <div class="row align-items-center header-content">
-            <div class="col-md-8">
-                <h1 class="welcome-text">Welcome back, {{ donor.full_name }}! 👋</h1>
-                <p class="location-text mb-0"><i class="bi bi-geo-alt-fill me-2"></i>{{ donor.address|default:"Location not set" }}</p>
-            </div>
-            <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <div class="blood-badge">
-                    <div class="blood-type">{{ donor.blood_type }}</div>
+<div class="dash-wrap">
+<div class="container">
+
+    <!-- ── HERO ───────────────────────────────────────────── -->
+    <div class="dash-hero">
+        <div class="dash-hero-crimson-bar"></div>
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="dash-hero-eyebrow">
+                    <div class="dash-hero-eyebrow-line"></div>
+                    <span>Donor Dashboard</span>
+                    <div class="dash-hero-eyebrow-line"></div>
                 </div>
-                <!-- Donor Level Badge -->
-                <div class="donor-level-badge">
-                    <div class="level-stars" id="headerStars">
-                        <!-- Stars will be added by JavaScript -->
-                    </div>
-                    <span class="level-text" id="headerLevel">Loading...</span>
+                <h2>Welcome back, <em>{{ donor.full_name }}</em></h2>
+                <p>Your blood donation saves lives. Thank you for being a hero in someone's story.</p>
+            </div>
+            <div class="col-lg-4 d-flex justify-content-lg-end">
+                <div class="dash-hero-actions">
+                    <a href="{% url 'edit_profile' %}" class="btn-dash-primary">
+                        <i class="bi bi-person-gear"></i> Edit Profile
+                    </a>
+                    <a href="{% url 'donation_history' %}" class="btn-dash-secondary">
+                        <i class="bi bi-clock-history"></i> History
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</section>
 
-<!-- MAIN DASHBOARD -->
-<section class="py-5">
-    <div class="container">
-        {% if not donor.latitude or not donor.longitude %}
-        <div class="alert alert-warning">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-exclamation-triangle-fill text-warning fs-2 me-3"></i>
-                <div class="flex-grow-1">
-                    <strong class="d-block mb-1">Location Not Set!</strong>
-                    <p class="mb-0 small">Update your location to see nearby requests.</p>
-                </div>
-                <a href="{% url 'edit_profile' %}" class="btn btn-warning btn-sm ms-3"><i class="bi bi-pencil-fill me-1"></i>Update Location</a>
+    <!-- ── MESSAGES ───────────────────────────────────────── -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3"
+             style="border:none; border-radius:10px; border-left:3px solid; font-size:13.5px;" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- ── STAT CARDS ─────────────────────────────────────── -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon crimson"><i class="bi bi-droplet-fill"></i></div>
+                <div class="stat-number">{{ donor.donation_count }}</div>
+                <div class="stat-label">Total Donations</div>
             </div>
         </div>
-        {% endif %}
-
-        <div class="row g-4">
-            <!-- LEFT COLUMN -->
-            <div class="col-lg-8">
-                <!-- Achievement Banner -->
-                <div class="achievement-banner">
-                    <div class="achievement-content">
-                        <div class="star-display">
-                            <i class="bi bi-star-fill star-icon-large"></i>
-                            <div>
-                                <div class="star-count" id="totalStars">0</div>
-                                <div class="star-level-text" id="levelTitle">Hero in Training</div>
-                            </div>
-                        </div>
-                        
-                        <p class="mb-2" id="levelDescription">Keep donating to earn more stars and become a legend!</p>
-                        
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <span style="font-weight: 600;">Next Star:</span>
-                            <span id="nextStarText">2 more donations needed</span>
-                        </div>
-                        
-                        <div class="next-star-progress">
-                            <div class="progress-fill" id="starProgress" style="width: 0%"></div>
-                        </div>
-
-                        <div class="achievement-stats">
-                            <div class="achievement-stat">
-                                <span class="achievement-stat-value" id="totalDonations">{{ history|length }}</span>
-                                <span class="achievement-stat-label">Total Donations</span>
-                            </div>
-                            <div class="achievement-stat">
-                                <span class="achievement-stat-value" id="totalUnits">{{ total_units|default:0 }}</span>
-                                <span class="achievement-stat-label">Units Donated</span>
-                            </div>
-                            <div class="achievement-stat">
-                                <span class="achievement-stat-value" id="livesSaved">{{ history|length|mul:3 }}</span>
-                                <span class="achievement-stat-label">Lives Saved</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Cards -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-3 col-6">
-                        <div class="info-card stat-card text-danger">
-                            <i class="bi bi-droplet-fill stat-icon"></i>
-                            <div class="stat-number">{{ history|length }}</div>
-                            <p class="stat-label mb-0">Donations</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-card stat-card text-primary">
-                            <i class="bi bi-hospital stat-icon"></i>
-                            <div class="stat-number">{{ nearby_requests|length }}</div>
-                            <p class="stat-label mb-0">Nearby</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-card stat-card text-success">
-                            <i class="bi bi-check-circle stat-icon"></i>
-                            <div class="stat-number">{{ compatible_requests|length }}</div>
-                            <p class="stat-label mb-0">Compatible</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <div class="info-card stat-card text-warning">
-                            <i class="bi bi-star-fill stat-icon"></i>
-                            <div class="stat-number" id="statsStars">0</div>
-                            <p class="stat-label mb-0">Stars Earned</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Emergency Requests -->
-                <div class="info-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="section-title mb-0"><i class="bi bi-exclamation-triangle-fill emergency-badge"></i>Emergency Requests Nearby</h4>
-                        {% if ranked_requests %}<span class="badge bg-danger fs-6">{{ ranked_requests|length }} Active</span>{% endif %}
-                    </div>
-
-                    {% if ranked_requests %}
-                    <div class="vstack gap-3">
-                        {% for item in ranked_requests %}
-                        <div class="request-card priority-{{ item.urgency|lower }}">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-                                        <span class="badge bg-{% if item.urgency == 'critical' %}danger{% elif item.urgency == 'high' %}warning{% else %}info{% endif %}">{{ item.urgency|upper }}</span>
-                                        <span class="badge bg-dark">{{ item.request.blood_type }}</span>
-                                        {% if item.distance %}<span class="distance-badge"><i class="bi bi-geo-alt-fill"></i> {{ item.distance }} km away</span>{% endif %}
-                                    </div>
-                                    <h5 class="fw-bold mb-2"><i class="bi bi-person-fill text-danger me-1"></i>Patient: {{ item.request.patient_name }} <span class="text-muted small">(Age {{ item.request.patient_age }})</span></h5>
-                                    <p class="mb-2"><i class="bi bi-hospital me-1 text-primary"></i><strong>{{ item.hospital_name }}</strong></p>
-                                    <p class="mb-2 small text-muted"><i class="bi bi-geo-alt me-1"></i>{{ item.hospital_address }}</p>
-                                    <p class="mb-0 small"><i class="bi bi-calendar3 me-1"></i>{{ item.request.date_requested|date:"M d, Y" }} • Units needed: <strong>{{ item.request.units_required }}</strong></p>
-                                </div>
-                                <div class="col-md-4 mt-3 mt-md-0 d-grid gap-2">
-                                    <a href="tel:{{ item.request.hospital.phone }}" class="btn btn-danger"><i class="bi bi-telephone-fill me-2"></i>Call Hospital</a>
-                                    <a href="{% url 'view_blood_request_detail' item.request.id %}" class="btn btn-outline-danger"><i class="bi bi-eye me-2"></i>View Details</a>
-                                    <form method="POST" action="{% url 'respond_to_request' item.request.id %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-success w-100">
-                                            <i class="bi bi-check2-circle me-1"></i>Respond & Earn ⭐
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="text-center mt-4">
-                        <a href="{% url 'find_nearby_hospitals' %}" class="btn btn-lifelink-primary"><i class="bi bi-search me-2"></i>View All Requests</a>
-                    </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon gold"><i class="bi bi-heart-pulse-fill"></i></div>
+                <div class="stat-number">{{ total_units }}</div>
+                <div class="stat-label">Units Donated</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="bi bi-people-fill"></i></div>
+                <div class="stat-number">{{ lives_saved }}</div>
+                <div class="stat-label">Lives Saved</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon ink"><i class="bi bi-activity"></i></div>
+                <div style="margin-bottom:10px;">
+                    {% if donor.is_available %}
+                        <span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Available</span>
                     {% else %}
-                        <div class="empty-state">
-                            <i class="bi bi-inbox"></i>
-                            <h5 class="fw-bold mt-3">No Emergency Requests</h5>
-                            <p class="text-muted mb-0">{% if donor.is_available %}You'll be notified when someone needs {{ donor.blood_type }} blood nearby{% else %}Set your status to "Available" to receive notifications{% endif %}</p>
-                        </div>
+                        <span class="tag tag-gold"><i class="bi bi-pause-circle-fill"></i> Unavailable</span>
                     {% endif %}
                 </div>
+                <form method="post" action="{% url 'update_availability' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="availability-toggle {% if donor.is_available %}available{% else %}unavailable{% endif %}">
+                        <i class="bi bi-arrow-repeat"></i>
+                        {% if donor.is_available %}Set Unavailable{% else %}Set Available{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-                <!-- Enhanced Donation History with Stars -->
-                <div class="info-card">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="section-title mb-0"><i class="bi bi-clock-history me-2"></i>Your Donation History</h4>
-                        {% if history %}<span class="badge bg-success fs-6">{{ history|length }} Donation{{ history|length|pluralize }}</span>{% endif %}
+    <!-- ── ELIGIBILITY BAR ────────────────────────────────── -->
+    {% if not can_donate %}
+    <div class="eligibility-bar ineligible">
+        <div class="eligibility-bar-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="eligibility-bar-text">
+            <strong>Not yet eligible to donate</strong>
+            <small>You can donate again in <strong>{{ days_until_eligible }} days</strong> (90-day waiting period).
+            {% if donor.last_donation_date %}Last donation: {{ donor.last_donation_date|date:"F d, Y" }}{% endif %}</small>
+        </div>
+    </div>
+    {% else %}
+    <div class="eligibility-bar eligible">
+        <div class="eligibility-bar-icon"><i class="bi bi-check-circle-fill"></i></div>
+        <div class="eligibility-bar-text">
+            <strong>You're eligible to donate</strong>
+            <small>Thank you for being available to save lives. Your generosity makes a real difference.</small>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ── MAIN CONTENT ROW ───────────────────────────────── -->
+    <div class="row g-4">
+
+        <!-- LEFT: Notifications + Requests ──────────────── -->
+        <div class="col-lg-8">
+
+            <!-- Active Notifications -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="bi bi-bell-fill"></i>
+                        Active Notifications
                     </div>
-
-                    {% if history %}
-                    <div class="vstack gap-3">
-                        {% for donation in history %}
-                        <div class="history-item {% if forloop.first %}history-item-new{% endif %}">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <h6 class="fw-bold mb-0"><i class="bi bi-hospital text-primary me-1"></i>{{ donation.hospital.hospital_name }}</h6>
-                                        <span class="history-star-badge">
-                                            <i class="bi bi-star-fill history-star-icon"></i>
-                                            +1 Star Earned
-                                        </span>
+                    {% if active_notifications %}
+                    <span class="dash-card-count">{{ active_notifications.count }}</span>
+                    {% endif %}
+                </div>
+                <div class="dash-card-body">
+                    {% if active_notifications %}
+                        {% for notification in active_notifications %}
+                        <div class="notif-item {% if not notification.is_read %}unread{% endif %}">
+                            <div class="row align-items-start g-3">
+                                <div class="col-md-7">
+                                    <div class="d-flex gap-3">
+                                        <div class="priority-dot mt-1
+                                            {% if notification.blood_request.urgency_level == 'critical' %}critical
+                                            {% elif notification.blood_request.urgency_level == 'high' %}high
+                                            {% elif notification.blood_request.urgency_level == 'medium' %}medium
+                                            {% else %}low{% endif %}">
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold mb-1" style="font-size:14px; color:var(--ink);">
+                                                <i class="bi bi-hospital" style="color:var(--crimson);"></i>
+                                                {{ notification.blood_request.hospital.hospital_name }}
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                                <span class="tag tag-crimson">{{ notification.blood_request.blood_type }}</span>
+                                                <span class="tag tag-gold">{{ notification.blood_request.units_needed }} units</span>
+                                                {% if notification.distance %}
+                                                <span class="tag tag-ink">
+                                                    <i class="bi bi-geo-alt"></i> {{ notification.distance|floatformat:1 }} km
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                            <div style="font-size:12.5px; color:var(--ink-muted);">
+                                                <strong style="color:var(--ink-light);">Patient:</strong>
+                                                {{ notification.blood_request.patient_name }}
+                                            </div>
+                                            <div style="font-size:12px; color:var(--ink-muted); margin-top:4px;">
+                                                <i class="bi bi-clock"></i>
+                                                Notified {{ notification.notified_at|timesince }} ago
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p class="mb-1 small"><i class="bi bi-calendar3 me-1"></i>{{ donation.donation_date|date:"F d, Y" }}</p>
-                                    <p class="mb-0 small text-muted"><i class="bi bi-droplet me-1"></i>{{ donation.units_donated }} unit{{ donation.units_donated|pluralize }} donated</p>
                                 </div>
-                                <span class="badge bg-success">Completed</span>
+                                <div class="col-md-5">
+                                    <div class="d-flex flex-column gap-2">
+                                        <a href="{% url 'view_notification_detail' notification.id %}" class="btn-notif-view">
+                                            <i class="bi bi-eye"></i> View Details
+                                        </a>
+                                        {% if notification.status == 'notified' %}
+                                        <div class="d-flex gap-2">
+                                            <form method="post" action="{% url 'accept_blood_request' notification.id %}" class="flex-fill">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn-notif-accept w-100"
+                                                        onclick="return confirm('Accept this blood request?')">
+                                                    <i class="bi bi-check-lg"></i> Accept
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{% url 'reject_blood_request' notification.id %}" class="flex-fill">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn-notif-reject w-100"
+                                                        onclick="return confirm('Reject this request?')">
+                                                    <i class="bi bi-x-lg"></i> Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% else %}
+                                        <span class="tag tag-ink">{{ notification.status|title }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
-                    </div>
                     {% else %}
                     <div class="empty-state">
-                        <i class="bi bi-heart-pulse"></i>
-                        <h5 class="fw-bold mt-3">No Donations Yet</h5>
-                        <p class="text-muted mb-0">Start saving lives and earn stars! Each donation earns you a ⭐</p>
+                        <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
+                        <h6>No Active Notifications</h6>
+                        <p>You'll be alerted when hospitals need your blood type.</p>
                     </div>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN -->
-            {% include 'donors/donor_dashboard_sidebar.html' %}
+            <!-- Nearby Blood Requests -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="bi bi-list-check"></i>
+                        Available Requests Near You
+                    </div>
+                </div>
+                <div class="dash-card-body">
+                    {% if ranked_requests %}
+                        {% for item in ranked_requests %}
+                        <div class="notif-item">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <div>
+                                    <div class="fw-bold mb-1" style="font-size:14px; color:var(--ink);">
+                                        <i class="bi bi-hospital" style="color:var(--crimson);"></i>
+                                        {{ item.hospital_name }}
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1 mb-2">
+                                        <span class="tag tag-crimson">{{ item.request.blood_type }}</span>
+                                        <span class="tag tag-gold">{{ item.request.units_needed }} units</span>
+                                        {% if item.distance %}
+                                        <span class="tag tag-ink">
+                                            <i class="bi bi-geo-alt"></i> {{ item.distance }} km
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <div style="font-size:12.5px; color:var(--ink-muted);">
+                                        <i class="bi bi-calendar-event"></i>
+                                        Required by: {{ item.request.required_by|date:"M d, Y" }}
+                                    </div>
+                                </div>
+                                <a href="{% url 'view_blood_request_detail' item.request.id %}" class="btn-notif-view flex-shrink-0">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="bi bi-check-circle"></i></div>
+                        <h6>No Urgent Requests</h6>
+                        <p>Check back later for opportunities to help.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Past Notifications -->
+            {% if past_notifications %}
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="bi bi-archive"></i> Past Notifications
+                    </div>
+                </div>
+                <div class="dash-card-body">
+                    {% for notification in past_notifications %}
+                    <div class="notif-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold" style="font-size:13.5px; color:var(--ink);">
+                                    {{ notification.blood_request.hospital.hospital_name }}
+                                </div>
+                                <div style="font-size:12px; color:var(--ink-muted); margin-top:4px;">
+                                    <i class="bi bi-calendar"></i> {{ notification.sent_at|date:"M d, Y" }}
+                                </div>
+                            </div>
+                            {% if notification.status == 'accepted' %}
+                                <span class="tag tag-green"><i class="bi bi-check"></i> Accepted</span>
+                            {% elif notification.status == 'rejected' %}
+                                <span class="tag tag-crimson"><i class="bi bi-x"></i> Rejected</span>
+                            {% elif notification.status == 'cancelled' %}
+                                <span class="tag tag-ink"><i class="bi bi-dash"></i> Cancelled</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- RIGHT: Profile + Leaderboard + Actions ──────── -->
+        <div class="col-lg-4">
+
+            <!-- Donor Profile -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="bi bi-person-circle"></i> Your Profile
+                    </div>
+                </div>
+                <div class="dash-card-body text-center">
+                    <div class="blood-type-badge">{{ donor.blood_type }}</div>
+                    <h5 style="font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--ink); margin-bottom:16px;">
+                        {{ donor.full_name }}
+                    </h5>
+                    <table class="profile-table w-100 text-start mb-3">
+                        <tr>
+                            <td><i class="bi bi-person text-muted"></i> Age</td>
+                            <td>{{ donor.age }} years</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-telephone text-muted"></i> Phone</td>
+                            <td>{{ donor.phone }}</td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-droplet text-muted"></i> Blood</td>
+                            <td><span class="tag tag-crimson">{{ donor.blood_type }}</span></td>
+                        </tr>
+                        {% if donor.weight %}
+                        <tr>
+                            <td><i class="bi bi-speedometer text-muted"></i> Weight</td>
+                            <td>{{ donor.weight }} kg</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td><i class="bi bi-geo-alt text-muted"></i> Location</td>
+                            <td>{{ donor.address|truncatewords:3 }}</td>
+                        </tr>
+                    </table>
+                    <a href="{% url 'edit_profile' %}" class="btn-dash-primary w-100 justify-content-center"
+                       style="background:var(--crimson); color:white; border-color:var(--crimson);">
+                        <i class="bi bi-pencil-square"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Leaderboard -->
+            {% if leaderboard %}
+            <div class="leaderboard-card">
+                <div class="trophy-wrap">🏆</div>
+                <h5>Top Donor</h5>
+                <h4>{{ leaderboard.username }}</h4>
+                <span class="tag tag-gold">{{ leaderboard.blood_type }}</span>
+                {% if leaderboard.hospital_name %}
+                <p style="font-size:12px; color:rgba(240,232,222,0.5); margin-top:8px; margin-bottom:0;">
+                    Last donated at {{ leaderboard.hospital_name }}
+                </p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Recent Donations -->
+            {% if history %}
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="bi bi-clock-history"></i> Recent Donations
+                    </div>
+                </div>
+                <div class="dash-card-body">
+                    {% for donation in history|slice:":5" %}
+                    <div class="timeline-item">
+                        <div class="timeline-date">{{ donation.date_donated|date:"M d, Y" }}</div>
+                        <div class="timeline-sub">
+                            {{ donation.hospital.hospital_name }}<br>
+                            <span class="tag tag-crimson" style="margin-top:4px;">
+                                {{ donation.units_donated }} unit(s)
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <a href="{% url 'donation_history' %}" class="btn-notif-view w-100 justify-content-center mt-3">
+                        <i class="bi bi-arrow-right-circle"></i> View Full History
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Actions -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="bi bi-lightning-charge-fill"></i> Quick Actions
+                    </div>
+                </div>
+                <div class="dash-card-body">
+                    <div class="d-flex flex-column gap-2">
+                        <a href="{% url 'find_nearby_hospitals' %}" class="quick-action-btn">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            Find Nearby Hospitals
+                        </a>
+                        <a href="{% url 'donation_history' %}" class="quick-action-btn">
+                            <i class="bi bi-clock-history"></i>
+                            Donation History
+                        </a>
+                        {% if active_notifications %}
+                        <form method="post" action="{% url 'mark_all_notifications_read' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="quick-action-btn" style="background:none; text-align:left; cursor:pointer;">
+                                <i class="bi bi-check-all"></i>
+                                Mark All as Read
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
-</section>
 
-<script>
-// Star System Logic
-function calculateStars(donations) {
-    // 1 star per 3 donations
-    return Math.floor(donations / 3);
-}
-
-function getLevelInfo(stars) {
-    if (stars === 0) return { title: 'Hero in Training', description: 'Start your journey by making your first donation!' };
-    if (stars === 1) return { title: 'Bronze Donor ⭐', description: 'You\'re on your way! Keep up the great work!' };
-    if (stars === 2) return { title: 'Silver Donor ⭐⭐', description: 'You\'re making a real difference!' };
-    if (stars === 3) return { title: 'Gold Donor ⭐⭐⭐', description: 'You\'re a true hero!' };
-    if (stars === 4) return { title: 'Platinum Donor ⭐⭐⭐⭐', description: 'Exceptional commitment to saving lives!' };
-    if (stars >= 5) return { title: 'Legend Donor ⭐⭐⭐⭐⭐', description: 'You are a living legend! Lives are being saved because of you!' };
-    return { title: 'Hero in Training', description: 'Keep donating!' };
-}
-
-function updateStarDisplay() {
-    const donations = parseInt(document.getElementById('totalDonations').textContent) || 0;
-    const stars = calculateStars(donations);
-    const levelInfo = getLevelInfo(stars);
-    
-    // Update main star count
-    document.getElementById('totalStars').textContent = stars;
-    document.getElementById('statsStars').textContent = stars;
-    
-    // Update level info
-    document.getElementById('levelTitle').textContent = levelInfo.title;
-    document.getElementById('levelDescription').textContent = levelInfo.description;
-    
-    // Update header stars
-    const headerStars = document.getElementById('headerStars');
-    headerStars.innerHTML = '';
-    const displayStars = Math.min(stars, 5);
-    for (let i = 0; i < displayStars; i++) {
-        const star = document.createElement('i');
-        star.className = 'bi bi-star-fill level-star';
-        headerStars.appendChild(star);
-    }
-    
-    // Update header level text
-    const headerLevel = document.getElementById('headerLevel');
-    if (stars === 0) headerLevel.textContent = 'New Hero';
-    else if (stars === 1) headerLevel.textContent = 'Bronze';
-    else if (stars === 2) headerLevel.textContent = 'Silver';
-    else if (stars === 3) headerLevel.textContent = 'Gold';
-    else if (stars === 4) headerLevel.textContent = 'Platinum';
-    else headerLevel.textContent = 'Legend';
-    
-    // Calculate progress to next star
-    const donationsForNextStar = ((stars + 1) * 3) - donations;
-    const progressPercent = ((donations % 3) / 3) * 100;
-    
-    document.getElementById('starProgress').style.width = progressPercent + '%';
-    
-    if (donationsForNextStar > 0) {
-        document.getElementById('nextStarText').textContent = 
-            donationsForNextStar + ' more donation' + (donationsForNextStar > 1 ? 's' : '') + ' needed';
-    } else {
-        document.getElementById('nextStarText').textContent = 'Congratulations! You\'ve earned a new star!';
-    }
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', updateStarDisplay);
-</script>
+</div>
+</div>
 {% endblock %}
 
-{% block footer %}
-<footer class="bg-white border-top py-3 mt-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6 text-center text-md-start">
-                <small class="text-muted">© 2025 LifeLink Nepal. Connecting Donors. Saving Lives.</small>
-            </div>
-            <div class="col-md-6 text-center text-md-end">
-                <small class="text-muted"><i class="bi bi-heart-fill text-danger"></i> Thank you for being a hero!</small>
-            </div>
-        </div>
-    </div>
-</footer>
+{% block extra_js %}
+<script>
+    // Auto-dismiss success/info alerts
+    setTimeout(() => {
+        document.querySelectorAll('.alert-success, .alert-info').forEach(el => {
+            new bootstrap.Alert(el).close();
+        });
+    }, 5000);
+</script>
 {% endblock %}

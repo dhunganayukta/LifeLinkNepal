@@ -1,170 +1,473 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Hospital Dashboard - Life Link Nepal{% endblock %}
+{% block title %}Hospital Dashboard — LifeLink Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
-    .info-card {
-        background: white;
-        border-radius: 8px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        border: 1px solid #e0e0e0;
-    }
-    
-    .info-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    
-    .table {
-        background: white;
-    }
-    
-    .table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        border-bottom: 2px solid #dee2e6;
-        color: #495057;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .table td {
-        vertical-align: middle;
-        padding: 1rem 0.75rem;
-    }
-    
-    .table-hover tbody tr:hover {
-        background-color: rgba(199, 30, 53, 0.04);
-    }
-    
-    /* Responsive button group */
-    .action-buttons {
-        display: flex;
-        gap: 0.25rem;
-        flex-wrap: nowrap;
-    }
-    
-    .action-buttons .btn {
-        padding: 0.375rem 0.5rem;
-        font-size: 0.875rem;
-        white-space: nowrap;
-    }
-    
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .action-buttons {
-            flex-direction: column;
-            gap: 0.5rem;
-            width: 100%;
-        }
-        
-        .action-buttons .btn {
-            width: 100%;
-            padding: 0.5rem;
-        }
-        
-        .table td {
-            padding: 0.75rem 0.5rem;
-            font-size: 0.875rem;
-        }
-        
-        .table th {
-            padding: 0.75rem 0.5rem;
-            font-size: 0.75rem;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .action-buttons {
-            flex-direction: column;
-        }
-        
-        .action-buttons .btn {
-            font-size: 0.75rem;
-        }
-    }
-    
-    /* Classic stat cards */
-    .stat-card {
-        background: white;
-        border-radius: 8px;
-        padding: 1.25rem;
-        border: 1px solid #e0e0e0;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .stat-card .stat-icon {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .stat-card .stat-number {
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin: 0.25rem 0;
-    }
-    
-    .stat-card .stat-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin: 0;
-        font-weight: 500;
-    }
-    
-    /* Priority badges */
-    .priority-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 4px;
-        font-size: 0.875rem;
-        font-weight: 600;
-    }
-    
-    /* Dark mode support */
-    body.dark-mode .info-card,
-    body.dark-mode .stat-card,
-    body.dark-mode .table {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-        border-color: #404040;
-    }
-    
-    body.dark-mode .table th {
-        background-color: #1a1a1a;
-        color: #e0e0e0;
-        border-color: #404040;
-    }
-    
-    body.dark-mode .table td {
-        color: #e0e0e0;
-        border-color: #404040;
-    }
-    
-    body.dark-mode .stat-card .stat-label {
-        color: #adb5bd;
-    }
+/* ═══════════════════════════════════════════════════════════
+   HOSPITAL DASHBOARD — matches base.html + home.html design
+   Palette : ivory + crimson + gold + ink
+   Type    : Cormorant Garamond display · Jost body
+   ═══════════════════════════════════════════════════════════ */
+
+.dash-wrap {
+    background: var(--ivory);
+    min-height: 100vh;
+    padding: 0 0 80px;
+}
+
+/* ── HERO BANNER ──────────────────────────────────────────── */
+.dash-hero {
+    background: var(--ink);
+    padding: 40px 0;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 48px;
+}
+
+.dash-hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    border: 1px solid rgba(196,146,74,0.1);
+    pointer-events: none;
+}
+
+.dash-hero::after {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    border: 1px solid rgba(196,146,74,0.06);
+    pointer-events: none;
+}
+
+.dash-hero-crimson-bar {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold), var(--crimson-light));
+}
+
+.dash-hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+}
+
+.dash-hero-eyebrow span {
+    font-size: 10.5px; letter-spacing: 3px;
+    text-transform: uppercase; font-weight: 600;
+    color: var(--gold);
+}
+
+.dash-hero-eyebrow-line {
+    width: 20px; height: 1px;
+    background: var(--gold); opacity: 0.5;
+}
+
+.dash-hero h2 {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 3.5vw, 42px);
+    font-weight: 600; color: white;
+    letter-spacing: -0.3px; line-height: 1.15;
+    margin-bottom: 6px;
+}
+
+.dash-hero-sub {
+    font-size: 14px;
+    color: rgba(240,232,222,0.55);
+    display: flex; align-items: center; gap: 6px;
+}
+
+.btn-new-request {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 26px;
+    background: white; color: var(--crimson);
+    font-size: 13.5px; font-weight: 700;
+    border-radius: 8px; text-decoration: none;
+    transition: all 0.25s ease;
+    border: 1.5px solid white;
+}
+
+.btn-new-request:hover {
+    background: var(--ivory); color: var(--crimson-mid);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+/* ── STAT CARDS ───────────────────────────────────────────── */
+.stat-card {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 24px;
+    height: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+body.dark-mode .stat-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+}
+
+.stat-card:hover::after { transform: scaleX(1); }
+.stat-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lift); border-color: var(--border); }
+
+.stat-icon-wrap {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin: 0 auto 14px;
+    transition: all 0.3s ease;
+}
+
+.stat-icon-wrap.crimson { background: var(--crimson-pale); color: var(--crimson); border: 1px solid var(--border); }
+.stat-icon-wrap.gold    { background: var(--gold-pale);    color: var(--gold);    border: 1px solid rgba(196,146,74,0.2); }
+.stat-icon-wrap.green   { background: rgba(74,222,128,0.1); color: #16a34a;       border: 1px solid rgba(74,222,128,0.2); }
+.stat-icon-wrap.ink     { background: rgba(28,20,16,0.06);  color: var(--ink-mid); border: 1px solid var(--border-subtle); }
+
+.stat-card:hover .stat-icon-wrap.crimson { background: var(--crimson); color: white; }
+.stat-card:hover .stat-icon-wrap.gold    { background: var(--gold);    color: white; }
+.stat-card:hover .stat-icon-wrap.green   { background: #16a34a;        color: white; }
+.stat-card:hover .stat-icon-wrap.ink     { background: var(--ink-mid); color: white; }
+
+.stat-number {
+    font-family: var(--font-display);
+    font-size: 38px; font-weight: 700;
+    color: var(--ink); line-height: 1; letter-spacing: -0.5px;
+    margin-bottom: 4px;
+}
+
+body.dark-mode .stat-number { color: var(--ink); }
+
+.stat-label {
+    font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--ink-muted); font-weight: 600;
+}
+
+/* ── MAIN CARDS ───────────────────────────────────────────── */
+.dash-card {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+body.dark-mode .dash-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.dash-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--ivory-mid);
+}
+
+body.dark-mode .dash-card-header {
+    background: #221c17;
+    border-color: rgba(255,255,255,0.05);
+}
+
+.dash-card-title {
+    font-family: var(--font-display);
+    font-size: 19px; font-weight: 600;
+    color: var(--ink);
+    display: flex; align-items: center; gap: 10px;
+}
+
+body.dark-mode .dash-card-title { color: var(--ink); }
+.dash-card-title i { color: var(--crimson); font-size: 16px; }
+
+.dash-card-body { padding: 20px 24px; }
+
+/* ── TAGS ─────────────────────────────────────────────────── */
+.tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px; font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.tag-crimson { background: var(--crimson-pale); color: var(--crimson); border: 1px solid var(--border); }
+.tag-gold    { background: var(--gold-pale);    color: var(--gold);    border: 1px solid rgba(196,146,74,0.25); }
+.tag-ink     { background: rgba(28,20,16,0.06); color: var(--ink-mid); border: 1px solid var(--border-subtle); }
+.tag-green   { background: rgba(74,222,128,0.1); color: #16a34a;       border: 1px solid rgba(74,222,128,0.2); }
+.tag-blue    { background: rgba(59,130,246,0.1); color: #2563eb;       border: 1px solid rgba(59,130,246,0.2); }
+
+/* ── TABLE ────────────────────────────────────────────────── */
+.dash-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.dash-table thead th {
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-muted);
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: transparent;
+    white-space: nowrap;
+}
+
+.dash-table tbody tr {
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background 0.2s ease;
+}
+
+.dash-table tbody tr:last-child { border-bottom: none; }
+
+.dash-table tbody tr:hover { background: rgba(155,23,40,0.03); }
+
+body.dark-mode .dash-table tbody tr:hover { background: rgba(155,23,40,0.07); }
+
+.dash-table td {
+    padding: 14px;
+    color: var(--ink-mid);
+    vertical-align: middle;
+}
+
+body.dark-mode .dash-table td { color: var(--ink-mid); }
+
+.dash-table td strong { color: var(--ink); font-weight: 600; }
+
+body.dark-mode .dash-table td strong { color: var(--ink); }
+
+/* Row priority highlight */
+.dash-table tr.row-critical td { background: rgba(155,23,40,0.04); }
+.dash-table tr.row-high td     { background: rgba(196,146,74,0.04); }
+
+/* ── TABLE ACTION BUTTONS ─────────────────────────────────── */
+.btn-tbl-view {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px;
+    background: transparent; color: var(--ink-mid);
+    font-size: 12px; font-weight: 600;
+    border-radius: 6px; text-decoration: none;
+    border: 1.5px solid var(--border-subtle);
+    transition: all 0.2s ease;
+}
+
+.btn-tbl-view:hover {
+    border-color: var(--crimson); color: var(--crimson);
+    background: var(--crimson-pale);
+}
+
+.btn-tbl-fulfill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px;
+    background: transparent; color: #16a34a;
+    font-size: 12px; font-weight: 600;
+    border-radius: 6px;
+    border: 1.5px solid rgba(74,222,128,0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-tbl-fulfill:hover {
+    background: #16a34a; color: white;
+    border-color: #16a34a;
+    transform: translateY(-1px);
+}
+
+/* ── AI ALGO CARDS ────────────────────────────────────────── */
+.algo-card {
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+body.dark-mode .algo-card {
+    background: #221c17;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.algo-card:hover {
+    border-color: var(--border);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-warm);
+}
+
+.algo-card-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin: 0 auto 12px;
+}
+
+.algo-card-title {
+    font-family: var(--font-display);
+    font-size: 16px; font-weight: 600;
+    color: var(--ink); margin-bottom: 4px;
+}
+
+body.dark-mode .algo-card-title { color: var(--ink); }
+
+.algo-card-sub {
+    font-size: 12px; color: var(--ink-muted);
+}
+
+/* ── HOSPITAL INFO CARD ───────────────────────────────────── */
+.hospital-icon-wrap {
+    width: 80px; height: 80px;
+    border-radius: 16px;
+    background: var(--crimson-pale);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; color: var(--crimson);
+    margin: 0 auto 16px;
+    transition: all 0.3s ease;
+}
+
+.dash-card:hover .hospital-icon-wrap {
+    background: var(--crimson); color: white;
+}
+
+/* ── STATS LIST ───────────────────────────────────────────── */
+.stats-list-item {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.stats-list-item:last-child { border-bottom: none; padding-bottom: 0; }
+.stats-list-item:first-child { padding-top: 0; }
+
+.stats-list-label {
+    font-size: 13px; color: var(--ink-muted); font-weight: 500;
+}
+
+.stats-list-value {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 700;
+    color: var(--ink); line-height: 1;
+}
+
+body.dark-mode .stats-list-value { color: var(--ink); }
+
+/* ── QUICK ACTIONS ────────────────────────────────────────── */
+.quick-action-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px; text-decoration: none;
+    color: var(--ink-mid);
+    font-size: 13.5px; font-weight: 600;
+    transition: all 0.25s ease; width: 100%;
+}
+
+body.dark-mode .quick-action-btn {
+    background: #221c17;
+    border-color: rgba(255,255,255,0.06);
+    color: var(--ink-mid);
+}
+
+.quick-action-btn i {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: var(--crimson-pale); color: var(--crimson);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.quick-action-btn:hover {
+    border-color: var(--crimson); color: var(--crimson);
+    background: var(--crimson-pale);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-warm);
+}
+
+.quick-action-btn:hover i { background: var(--crimson); color: white; }
+
+/* ── EMPTY STATE ──────────────────────────────────────────── */
+.empty-state {
+    text-align: center; padding: 56px 24px;
+}
+
+.empty-state-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--ivory-mid);
+    border: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 28px; color: var(--ink-muted);
+}
+
+.empty-state h6 {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 6px;
+}
+
+body.dark-mode .empty-state h6 { color: var(--ink); }
+
+.empty-state p { font-size: 13.5px; color: var(--ink-muted); margin-bottom: 20px; }
+
+.btn-create {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px;
+    background: var(--crimson); color: white;
+    font-size: 13.5px; font-weight: 600;
+    border-radius: 8px; text-decoration: none;
+    transition: all 0.25s ease; border: 1.5px solid var(--crimson);
+}
+
+.btn-create:hover {
+    background: var(--crimson-mid); border-color: var(--crimson-mid); color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(155,23,40,0.35);
+}
+
+/* ── AI BADGE ─────────────────────────────────────────────── */
+.ai-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+    color: #2563eb; letter-spacing: 0.5px;
+}
+
+/* ── DARK MODE ────────────────────────────────────────────── */
+body.dark-mode .dash-wrap { background: var(--ivory); }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-    // Confirm before marking as fulfilled
     document.querySelectorAll('.fulfill-form').forEach(function(form){
         form.addEventListener('submit', function(e){
-            if (!confirm('Are you sure you want to mark this request as fulfilled?')) {
+            if (!confirm('Mark this request as fulfilled?')) {
                 e.preventDefault();
             }
         });
@@ -174,157 +477,156 @@ document.addEventListener('DOMContentLoaded', function(){
 {% endblock %}
 
 {% block content %}
-<!-- Dashboard Header -->
-<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center text-white flex-wrap gap-3">
-            <div>
-                <h2 class="fw-bold mb-1">{{ hospital.hospital_name }}</h2>
-                <p class="mb-0">
-                    <i class="bi bi-geo-alt-fill me-1"></i>{{ hospital.address }}
-                </p>
-            </div>
-            <div>
-                <a href="{% url 'create_blood_request' %}" class="btn btn-light btn-lg">
-                    <i class="bi bi-plus-circle-fill me-2"></i>New Blood Request
-                </a>
+<div class="dash-wrap">
+
+    <!-- ── HERO ───────────────────────────────────────────── -->
+    <div class="dash-hero">
+        <div class="dash-hero-crimson-bar"></div>
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <div class="dash-hero-eyebrow">
+                        <div class="dash-hero-eyebrow-line"></div>
+                        <span>Hospital Dashboard</span>
+                        <div class="dash-hero-eyebrow-line"></div>
+                    </div>
+                    <h2>{{ hospital.hospital_name }}</h2>
+                    <div class="dash-hero-sub">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        {{ hospital.address }}
+                    </div>
+                </div>
+                <div class="col-lg-4 d-flex justify-content-lg-end">
+                    <a href="{% url 'create_blood_request' %}" class="btn-new-request">
+                        <i class="bi bi-plus-circle-fill"></i> New Blood Request
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-</section>
 
-<section class="py-5">
     <div class="container">
-        <div class="row">
-            <!-- Main Content -->
-            <div class="col-lg-8">
-                <!-- Stats Overview -->
-                <div class="row g-3 mb-4">
-                    <div class="col-xl-3 col-md-6 col-6">
-                        <div class="stat-card">
-                            <div class="stat-icon text-warning">
-                                <i class="bi bi-clock-history"></i>
-                            </div>
-                            <div class="stat-number text-warning">{{ pending_count|default:0 }}</div>
-                            <div class="stat-label">Pending</div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 col-6">
-                        <div class="stat-card">
-                            <div class="stat-icon text-success">
-                                <i class="bi bi-check-circle-fill"></i>
-                            </div>
-                            <div class="stat-number text-success">{{ fulfilled_count|default:0 }}</div>
-                            <div class="stat-label">Fulfilled</div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 col-6">
-                        <div class="stat-card">
-                            <div class="stat-icon text-danger">
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-                            </div>
-                            <div class="stat-number text-danger">{{ critical_count|default:0 }}</div>
-                            <div class="stat-label">Critical</div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 col-6">
-                        <div class="stat-card">
-                            <div class="stat-icon text-primary">
-                                <i class="bi bi-list-check"></i>
-                            </div>
-                            <div class="stat-number text-primary">{{ total_requests|default:0 }}</div>
-                            <div class="stat-label">Total</div>
-                        </div>
-                    </div>
+
+        <!-- ── STAT CARDS ─────────────────────────────────── -->
+        <div class="row g-3 mb-4">
+            <div class="col-xl-3 col-md-6 col-6">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap gold"><i class="bi bi-clock-history"></i></div>
+                    <div class="stat-number">{{ pending_count|default:0 }}</div>
+                    <div class="stat-label">Pending</div>
                 </div>
+            </div>
+            <div class="col-xl-3 col-md-6 col-6">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap green"><i class="bi bi-check-circle-fill"></i></div>
+                    <div class="stat-number">{{ fulfilled_count|default:0 }}</div>
+                    <div class="stat-label">Fulfilled</div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 col-6">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap crimson"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                    <div class="stat-number">{{ critical_count|default:0 }}</div>
+                    <div class="stat-label">Critical</div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 col-6">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap ink"><i class="bi bi-list-check"></i></div>
+                    <div class="stat-number">{{ total_requests|default:0 }}</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── MAIN ROW ───────────────────────────────────── -->
+        <div class="row g-4">
+
+            <!-- LEFT: Requests table + AI info ─────────── -->
+            <div class="col-lg-8">
 
                 <!-- Blood Requests Table -->
-                <div class="info-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                        <h4 class="fw-bold mb-0">
-                            <i class="bi bi-list-check text-danger me-2"></i>
-                            Blood Requests
-                        </h4>
-                        <span class="badge bg-info">
-                            <i class="bi bi-cpu me-1"></i>AI Ranked
-                        </span>
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title">
+                            <i class="bi bi-list-check"></i> Blood Requests
+                        </div>
+                        <span class="ai-badge"><i class="bi bi-cpu"></i> AI Ranked</span>
                     </div>
-
-                    {% if ranked_requests %}
+                    <div class="dash-card-body" style="padding:0;">
+                        {% if ranked_requests %}
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
+                            <table class="dash-table">
                                 <thead>
                                     <tr>
-                                        <th>Patient</th>
+                                        <th style="padding-left:24px;">Patient</th>
                                         <th>Blood</th>
                                         <th class="d-none d-md-table-cell">Units</th>
                                         <th>Urgency</th>
-                                        <th class="d-none d-lg-table-cell">Priority</th>
+                                        <th class="d-none d-lg-table-cell">Score</th>
                                         <th>Status</th>
-                                        <th style="min-width: 140px;">Actions</th>
+                                        <th style="padding-right:24px;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for item in ranked_requests %}
                                     <tr class="
-                                        {% if item.priority_level == 'critical' %}table-danger
-                                        {% elif item.priority_level == 'high' %}table-warning
-                                        {% endif %}">
-                                        <td>
-                                            <strong class="d-block">{{ item.request.patient_name }}</strong>
-                                            <small class="text-muted">
+                                        {% if item.priority_level == 'critical' %}row-critical
+                                        {% elif item.priority_level == 'high' %}row-high{% endif %}">
+                                        <td style="padding-left:24px;">
+                                            <strong>{{ item.request.patient_name }}</strong><br>
+                                            <small style="color:var(--ink-muted);">
                                                 {% if item.request.patient_age %}{{ item.request.patient_age }} yrs{% else %}Age N/A{% endif %}
                                             </small>
                                         </td>
                                         <td>
-                                            <span class="badge bg-danger">{{ item.request.blood_type }}</span>
+                                            <span class="tag tag-crimson">{{ item.request.blood_type }}</span>
                                         </td>
                                         <td class="d-none d-md-table-cell">
-                                            {{ item.request.units_needed }}
+                                            <strong>{{ item.request.units_needed }}</strong>
                                         </td>
                                         <td>
-                                            <span class="badge 
-                                                {% if item.request.urgency_level == 'critical' %}bg-danger
-                                                {% elif item.request.urgency_level == 'urgent' %}bg-warning text-dark
-                                                {% else %}bg-success{% endif %}">
-                                                {{ item.request.get_urgency_level_display|upper }}
-                                            </span>
+                                            {% if item.request.urgency_level == 'critical' %}
+                                                <span class="tag tag-crimson">Critical</span>
+                                            {% elif item.request.urgency_level == 'urgent' %}
+                                                <span class="tag tag-gold">Urgent</span>
+                                            {% else %}
+                                                <span class="tag tag-green">{{ item.request.get_urgency_level_display }}</span>
+                                            {% endif %}
                                         </td>
                                         <td class="d-none d-lg-table-cell">
-                                            <span class="badge 
-                                                {% if item.priority_level == 'critical' %}bg-danger
-                                                {% elif item.priority_level == 'high' %}bg-warning text-dark
-                                                {% elif item.priority_level == 'medium' %}bg-info
-                                                {% else %}bg-secondary{% endif %}">
+                                            <span class="tag
+                                                {% if item.priority_level == 'critical' %}tag-crimson
+                                                {% elif item.priority_level == 'high' %}tag-gold
+                                                {% elif item.priority_level == 'medium' %}tag-blue
+                                                {% else %}tag-ink{% endif %}">
                                                 {{ item.priority_score|floatformat:0 }}
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge 
-                                                {% if item.request.status == 'fulfilled' %}bg-success
-                                                {% elif item.request.status == 'pending' %}bg-warning text-dark
-                                                {% else %}bg-secondary{% endif %}">
-                                                {{ item.request.get_status_display }}
-                                            </span>
+                                            {% if item.request.status == 'fulfilled' %}
+                                                <span class="tag tag-green">Fulfilled</span>
+                                            {% elif item.request.status == 'pending' %}
+                                                <span class="tag tag-gold">Pending</span>
+                                            {% else %}
+                                                <span class="tag tag-ink">{{ item.request.get_status_display }}</span>
+                                            {% endif %}
                                         </td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <a href="{% url 'view_blood_request' item.request.id %}" 
-                                                   class="btn btn-sm btn-primary" 
-                                                   title="View Details">
-                                                    <i class="bi bi-eye me-1"></i>
+                                        <td style="padding-right:24px;">
+                                            <div class="d-flex gap-2 flex-wrap">
+                                                <a href="{% url 'view_blood_request' item.request.id %}"
+                                                   class="btn-tbl-view">
+                                                    <i class="bi bi-eye"></i>
                                                     <span class="d-none d-sm-inline">View</span>
                                                 </a>
                                                 {% if item.request.status == 'pending' %}
-                                                <form method="post" 
-                                                      action="{% url 'mark_fulfilled' item.request.id %}" 
-                                                      class="fulfill-form d-inline">
+                                                <form method="post"
+                                                      action="{% url 'mark_fulfilled' item.request.id %}"
+                                                      class="fulfill-form">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                                    <button type="submit" 
-                                                            class="btn btn-sm btn-success" 
-                                                            title="Mark as Fulfilled">
-                                                        <i class="bi bi-check-circle me-1"></i>
+                                                    <button type="submit" class="btn-tbl-fulfill">
+                                                        <i class="bi bi-check-circle"></i>
                                                         <span class="d-none d-sm-inline">Fulfill</span>
                                                     </button>
                                                 </form>
@@ -336,123 +638,160 @@ document.addEventListener('DOMContentLoaded', function(){
                                 </tbody>
                             </table>
                         </div>
-                        
-                        <div class="alert alert-info mt-3 mb-0">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            <small><strong>AI Ranking:</strong> Requests prioritized by urgency, waiting time, units needed, and blood rarity.</small>
+                        <div style="padding:14px 24px; border-top:1px solid var(--border-subtle); background:var(--ivory-mid);">
+                            <small style="font-size:12px; color:var(--ink-muted);">
+                                <i class="bi bi-info-circle me-1" style="color:var(--gold);"></i>
+                                <strong style="color:var(--ink-light);">AI Ranking:</strong>
+                                Requests prioritized by urgency, waiting time, units needed, and blood rarity.
+                            </small>
                         </div>
-                    {% else %}
-                        <div class="text-center py-5">
-                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
-                            <h5 class="text-muted mt-3 mb-2">No Blood Requests</h5>
-                            <p class="text-muted mb-3">Create your first blood request to get started</p>
-                            <a href="{% url 'create_blood_request' %}" class="btn btn-danger">
-                                <i class="bi bi-plus-circle me-1"></i>Create Request
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
+                            <h6>No Blood Requests Yet</h6>
+                            <p>Create your first blood request to get started.</p>
+                            <a href="{% url 'create_blood_request' %}" class="btn-create">
+                                <i class="bi bi-plus-circle"></i> Create Request
                             </a>
                         </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- AI Algorithms Info -->
-                <div class="info-card">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-cpu text-danger me-2"></i>
-                        Active AI Algorithms
-                    </h5>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="text-center p-3 border rounded">
-                                <i class="bi bi-sort-numeric-down text-primary fs-3"></i>
-                                <h6 class="fw-bold mt-2 mb-1">Priority Algorithm</h6>
-                                <small class="text-muted">Smart request ranking</small>
-                            </div>
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title">
+                            <i class="bi bi-cpu"></i> Active AI Algorithms
                         </div>
-                        <div class="col-md-4">
-                            <div class="text-center p-3 border rounded">
-                                <i class="bi bi-geo-alt text-success fs-3"></i>
-                                <h6 class="fw-bold mt-2 mb-1">Haversine Distance</h6>
-                                <small class="text-muted">Nearest donor finder</small>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="algo-card">
+                                    <div class="algo-card-icon" style="background:rgba(59,130,246,0.1); color:#2563eb;">
+                                        <i class="bi bi-sort-numeric-down"></i>
+                                    </div>
+                                    <div class="algo-card-title">Priority Algorithm</div>
+                                    <div class="algo-card-sub">Smart request ranking</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center p-3 border rounded">
-                                <i class="bi bi-star text-warning fs-3"></i>
-                                <h6 class="fw-bold mt-2 mb-1">MCDM (TOPSIS)</h6>
-                                <small class="text-muted">Best match ranking</small>
+                            <div class="col-md-4">
+                                <div class="algo-card">
+                                    <div class="algo-card-icon" style="background:rgba(74,222,128,0.1); color:#16a34a;">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </div>
+                                    <div class="algo-card-title">Haversine Distance</div>
+                                    <div class="algo-card-sub">Nearest donor finder</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="algo-card">
+                                    <div class="algo-card-icon" style="background:var(--gold-pale); color:var(--gold);">
+                                        <i class="bi bi-star"></i>
+                                    </div>
+                                    <div class="algo-card-title">MCDM (TOPSIS)</div>
+                                    <div class="algo-card-sub">Best match ranking</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
-            <!-- Sidebar -->
-            <div class="col-lg-4 mt-4 mt-lg-0">
-                <!-- Hospital Info Card -->
-                <div class="info-card text-center mb-4">
-                    <div class="bg-danger bg-opacity-10 rounded p-4 mb-3">
-                        <i class="bi bi-hospital-fill text-danger" style="font-size: 3.5rem;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">{{ hospital.hospital_name }}</h5>
-                    <p class="text-muted small mb-2">
-                        <i class="bi bi-telephone-fill me-1"></i>{{ hospital.phone }}
-                    </p>
-                    <p class="text-muted small mb-3">
-                        <i class="bi bi-geo-alt-fill me-1"></i>{{ hospital.address }}
-                    </p>
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'create_blood_request' %}" class="btn btn-danger">
-                            <i class="bi bi-plus-circle me-2"></i>New Request
-                        </a>
-                        <a href="{% url 'hospital_profile' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-person-circle me-2"></i>View Profile
-                        </a>
+            <!-- RIGHT: Hospital info + Stats + Actions ─── -->
+            <div class="col-lg-4">
+
+                <!-- Hospital Info -->
+                <div class="dash-card">
+                    <div class="dash-card-body text-center">
+                        <div class="hospital-icon-wrap">
+                            <i class="bi bi-hospital-fill"></i>
+                        </div>
+                        <h5 style="font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--ink); margin-bottom:6px;">
+                            {{ hospital.hospital_name }}
+                        </h5>
+                        <p style="font-size:13px; color:var(--ink-muted); margin-bottom:4px;">
+                            <i class="bi bi-telephone-fill me-1" style="color:var(--crimson);"></i>
+                            {{ hospital.phone }}
+                        </p>
+                        <p style="font-size:13px; color:var(--ink-muted); margin-bottom:20px;">
+                            <i class="bi bi-geo-alt-fill me-1" style="color:var(--gold);"></i>
+                            {{ hospital.address }}
+                        </p>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'create_blood_request' %}" class="btn-create justify-content-center">
+                                <i class="bi bi-plus-circle"></i> New Request
+                            </a>
+                            <a href="{% url 'hospital_profile' %}"
+                               style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; background:transparent; color:var(--ink-mid); font-size:13px; font-weight:600; border-radius:8px; text-decoration:none; border:1.5px solid var(--border-subtle); transition:all 0.25s ease;"
+                               onmouseover="this.style.borderColor='var(--border)'; this.style.color='var(--ink)';"
+                               onmouseout="this.style.borderColor='var(--border-subtle)'; this.style.color='var(--ink-mid)';">
+                                <i class="bi bi-person-circle"></i> View Profile
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Quick Stats -->
-                <div class="info-card mb-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-graph-up text-danger me-2"></i>
-                        Statistics
-                    </h5>
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                        <span class="text-muted">Total Requests</span>
-                        <span class="fs-5 fw-bold">{{ total_requests|default:0 }}</span>
+                <!-- Statistics -->
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title">
+                            <i class="bi bi-graph-up"></i> Statistics
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                        <span class="text-muted">Pending</span>
-                        <span class="fs-5 fw-bold text-warning">{{ pending_count|default:0 }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                        <span class="text-muted">Fulfilled</span>
-                        <span class="fs-5 fw-bold text-success">{{ fulfilled_count|default:0 }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted">Critical Priority</span>
-                        <span class="fs-5 fw-bold text-danger">{{ critical_count|default:0 }}</span>
+                    <div class="dash-card-body">
+                        <div class="stats-list-item">
+                            <span class="stats-list-label">Total Requests</span>
+                            <span class="stats-list-value">{{ total_requests|default:0 }}</span>
+                        </div>
+                        <div class="stats-list-item">
+                            <span class="stats-list-label">Pending</span>
+                            <span class="stats-list-value" style="color:var(--gold);">{{ pending_count|default:0 }}</span>
+                        </div>
+                        <div class="stats-list-item">
+                            <span class="stats-list-label">Fulfilled</span>
+                            <span class="stats-list-value" style="color:#16a34a;">{{ fulfilled_count|default:0 }}</span>
+                        </div>
+                        <div class="stats-list-item">
+                            <span class="stats-list-label">Critical Priority</span>
+                            <span class="stats-list-value" style="color:var(--crimson);">{{ critical_count|default:0 }}</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="info-card">
-                    <h5 class="fw-bold mb-3">Quick Actions</h5>
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'create_blood_request' %}" class="btn btn-danger">
-                            <i class="bi bi-megaphone me-2"></i>Post Blood Request
-                        </a>
-                        <a href="{% url 'all_blood_requests' %}" class="btn btn-outline-danger">
-                            <i class="bi bi-list-ul me-2"></i>View All Requests
-                        </a>
-                        <a href="{% url 'hospital_donors' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-people me-2"></i>Browse Donors
-                        </a>
-                        <a href="{% url 'hospital_profile' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-gear me-2"></i>Settings
-                        </a>
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title">
+                            <i class="bi bi-lightning-charge-fill"></i> Quick Actions
+                        </div>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{% url 'create_blood_request' %}" class="quick-action-btn">
+                                <i class="bi bi-megaphone"></i>
+                                Post Blood Request
+                            </a>
+                            <a href="{% url 'all_blood_requests' %}" class="quick-action-btn">
+                                <i class="bi bi-list-ul"></i>
+                                View All Requests
+                            </a>
+                            <a href="{% url 'hospital_donors' %}" class="quick-action-btn">
+                                <i class="bi bi-people"></i>
+                                Browse Donors
+                            </a>
+                            <a href="{% url 'hospital_profile' %}" class="quick-action-btn">
+                                <i class="bi bi-gear"></i>
+                                Settings
+                            </a>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

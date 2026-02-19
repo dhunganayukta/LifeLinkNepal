@@ -1,190 +1,194 @@
-# api/views.py - UPDATED WITH SESSION AUTHENTICATION
+# api/views.py - COMPLETE VERSION WITH BLOOD REQUESTS
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from django.core.mail import send_mail
-from django.conf import settings
-from django.db import models
+from rest_framework.permissions import AllowAny
+from django.db.models import Q, Count
+from datetime import datetime, timedelta
 
-from donors.models import DonorProfile
+# Import models
+from donors.models import DonorProfile, DonorNotification, DonationHistory
 from hospitals.models import HospitalProfile, BloodRequest
-from donors.serializers import DonorSerializer
-from hospitals.serializers import HospitalSerializer, BloodRequestSerializer
+
+# Import serializers
+from .serializers import (
+    DonorSerializer, 
+    HospitalSerializer,
+    BloodRequestSerializer,
+    DonorNotificationSerializer,
+    DonationHistorySerializer,
+)
 
 
-class DonorViewSet(viewsets.ReadOnlyModelViewSet):
-    """API endpoint for viewing donors"""
-    queryset = DonorProfile.objects.all().order_by('-created_at')
+class DonorViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Donor management
+    """
+    permission_classes = [AllowAny]
+    queryset = DonorProfile.objects.all()
     serializer_class = DonorSerializer
-    # Support both session (for admin panel) and JWT (for mobile/external)
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    
+
     def get_queryset(self):
-        queryset = super().get_queryset()
-        blood_type = self.request.query_params.get('blood_type')
-        if blood_type and blood_type != 'all':
+        queryset = DonorProfile.objects.all()
+        
+        # Filter by blood type if provided
+        blood_type = self.request.query_params.get('blood_type', None)
+        if blood_type:
             queryset = queryset.filter(blood_type=blood_type)
-        return queryset
+        
+        # Filter by availability
+        is_available = self.request.query_params.get('is_available', None)
+        if is_available is not None:
+            queryset = queryset.filter(is_available=is_available.lower() == 'true')
+        
+        return queryset.select_related('user')
+
+    @action(detail=True, methods=['get'])
+    def donation_history(self, request, pk=None):
+        """Get donation history for a specific donor"""
+        donor = self.get_object()
+        history = DonationHistory.objects.filter(donor=donor)
+        serializer = DonationHistorySerializer(history, many=True)
+        return Response(serializer.data)
 
 
-class HospitalViewSet(viewsets.ReadOnlyModelViewSet):
-    """API endpoint for viewing hospitals"""
-    queryset = HospitalProfile.objects.all().order_by('-created_at')
+class HospitalViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Hospital management
+    """
+    permission_classes = [AllowAny]
+    queryset = HospitalProfile.objects.all()
     serializer_class = HospitalSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get_queryset(self):
+        return HospitalProfile.objects.all().select_related('user')
+
+    @action(detail=True, methods=['get'])
+    def blood_requests(self, request, pk=None):
+        """Get all blood requests for a specific hospital"""
+        hospital = self.get_object()
+        requests = BloodRequest.objects.filter(hospital=hospital)
+        serializer = BloodRequestSerializer(requests, many=True)
+        return Response(serializer.data)
 
 
 class BloodRequestViewSet(viewsets.ModelViewSet):
-    """API endpoint for managing blood requests"""
-    queryset = BloodRequest.objects.all().order_by('-created_at')
+    """
+    ViewSet for Blood Request management
+    """
+    permission_classes = [AllowAny]
+    queryset = BloodRequest.objects.all()
     serializer_class = BloodRequestSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    
+
     def get_queryset(self):
-        queryset = super().get_queryset()
-        status_filter = self.request.query_params.get('status')
-        if status_filter and status_filter != 'all':
+        queryset = BloodRequest.objects.all().select_related('hospital')
+        
+        # Filter by status
+        status_filter = self.request.query_params.get('status', None)
+        if status_filter:
             queryset = queryset.filter(status=status_filter)
-        return queryset
-    
-    @action(detail=True, methods=['post'])
-    def notify_donors(self, request, pk=None):
-        """Notify compatible donors about a blood request"""
+        
+        # Filter by urgency
+        urgency = self.request.query_params.get('urgency', None)
+        if urgency:
+            queryset = queryset.filter(urgency_level=urgency)
+        
+        # Filter by blood type
+        blood_type = self.request.query_params.get('blood_type', None)
+        if blood_type:
+            queryset = queryset.filter(blood_type=blood_type)
+        
+        return queryset.order_by('-created_at')
+
+    @action(detail=True, methods=['get'])
+    def matched_donors(self, request, pk=None):
+        """
+        Get matched donors for a specific blood request
+        Returns donors ordered by priority
+        """
         blood_request = self.get_object()
         
-        # Get compatible blood types
-        compatible_types = get_compatible_blood_types(blood_request.blood_type)
+        # Get all notifications for this request, ordered by priority
+        notifications = DonorNotification.objects.filter(
+            blood_request=blood_request
+        ).select_related('donor').order_by('priority_order')
         
-        # Get eligible donors (who can donate - 90 days since last donation)
-        from datetime import date, timedelta
-        eligible_date = date.today() - timedelta(days=90)
-        
-        eligible_donors = DonorProfile.objects.filter(
-            blood_type__in=compatible_types,
-            is_available=True
-        ).filter(
-            models.Q(last_donation_date__isnull=True) | 
-            models.Q(last_donation_date__lte=eligible_date)
-        )
-        
-        notified_count = 0
-        errors = []
-        
-        # Notify each donor
-        for donor in eligible_donors:
-            try:
-                send_donor_notification(donor, blood_request)
-                notified_count += 1
-            except Exception as e:
-                errors.append(f"Error notifying {donor.id}: {str(e)}")
-        
-        # Update request status
-        if notified_count > 0 and blood_request.status == 'pending':
-            blood_request.status = 'matched'
-            blood_request.save()
+        matched_donors = []
+        for notification in notifications:
+            donor = notification.donor
+            matched_donors.append({
+                'donor': {
+                    'id': donor.id,
+                    'full_name': donor.full_name,
+                    'blood_type': donor.blood_type,
+                    'phone': donor.phone,
+                    'location': donor.address,  # Using address as location
+                    'email': donor.user.email if hasattr(donor, 'user') else None,
+                },
+                'match_score': notification.match_score or 0,
+                'distance': notification.distance,
+                'priority_order': notification.priority_order,
+                'status': notification.status,
+                'is_notified': notification.is_notified,
+                'notified_at': notification.notified_at,
+            })
         
         return Response({
-            'message': f'Successfully notified {notified_count} out of {eligible_donors.count()} donors',
-            'notified_count': notified_count,
-            'total_eligible': eligible_donors.count(),
-            'errors': errors if errors else None
-        }, status=status.HTTP_200_OK)
+            'blood_request_id': blood_request.id,
+            'blood_type': blood_request.blood_type,
+            'matched_donors': matched_donors,
+            'total_matches': len(matched_donors),
+        })
 
 
+# Dashboard Statistics View
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, IsAdminUser])
+@permission_classes([AllowAny])
 def dashboard_stats(request):
-    """Get dashboard statistics"""
-    from datetime import date, timedelta
+    """
+    Get dashboard statistics
+    """
+    total_donors = DonorProfile.objects.count()
+    total_hospitals = HospitalProfile.objects.count()
     
-    # Get donors who can donate (haven't donated in 90 days)
-    eligible_date = date.today() - timedelta(days=90)
-    available_donors = DonorProfile.objects.filter(
-        is_available=True
-    ).filter(
-        models.Q(last_donation_date__isnull=True) | 
-        models.Q(last_donation_date__lte=eligible_date)
-    ).count()
+    # Blood request stats
+    total_requests = BloodRequest.objects.count()
+    active_requests = BloodRequest.objects.filter(status='pending').count()
+    fulfilled_requests = BloodRequest.objects.filter(status='fulfilled').count()
+    
+    # Blood type distribution
+    blood_type_dist = {}
+    for blood_type in ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-']:
+        count = DonorProfile.objects.filter(blood_type=blood_type).count()
+        blood_type_dist[blood_type] = count
+    
+    # Recent activity
+    recent_requests = BloodRequest.objects.order_by('-created_at')[:10]
+    recent_donations = DonationHistory.objects.order_by('-date_donated')[:10]
     
     return Response({
-        'total_donors': DonorProfile.objects.count(),
-        'available_donors': available_donors,
-        'total_hospitals': HospitalProfile.objects.count(),
-        'active_requests': BloodRequest.objects.filter(
-            status__in=['pending', 'matched']
-        ).count(),
-        'completed_requests': BloodRequest.objects.filter(
-            status='completed'
-        ).count(),
+        'total_donors': total_donors,
+        'total_hospitals': total_hospitals,
+        'total_requests': total_requests,
+        'active_requests': active_requests,
+        'fulfilled_requests': fulfilled_requests,
+        'completed_requests': fulfilled_requests,  # Alias
+        'blood_type_distribution': blood_type_dist,
+        'recent_requests_count': recent_requests.count(),
+        'recent_donations_count': recent_donations.count(),
     })
 
 
-# Helper functions
-def get_compatible_blood_types(blood_type):
-    """Get compatible donor blood types"""
-    compatibility = {
-        'A+': ['A+', 'A-', 'O+', 'O-'],
-        'A-': ['A-', 'O-'],
-        'B+': ['B+', 'B-', 'O+', 'O-'],
-        'B-': ['B-', 'O-'],
-        'AB+': ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-        'AB-': ['A-', 'B-', 'AB-', 'O-'],
-        'O+': ['O+', 'O-'],
-        'O-': ['O-'],
-    }
-    return compatibility.get(blood_type, [])
-
-
-def send_donor_notification(donor, blood_request):
-    """Send email notification to donor"""
-    
-    # Get donor's email
-    donor_email = donor.user.email if donor.user else None
-    
-    if not donor_email:
-        raise Exception(f"No email found for donor {donor.full_name}")
-    
-    # Get hospital details
-    hospital_name = getattr(blood_request.hospital, 'hospital_name', 'Hospital')
-    hospital_phone = getattr(blood_request.hospital, 'phone', 'N/A')
-    hospital_address = getattr(blood_request.hospital, 'address', 'N/A')
-    
-    subject = f'🩸 Urgent: {blood_request.blood_type} Blood Needed - LifeLink Nepal'
-    
-    message = f"""
-Dear {donor.full_name},
-
-We urgently need your help!
-
-Blood Type Needed: {blood_request.blood_type}
-Units Required: {blood_request.units_needed}
-Hospital: {hospital_name}
-Urgency Level: {blood_request.urgency.upper()}
-Patient: {getattr(blood_request, 'patient_name', 'N/A')}
-Reason: {getattr(blood_request, 'reason', 'Emergency')}
-
-Contact Details:
-Phone: {hospital_phone}
-Address: {hospital_address}
-
-Please contact the hospital immediately if you can donate.
-Your donation can save a life!
-
-Thank you for being a lifesaver.
-
-Best regards,
-LifeLink Nepal Team
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def donor_leaderboard(request):
     """
+    Get top donors by donation count
+    """
+    top_donors = DonorProfile.objects.filter(
+        donation_count__gt=0
+    ).order_by('-donation_count')[:20]
     
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [donor_email],
-        fail_silently=False,
-    )
+    serializer = DonorSerializer(top_donors, many=True)
+    return Response(serializer.data)

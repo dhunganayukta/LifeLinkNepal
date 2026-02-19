@@ -1,619 +1,272 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Nearby Hospitals - LifeLink Nepal{% endblock %}
+{% block title %}Nearby Hospitals — LifeLink Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
-    :root {
-        --lifelink-red: #E63946;
-        --lifelink-blue: #1D70B8;
-        --lifelink-dark-blue: #003A70;
-        --lifelink-light-red: #FFE5E8;
-        --lifelink-gradient: linear-gradient(135deg, #1D70B8 0%, #E63946 100%);
-    }
-    
-    body {
-        background-color: #F8F9FA;
-    }
-    
-    /* ==================== PAGE HEADER ==================== */
-    .page-header {
-        background: var(--lifelink-gradient);
-        padding: 3rem 0;
-        box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 400px;
-        height: 400px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
-    
-    .page-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: white;
-        margin-bottom: 0.5rem;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    .page-subtitle {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 1.1rem;
-    }
-    
-    /* ==================== FILTER BAR ==================== */
-    .filter-bar {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        margin-top: -2rem;
-        margin-bottom: 2rem;
-        position: relative;
-        z-index: 10;
-    }
-    
-    /* ==================== HOSPITAL CARDS ==================== */
-    .hospital-card {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-        transition: all 0.3s ease;
-        border-left: 5px solid var(--lifelink-red);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .hospital-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 150px;
-        height: 150px;
-        background: var(--lifelink-gradient);
-        opacity: 0.05;
-        border-radius: 50%;
-        transform: translate(30%, -30%);
-    }
-    
-    .hospital-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(230, 57, 70, 0.15);
-        border-left-color: var(--lifelink-blue);
-    }
-    
-    .hospital-icon {
-        width: 80px;
-        height: 80px;
-        background: var(--lifelink-gradient);
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
-    }
-    
-    .hospital-icon i {
-        font-size: 2.5rem;
-        color: white;
-    }
-    
-    .hospital-name {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 0.5rem;
-    }
-    
-    .hospital-info {
-        color: #6c757d;
-        font-size: 0.95rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .hospital-info i {
-        color: var(--lifelink-red);
-        margin-right: 0.5rem;
-        width: 20px;
-    }
-    
-    /* ==================== DISTANCE BADGE ==================== */
-    .distance-badge {
-        background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
-        color: var(--lifelink-blue);
-        padding: 0.5rem 1.25rem;
-        border-radius: 25px;
-        font-size: 1rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 2px 8px rgba(29, 112, 184, 0.2);
-    }
-    
-    /* ==================== REQUEST STATS ==================== */
-    .request-stats {
-        background: var(--lifelink-light-red);
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-top: 1.5rem;
-    }
-    
-    .stat-item {
-        text-align: center;
-        padding: 0.75rem;
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--lifelink-red);
-        line-height: 1;
-        margin-bottom: 0.25rem;
-    }
-    
-    .stat-label {
-        font-size: 0.85rem;
-        color: #6c757d;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    /* ==================== ACTION BUTTONS ==================== */
-    .btn-lifelink-primary {
-        background: var(--lifelink-gradient);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-lifelink-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
-        color: white;
-    }
-    
-    .btn-view-requests {
-        background: white;
-        border: 2px solid var(--lifelink-red);
-        color: var(--lifelink-red);
-        font-weight: 600;
-        padding: 0.65rem 1.5rem;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-view-requests:hover {
-        background: var(--lifelink-red);
-        color: white;
-        transform: translateY(-2px);
-    }
-    
-    /* ==================== EMPTY STATE ==================== */
-    .empty-state {
-        background: white;
-        border-radius: 16px;
-        padding: 4rem 2rem;
-        text-align: center;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-    }
-    
-    .empty-state i {
-        font-size: 6rem;
-        color: var(--lifelink-red);
-        opacity: 0.2;
-        margin-bottom: 1.5rem;
-    }
-    
-    .empty-state h3 {
-        color: #2c3e50;
-        font-weight: 700;
-        margin-bottom: 1rem;
-    }
-    
-    /* ==================== SUMMARY BAR ==================== */
-    .summary-bar {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-        margin-bottom: 2rem;
-    }
-    
-    .summary-item {
-        text-align: center;
-        padding: 1rem;
-        border-right: 1px solid #e9ecef;
-    }
-    
-    .summary-item:last-child {
-        border-right: none;
-    }
-    
-    .summary-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--lifelink-red);
-        line-height: 1;
-    }
-    
-    .summary-label {
-        font-size: 0.9rem;
-        color: #6c757d;
-        font-weight: 600;
-        margin-top: 0.5rem;
-    }
-    
-    /* ==================== BADGES ==================== */
-    .verified-badge {
-        background: #D4EDDA;
-        color: #155724;
-        padding: 0.35rem 0.85rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-    }
-    
-    .compatible-badge {
-        background: linear-gradient(135deg, #D4EDDA, #C3E6CB);
-        color: #155724;
-        padding: 0.4rem 1rem;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        box-shadow: 0 2px 6px rgba(21, 87, 36, 0.2);
-    }
-    
-    /* ==================== LOADING ANIMATION ==================== */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .hospital-card {
-        animation: fadeInUp 0.6s ease-out;
-    }
-    
-    /* ==================== RESPONSIVE ==================== */
-    @media (max-width: 768px) {
-        .page-title {
-            font-size: 2rem;
-        }
-        
-        .hospital-name {
-            font-size: 1.25rem;
-        }
-        
-        .summary-item {
-            border-right: none;
-            border-bottom: 1px solid #e9ecef;
-            padding: 1rem 0;
-        }
-        
-        .summary-item:last-child {
-            border-bottom: none;
-        }
-        
-        .stat-number {
-            font-size: 1.5rem;
-        }
-    }
+.dash-wrap { background: var(--ivory); min-height: 100vh; padding: 48px 0 80px; }
+
+/* HERO */
+.dash-hero { background: var(--ink); border-radius: 16px; padding: 36px 40px; margin-bottom: 40px; position: relative; overflow: hidden; }
+.dash-hero::before { content:''; position:absolute; top:-80px; right:-80px; width:280px; height:280px; border-radius:50%; border:1px solid rgba(196,146,74,0.12); pointer-events:none; }
+.dash-hero::after  { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%; border:1px solid rgba(196,146,74,0.07); pointer-events:none; }
+.dash-hero-crimson-bar { position:absolute; top:0; left:0; width:4px; height:100%; background:linear-gradient(180deg, var(--crimson) 0%, var(--gold) 100%); border-radius:4px 0 0 4px; }
+.dash-hero-eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; }
+.dash-hero-eyebrow span { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; font-weight:600; color:var(--gold); }
+.dash-hero-eyebrow-line { width:20px; height:1px; background:var(--gold); opacity:0.6; }
+.dash-hero h2 { font-family:var(--font-display); font-size:clamp(28px,3.5vw,44px); font-weight:600; color:white; letter-spacing:-0.3px; line-height:1.15; margin-bottom:8px; }
+.dash-hero p { font-size:14.5px; color:rgba(240,232,222,0.6); margin:0; display:flex; align-items:center; gap:6px; }
+.btn-dash-secondary { display:inline-flex; align-items:center; gap:8px; padding:9px 20px; background:transparent; color:rgba(240,232,222,0.75); font-size:13px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid rgba(240,232,222,0.2); }
+.btn-dash-secondary:hover { border-color:rgba(196,146,74,0.5); color:var(--gold-light); background:rgba(196,146,74,0.08); }
+
+/* STAT CARDS */
+.stat-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; padding:20px; text-align:center; height:100%; transition:all 0.3s ease; position:relative; overflow:hidden; }
+body.dark-mode .stat-card { background:#1a1410; border-color:rgba(255,255,255,0.06); }
+.stat-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(90deg, var(--crimson), var(--gold)); transform:scaleX(0); transform-origin:left; transition:transform 0.35s ease; }
+.stat-card:hover::after { transform:scaleX(1); }
+.stat-card:hover { transform:translateY(-5px); box-shadow:var(--shadow-lift); border-color:var(--border); }
+.stat-number { font-family:var(--font-display); font-size:34px; font-weight:700; color:var(--ink); line-height:1; letter-spacing:-0.5px; margin-bottom:4px; }
+.stat-label  { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-muted); font-weight:600; }
+
+/* NOTICE BAR */
+.notice-bar { border-radius:10px; padding:14px 18px; font-size:13px; display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; }
+.notice-bar.warning { background:rgba(196,146,74,0.08); border:1px solid rgba(196,146,74,0.25); color:var(--ink-mid); }
+.notice-bar.info    { background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2);  color:var(--ink-mid); }
+.notice-bar i { margin-top:1px; flex-shrink:0; }
+.notice-bar.warning i { color:var(--gold); }
+.notice-bar.info    i { color:#2563eb; }
+.notice-bar ul { margin:6px 0 0; padding-left:16px; }
+.notice-bar ul li { margin-bottom:3px; font-size:12.5px; }
+
+/* HOSPITAL CARD */
+.hospital-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; padding:28px; margin-bottom:20px; transition:all 0.3s ease; position:relative; overflow:hidden; }
+body.dark-mode .hospital-card { background:#1a1410; border-color:rgba(255,255,255,0.06); }
+.hospital-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:linear-gradient(180deg, var(--crimson), var(--gold)); border-radius:4px 0 0 4px; }
+.hospital-card:hover { transform:translateY(-5px); box-shadow:var(--shadow-lift); border-color:var(--border); }
+
+.hospital-icon { width:60px; height:60px; border-radius:14px; background:var(--crimson-pale); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:26px; color:var(--crimson); flex-shrink:0; transition:all 0.3s ease; }
+.hospital-card:hover .hospital-icon { background:var(--crimson); color:white; }
+
+.hospital-name { font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--ink); margin-bottom:4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.hospital-meta { font-size:13px; color:var(--ink-muted); display:flex; align-items:center; gap:5px; margin-bottom:6px; }
+.hospital-meta i { color:var(--gold); font-size:13px; flex-shrink:0; }
+
+/* REQUEST STATS ROW */
+.req-stats { background:var(--ivory-mid); border:1px solid var(--border-subtle); border-radius:10px; padding:16px; margin-top:16px; }
+body.dark-mode .req-stats { background:#221c17; }
+.req-stat-item { text-align:center; padding:0 12px; border-right:1px solid var(--border-subtle); }
+.req-stat-item:last-child { border-right:none; }
+.req-stat-number { font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--ink); line-height:1; }
+.req-stat-label  { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; font-weight:600; color:var(--ink-muted); margin-top:3px; }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; letter-spacing:0.3px; }
+.tag-crimson { background:var(--crimson-pale); color:var(--crimson); border:1px solid var(--border); }
+.tag-green   { background:rgba(74,222,128,0.1); color:#16a34a;       border:1px solid rgba(74,222,128,0.2); }
+.tag-blue    { background:rgba(59,130,246,0.1); color:#2563eb;       border:1px solid rgba(59,130,246,0.2); }
+.tag-gold    { background:var(--gold-pale);     color:var(--gold);   border:1px solid rgba(196,146,74,0.25); }
+
+/* ACTION BUTTONS */
+.btn-call { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 18px; background:var(--crimson); color:white; font-size:13px; font-weight:700; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid var(--crimson); width:100%; }
+.btn-call:hover { background:var(--crimson-mid); color:white; transform:translateY(-1px); box-shadow:0 6px 18px rgba(155,23,40,0.3); }
+.btn-view { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 18px; background:transparent; color:var(--crimson); font-size:13px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid rgba(155,23,40,0.3); width:100%; cursor:pointer; }
+.btn-view:hover { background:var(--crimson-pale); border-color:var(--crimson); color:var(--crimson); }
+.btn-email { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 18px; background:transparent; color:#2563eb; font-size:13px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid rgba(59,130,246,0.25); width:100%; }
+.btn-email:hover { background:rgba(59,130,246,0.08); border-color:#2563eb; color:#2563eb; }
+.btn-disabled { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 18px; background:transparent; color:var(--ink-muted); font-size:13px; font-weight:600; border-radius:8px; border:1.5px solid var(--border-subtle); width:100%; cursor:not-allowed; opacity:0.6; }
+
+/* EMPTY STATE */
+.empty-state { text-align:center; padding:56px 24px; background:white; border:1px solid var(--border-subtle); border-radius:14px; }
+body.dark-mode .empty-state { background:#1a1410; }
+.empty-state-icon { width:72px; height:72px; border-radius:50%; background:var(--ivory-mid); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:28px; color:var(--ink-muted); }
+.empty-state h6 { font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--ink); margin-bottom:6px; }
+.empty-state p { font-size:13.5px; color:var(--ink-muted); margin-bottom:20px; }
+.btn-create { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:var(--crimson); color:white; font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid var(--crimson); }
+.btn-create:hover { background:var(--crimson-mid); color:white; transform:translateY(-2px); box-shadow:0 6px 18px rgba(155,23,40,0.35); }
+.btn-outline-back { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:transparent; color:var(--ink-mid); font-size:13.5px; font-weight:600; border-radius:8px; border:1.5px solid var(--border-subtle); text-decoration:none; transition:all 0.2s ease; }
+.btn-outline-back:hover { border-color:var(--border); color:var(--ink); }
+
+body.dark-mode .dash-wrap { background:var(--ivory); }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- ==================== PAGE HEADER ==================== -->
-<section class="page-header">
-    <div class="container">
-        <div class="row align-items-center">
+<div class="dash-wrap">
+<div class="container">
+
+    <!-- HERO -->
+    <div class="dash-hero">
+        <div class="dash-hero-crimson-bar"></div>
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="dash-hero-eyebrow">
+                    <div class="dash-hero-eyebrow-line"></div>
+                    <span>Nearby Hospitals</span>
+                    <div class="dash-hero-eyebrow-line"></div>
+                </div>
+                <h2>Hospitals Near You</h2>
+                <p><i class="bi bi-geo-alt-fill"></i> Hospitals within 50km from your location</p>
+            </div>
+            <div class="col-lg-4 d-flex justify-content-lg-end">
+                <a href="{% url 'donor_dashboard' %}" class="btn-dash-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Warning -->
+    {% if not donor.latitude or not donor.longitude %}
+    <div class="notice-bar warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div>
+            <strong style="color:var(--ink);">Location Not Set!</strong> Please update your location to see nearby hospitals.
+            <a href="{% url 'edit_profile' %}" style="color:var(--crimson); font-weight:700; margin-left:6px;">Update Location →</a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if nearby_hospitals %}
+
+    <!-- Summary Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number">{{ nearby_hospitals|length }}</div>
+                <div class="stat-label">Hospitals Found</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number" style="color:var(--crimson);">
+                    {% for hospital in nearby_hospitals %}{% if forloop.first %}{{ hospital.total_requests }}{% endif %}{% empty %}0{% endfor %}
+                </div>
+                <div class="stat-label">Active Requests</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number" style="color:#16a34a;">
+                    {% for hospital in nearby_hospitals %}{% if forloop.first %}{{ hospital.compatible_requests }}{% endif %}{% empty %}0{% endfor %}
+                </div>
+                <div class="stat-label">Compatible Requests</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hospital Cards -->
+    {% for item in nearby_hospitals %}
+    <div class="hospital-card">
+        <div class="row align-items-start g-4">
             <div class="col-md-8">
-                <h1 class="page-title">
-                    <i class="bi bi-hospital me-3"></i>
-                    Nearby Hospitals
-                </h1>
-                <p class="page-subtitle mb-0">
-                    <i class="bi bi-geo-alt-fill me-2"></i>
-                    Hospitals within 50km from your location
-                </p>
-            </div>
-            <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <a href="{% url 'donor_dashboard' %}" class="btn btn-light btn-lg">
-                    <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ==================== MAIN CONTENT ==================== -->
-<section class="py-5">
-    <div class="container">
-        
-        <!-- Location Check -->
-        {% if not donor.latitude or not donor.longitude %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
-                <div>
-                    <strong>Location Not Set!</strong>
-                    <p class="mb-0">Please update your location to see nearby hospitals.</p>
-                </div>
-                <a href="{% url 'edit_profile' %}" class="btn btn-warning ms-auto">
-                    Update Location
-                </a>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endif %}
-
-        <!-- Summary Statistics -->
-        {% if nearby_hospitals %}
-        <div class="summary-bar">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="summary-item">
-                        <div class="summary-number">{{ nearby_hospitals|length }}</div>
-                        <div class="summary-label">
-                            <i class="bi bi-hospital me-1"></i>
-                            Hospitals Found
+                <div class="d-flex gap-16 align-items-start" style="gap:16px;">
+                    <div class="hospital-icon"><i class="bi bi-hospital-fill"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="hospital-name">
+                            {{ item.hospital.hospital_name }}
+                            {% if item.hospital.is_verified %}
+                                <span class="tag tag-green" style="font-size:10.5px;"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                            {% endif %}
+                        </div>
+                        <div class="hospital-meta"><i class="bi bi-geo-alt-fill"></i>{{ item.hospital.address }}</div>
+                        <div class="hospital-meta"><i class="bi bi-telephone-fill"></i>{{ item.hospital.phone }}</div>
+                        {% if item.hospital.email %}
+                        <div class="hospital-meta"><i class="bi bi-envelope-fill"></i>{{ item.hospital.email }}</div>
+                        {% endif %}
+                        <div style="margin-top:10px;">
+                            <span class="tag tag-blue"><i class="bi bi-pin-map-fill"></i> {{ item.distance }} km away</span>
+                            {% if item.compatible_requests > 0 %}
+                            <span class="tag tag-green" style="margin-left:6px;"><i class="bi bi-check-circle-fill"></i> {{ item.compatible_requests }} Compatible</span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="summary-item">
-                        <div class="summary-number text-primary">
-                            {% widthratio nearby_hospitals|length 1 1 as total %}
-                            {{ total }}
+                <!-- Request Stats -->
+                <div class="req-stats">
+                    <div class="row g-0">
+                        <div class="col-4 req-stat-item">
+                            <div class="req-stat-number">{{ item.total_requests }}</div>
+                            <div class="req-stat-label">Total Requests</div>
                         </div>
-                        <div class="summary-label">
-                            <i class="bi bi-droplet me-1"></i>
-                            Active Requests
+                        <div class="col-4 req-stat-item">
+                            <div class="req-stat-number" style="color:#16a34a;">{{ item.compatible_requests }}</div>
+                            <div class="req-stat-label">Compatible</div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="summary-item">
-                        <div class="summary-number text-success">
-                            {% for hospital in nearby_hospitals %}
-                                {% if forloop.first %}{{ hospital.compatible_requests }}{% endif %}
-                            {% empty %}0{% endfor %}
-                        </div>
-                        <div class="summary-label">
-                            <i class="bi bi-check-circle me-1"></i>
-                            Compatible Requests
+                        <div class="col-4 req-stat-item">
+                            <div class="req-stat-number" style="color:#2563eb;">{{ item.distance }}</div>
+                            <div class="req-stat-label">Km Away</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {% endif %}
-
-        <!-- Hospital Cards -->
-        {% if nearby_hospitals %}
-            <div class="row">
-                {% for item in nearby_hospitals %}
-                <div class="col-12">
-                    <div class="hospital-card">
-                        <div class="row align-items-center">
-                            <!-- Hospital Icon & Info -->
-                            <div class="col-md-8">
-                                <div class="d-flex align-items-start">
-                                    <div class="hospital-icon me-3">
-                                        <i class="bi bi-hospital-fill"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                                            <h3 class="hospital-name mb-0">{{ item.hospital.hospital_name }}</h3>
-                                            {% if item.hospital.is_verified %}
-                                            <span class="verified-badge">
-                                                <i class="bi bi-patch-check-fill"></i>
-                                                Verified
-                                            </span>
-                                            {% endif %}
-                                        </div>
-                                        
-                                        <div class="hospital-info">
-                                            <i class="bi bi-geo-alt-fill"></i>
-                                            {{ item.hospital.address }}
-                                        </div>
-                                        
-                                        <div class="hospital-info">
-                                            <i class="bi bi-telephone-fill"></i>
-                                            {{ item.hospital.phone }}
-                                        </div>
-                                        
-                                        <div class="hospital-info">
-                                            <i class="bi bi-envelope-fill"></i>
-                                            {{ item.hospital.email }}
-                                        </div>
-                                        
-                                        <div class="mt-2">
-                                            <span class="distance-badge">
-                                                <i class="bi bi-pin-map-fill"></i>
-                                                {{ item.distance }} km away
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Request Statistics -->
-                                <div class="request-stats">
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <div class="stat-item">
-                                                <div class="stat-number">{{ item.total_requests }}</div>
-                                                <div class="stat-label">Total Requests</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="stat-item">
-                                                <div class="stat-number text-success">{{ item.compatible_requests }}</div>
-                                                <div class="stat-label">Compatible</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="stat-item">
-                                                <div class="stat-number text-info">{{ item.distance }}</div>
-                                                <div class="stat-label">Km Away</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Action Buttons -->
-                            <div class="col-md-4 mt-4 mt-md-0">
-                                <div class="d-grid gap-3">
-                                    {% if item.compatible_requests > 0 %}
-                                    <div class="text-center mb-2">
-                                        <span class="compatible-badge">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                            {{ item.compatible_requests }} Compatible Request{{ item.compatible_requests|pluralize }}
-                                        </span>
-                                    </div>
-                                    {% endif %}
-                                    
-                                    <a href="tel:{{ item.hospital.phone }}" class="btn btn-lifelink-primary btn-lg">
-                                        <i class="bi bi-telephone-fill me-2"></i>
-                                        Call Hospital
-                                    </a>
-                                    
-                                    {% if item.total_requests > 0 %}
-                                    <button class="btn btn-view-requests btn-lg" 
-                                            onclick="alert('View all {{ item.total_requests }} blood request(s) from this hospital')">
-                                        <i class="bi bi-eye me-2"></i>
-                                        View All Requests ({{ item.total_requests }})
-                                    </button>
-                                    {% else %}
-                                    <button class="btn btn-outline-secondary btn-lg" disabled>
-                                        <i class="bi bi-inbox me-2"></i>
-                                        No Active Requests
-                                    </button>
-                                    {% endif %}
-                                    
-                                    <a href="mailto:{{ item.hospital.email }}" class="btn btn-outline-primary">
-                                        <i class="bi bi-envelope-fill me-2"></i>
-                                        Email Hospital
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            
-            <!-- Pagination or Load More -->
-            {% if nearby_hospitals|length >= 20 %}
-            <div class="text-center mt-4">
-                <p class="text-muted">
-                    <i class="bi bi-info-circle me-2"></i>
-                    Showing top 20 nearest hospitals
-                </p>
-            </div>
-            {% endif %}
-            
-        {% else %}
-            <!-- Empty State -->
-            <div class="empty-state">
-                <i class="bi bi-hospital"></i>
-                <h3>No Hospitals Found Nearby</h3>
-                <p class="text-muted mb-4">
-                    {% if not donor.latitude or not donor.longitude %}
-                        Please set your location to find nearby hospitals.
+            <div class="col-md-4">
+                <div class="d-grid gap-2">
+                    <a href="tel:{{ item.hospital.phone }}" class="btn-call">
+                        <i class="bi bi-telephone-fill"></i> Call Hospital
+                    </a>
+                    {% if item.total_requests > 0 %}
+                    <button class="btn-view" onclick="alert('{{ item.total_requests }} blood request(s) from this hospital')">
+                        <i class="bi bi-eye"></i> View Requests ({{ item.total_requests }})
+                    </button>
                     {% else %}
-                        There are no verified hospitals within 50km of your location.
+                    <span class="btn-disabled">
+                        <i class="bi bi-inbox"></i> No Active Requests
+                    </span>
                     {% endif %}
-                </p>
-                <div class="d-flex gap-3 justify-content-center">
-                    <a href="{% url 'edit_profile' %}" class="btn btn-lifelink-primary">
-                        <i class="bi bi-pencil me-2"></i>Update Location
+                    {% if item.hospital.email %}
+                    <a href="mailto:{{ item.hospital.email }}" class="btn-email">
+                        <i class="bi bi-envelope-fill"></i> Email Hospital
                     </a>
-                    <a href="{% url 'donor_dashboard' %}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-                    </a>
-                </div>
-            </div>
-        {% endif %}
-        
-        <!-- Help Section -->
-        <div class="alert alert-info mt-4" role="alert">
-            <div class="d-flex align-items-start">
-                <i class="bi bi-info-circle-fill fs-4 me-3"></i>
-                <div>
-                    <h5 class="alert-heading">Need Help?</h5>
-                    <p class="mb-2">
-                        <strong>How to use this page:</strong>
-                    </p>
-                    <ul class="mb-0 small">
-                        <li>Hospitals are sorted by distance from your location</li>
-                        <li>Click "View All Requests" to see specific blood needs</li>
-                        <li>Call hospitals directly for urgent matters</li>
-                        <li>Compatible requests match your blood type: <strong>{{ donor.blood_type }}</strong></li>
-                    </ul>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        
     </div>
-</section>
-{% endblock %}
+    {% endfor %}
 
-{% block extra_js %}
-<script>
-    // Smooth scroll animation
-    document.addEventListener('DOMContentLoaded', function() {
-        const cards = document.querySelectorAll('.hospital-card');
-        
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-        
-        cards.forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'all 0.6s ease-out';
-            observer.observe(card);
-        });
-    });
-</script>
+    {% if nearby_hospitals|length >= 20 %}
+    <div style="text-align:center; font-size:12.5px; color:var(--ink-muted); margin-top:-8px; margin-bottom:24px;">
+        <i class="bi bi-info-circle me-1"></i>Showing top 20 nearest hospitals
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="bi bi-hospital"></i></div>
+        <h6>No Hospitals Found Nearby</h6>
+        <p>
+            {% if not donor.latitude or not donor.longitude %}
+                Set your location to find nearby hospitals.
+            {% else %}
+                No verified hospitals within 50km of your location.
+            {% endif %}
+        </p>
+        <div class="d-flex gap-2 justify-content-center flex-wrap">
+            <a href="{% url 'edit_profile' %}" class="btn-create">
+                <i class="bi bi-pencil"></i> Update Location
+            </a>
+            <a href="{% url 'donor_dashboard' %}" class="btn-outline-back">
+                <i class="bi bi-arrow-left"></i> Dashboard
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Help Notice -->
+    <div class="notice-bar info" style="margin-top:24px;">
+        <i class="bi bi-lightbulb-fill"></i>
+        <div>
+            <strong style="color:var(--ink);">How to use this page:</strong>
+            <ul>
+                <li>Hospitals are sorted by distance from your location</li>
+                <li>Click "View Requests" to see specific blood needs</li>
+                <li>Call hospitals directly for urgent matters</li>
+                <li>Compatible requests match your blood type: <strong>{{ donor.blood_type }}</strong></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+</div>
 {% endblock %}

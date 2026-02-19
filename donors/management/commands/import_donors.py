@@ -2,6 +2,7 @@
 """
 Django management command to import donor data from Excel
 Usage: python manage.py import_donors path/to/donors.xlsx
+FIXED: Now uses username AND password from Excel file
 """
 
 from django.core.management.base import BaseCommand
@@ -45,10 +46,20 @@ class Command(BaseCommand):
                     try:
                         full_name = row.get('full_name', row.get('name', ''))
                         email = row.get('email', f"donor_{index}@lifelink.np")
-                        phone = row.get('phone_number', '')          # was 'phone'
-                        blood_type = row.get('blood_group', 'O+')    # was 'blood_type'
+                        phone = row.get('phone_number', '')
+                        blood_type = row.get('blood_group', 'O+')
                         age = row.get('age', 25)
                         address = row.get('address', '')
+                        
+                        # 🔥 FIX: Read username and password from Excel
+                        excel_username = row.get('username', '')
+                        password = row.get('password', 'ChangeMe123!')
+                        
+                        # Use Excel username if provided, otherwise generate from email
+                        if excel_username and not pd.isna(excel_username):
+                            username = str(excel_username).strip()[:30]
+                        else:
+                            username = email.split('@')[0].lower().replace(' ', '_')[:30]
                         
                         # Optional fields
                         latitude = row.get('latitude')
@@ -84,7 +95,6 @@ class Command(BaseCommand):
                             continue
                         
                         # Create or get User account for this donor
-                        username = email.split('@')[0].lower().replace(' ', '_')[:30]
                         user, user_created = User.objects.get_or_create(
                             email=email,
                             defaults={
@@ -93,9 +103,14 @@ class Command(BaseCommand):
                             }
                         )
                         
-                        # Set a default password if user was just created
+                        # 🔥 FIX: Set password from Excel or default
                         if user_created:
-                            user.set_password('ChangeMe123!')  # Donor should change this
+                            if password and not pd.isna(password):
+                                user.set_password(password)
+                                self.stdout.write(f'  → Created user: {username} / {user.email} (password from Excel)')
+                            else:
+                                user.set_password('ChangeMe123!')
+                                self.stdout.write(f'  → Created user: {username} / {user.email} (default password)')
                             user.save()
                         
                         # Parse last donation date if present
@@ -130,7 +145,7 @@ class Command(BaseCommand):
                         
                         if created:
                             imported_count += 1
-                            self.stdout.write(f'✓ Created: {donor.full_name} ({donor.blood_type}) - {user.email}')
+                            self.stdout.write(f'✓ Created: {donor.full_name} ({donor.blood_type}) - Username: {username}')
                         else:
                             updated_count += 1
                             self.stdout.write(f'↻ Updated: {donor.full_name} ({donor.blood_type})')
@@ -154,8 +169,8 @@ class Command(BaseCommand):
             if imported_count > 0:
                 self.stdout.write(
                     self.style.WARNING(
-                        f'\n⚠️  NOTE: Default password is "ChangeMe123!" for new donor accounts.\n'
-                        f'Donors should change their password on first login.'
+                        f'\n⚠️  Usernames and passwords were imported from Excel.\n'
+                        f'Donors can login with their username and password from the Excel file.'
                     )
                 )
             

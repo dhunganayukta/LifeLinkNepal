@@ -1,392 +1,1062 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}About Us — Life Link Nepal{% endblock %}
+
 {% block extra_css %}
 <style>
-    :root {
-        --primary-red: #c71e35;
-        --secondary-red: #e53949;
-        --dark-red: #a01828;
-    }
+/* ════════════════════════════════════════════════════════════
+   ABOUT PAGE — matching base.html editorial aesthetic
+   ════════════════════════════════════════════════════════════ */
 
-    /* Hero Section */
-    .about-hero {
-        background: linear-gradient(135deg, rgba(199, 30, 53, 0.95) 0%, rgba(160, 24, 40, 0.95) 100%), 
-                    url('{% static "images/hero.png" %}');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        min-height: 60vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-    }
+/* ── PAGE HERO ───────────────────────────────────────────── */
+.about-hero {
+    position: relative;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-subtle);
+}
 
-    .about-hero::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
+.about-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url("{% static 'images/hero.png' %}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    filter: brightness(0.35);
+    z-index: 0;
+}
 
-    .about-hero h1 {
-        font-size: 4rem;
-        font-weight: 900;
-        text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-        margin-bottom: 1rem;
-        position: relative;
-        z-index: 1;
-    }
+.about-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(155,23,40,0.55) 0%, rgba(10,8,6,0.75) 100%);
+    z-index: 1;
+}
 
-    .about-hero .lead {
-        font-size: 1.5rem;
-        opacity: 0.95;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        position: relative;
-        z-index: 1;
-    }
+.about-hero-rule {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--crimson) 0%, var(--gold) 100%);
+    z-index: 3;
+}
 
-    /* Mission Section */
-    .mission-section {
-        padding: 5rem 0;
-    }
+.about-hero-bg-text {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-display);
+    font-size: 200px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.04);
+    pointer-events: none;
+    white-space: nowrap;
+    line-height: 1;
+    letter-spacing: -4px;
+    user-select: none;
+    z-index: 2;
+}
 
-    .mission-badge {
-        display: inline-block;
-        background: linear-gradient(135deg, var(--primary-red), var(--secondary-red));
-        color: white;
-        padding: 0.5rem 1.5rem;
-        border-radius: 50px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 0.85rem;
-        margin-bottom: 1rem;
-    }
+.about-hero-content {
+    position: relative;
+    z-index: 3;
+    padding: 100px 0 90px;
+    width: 100%;
+}
 
-    .section-heading {
-        font-size: 3rem;
-        font-weight: 800;
-        margin-bottom: 1.5rem;
-        line-height: 1.2;
-    }
+.about-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
 
-    .mission-content {
-        font-size: 1.15rem;
-        line-height: 1.9;
-        color: #555;
-    }
+.about-hero-eyebrow-line {
+    width: 28px;
+    height: 1.5px;
+    background: var(--crimson-light, #e85c6e);
+}
 
-    /* Feature Boxes */
-    .feature-box {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-        transition: all 0.4s ease;
-        border: 2px solid transparent;
-        height: 100%;
-    }
+.about-hero-eyebrow span {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--crimson-light, #e85c6e);
+}
 
-    .feature-box:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 50px rgba(199, 30, 53, 0.2);
-        border-color: var(--secondary-red);
-    }
+.about-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 5vw, 68px);
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
 
-    .feature-icon {
-        width: 70px;
-        height: 70px;
-        background: linear-gradient(135deg, var(--primary-red), var(--secondary-red));
-        border-radius: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 2rem;
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-    }
+.about-hero h1 em {
+    font-style: italic;
+    color: var(--crimson-light, #e85c6e);
+}
 
-    .feature-box:hover .feature-icon {
-        transform: scale(1.1) rotate(5deg);
-    }
+.about-hero-desc {
+    font-size: 16.5px;
+    line-height: 1.85;
+    color: rgba(240, 232, 222, 0.72);
+    max-width: 580px;
+    font-weight: 400;
+}
 
-    /* Image Section */
-    .image-container {
-        position: relative;
-        border-radius: 25px;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        transition: transform 0.5s ease;
-    }
+.about-hero-scroll-hint {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.45;
+}
 
-    .image-container:hover {
-        transform: scale(1.02);
-    }
+.about-hero-scroll-hint span {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: white;
+}
 
-    .image-container img {
-        width: 100%;
-        height: auto;
-        display: block;
-        transition: transform 0.5s ease;
-    }
+.about-hero-scroll-hint i {
+    color: white;
+    animation: bounceDown 1.6s ease-in-out infinite;
+}
 
-    .image-container:hover img {
-        transform: scale(1.1);
-    }
+@keyframes bounceDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+}
 
-    .image-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-        padding: 2rem;
-        color: white;
-        transform: translateY(100%);
-        transition: transform 0.4s ease;
-    }
+/* ── SECTION UTILITY ─────────────────────────────────────── */
+.sec-header { margin-bottom: 52px; }
 
-    .image-container:hover .image-overlay {
-        transform: translateY(0);
-    }
+.sec-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
 
-    /* Stats Section */
-    .stats-section {
-        background: linear-gradient(135deg, var(--primary-red) 0%, var(--secondary-red) 100%);
-        padding: 5rem 0;
-        position: relative;
-        overflow: hidden;
-    }
+.sec-eyebrow-line {
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+}
 
-    .stats-section::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
-    }
+.sec-eyebrow span {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--gold);
+}
 
-    .stat-card {
-        background: rgba(255,255,255,0.15);
-        backdrop-filter: blur(15px);
-        border-radius: 20px;
-        padding: 2.5rem;
-        text-align: center;
-        border: 2px solid rgba(255,255,255,0.2);
-        transition: all 0.3s ease;
-    }
+.sec-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.5vw, 42px);
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.3px;
+    line-height: 1.15;
+    margin-bottom: 12px;
+}
 
-    .stat-card:hover {
-        background: rgba(255,255,255,0.25);
-        transform: translateY(-10px);
-    }
+body.dark-mode .sec-title { color: var(--ink); }
 
-    .stat-number {
-        font-size: 4rem;
-        font-weight: 900;
-        color: white;
-        line-height: 1;
-        margin-bottom: 0.5rem;
-    }
+.sec-subtitle {
+    font-size: 15px;
+    color: var(--ink-light);
+    max-width: 540px;
+    line-height: 1.78;
+    font-weight: 400;
+}
 
-    .stat-label {
-        font-size: 1.1rem;
-        color: rgba(255,255,255,0.95);
-        font-weight: 600;
-    }
+/* ── MISSION SECTION ─────────────────────────────────────── */
+.mission-section {
+    background: var(--ivory);
+    padding: 96px 0;
+}
 
-    /* Process Steps */
-    .process-step {
-        background: white;
-        border-radius: 20px;
-        padding: 2.5rem;
-        text-align: center;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
-        position: relative;
-        height: 100%;
-    }
+body.dark-mode .mission-section { background: var(--ivory); }
 
-    .process-step::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, var(--primary-red), var(--secondary-red));
-        border-radius: 20px 20px 0 0;
-    }
+.mission-body {
+    font-size: 15.5px;
+    line-height: 1.9;
+    color: var(--ink-light);
+    margin-bottom: 16px;
+}
 
-    .process-step:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 50px rgba(199, 30, 53, 0.2);
-    }
+body.dark-mode .mission-body { color: var(--ink-light); }
 
-    .process-number {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, var(--primary-red), var(--secondary-red));
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 2rem;
-        font-weight: 900;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 8px 20px rgba(199, 30, 53, 0.3);
-    }
+.mission-highlight {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 22px;
+    background: var(--crimson-pale);
+    border-left: 3px solid var(--crimson);
+    border-radius: 0 8px 8px 0;
+    margin: 28px 0;
+}
 
-    /* CTA Section */
-    .cta-section {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 5rem 0;
-        position: relative;
-    }
+body.dark-mode .mission-highlight {
+    background: rgba(155, 23, 40, 0.12);
+}
 
-    .cta-card {
-        background: white;
-        border-radius: 25px;
-        padding: 4rem;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.1);
-        text-align: center;
-    }
+.mission-highlight i {
+    color: var(--crimson);
+    font-size: 18px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
 
-    .cta-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 1.5rem;
-        background: linear-gradient(135deg, var(--primary-red), var(--secondary-red));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
+.mission-highlight p {
+    margin: 0;
+    font-size: 17px;
+    color: var(--ink-mid);
+    font-weight: 500;
+    line-height: 1.65;
+    font-family: var(--font-display);
+    font-style: italic;
+}
 
-    .btn-custom {
-        background: linear-gradient(135deg, var(--primary-red), var(--secondary-red));
-        color: white;
-        border: none;
-        padding: 1rem 3rem;
-        font-weight: 700;
-        border-radius: 50px;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 8px 25px rgba(199, 30, 53, 0.3);
-    }
+body.dark-mode .mission-highlight p { color: var(--ink-mid); }
 
-    .btn-custom:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(199, 30, 53, 0.4);
-    }
+.mission-feature-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+}
 
-    .btn-outline-custom {
-        border: 3px solid var(--primary-red);
-        color: var(--primary-red);
-        background: transparent;
-        padding: 0.95rem 3rem;
-        font-weight: 700;
-        border-radius: 50px;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-    }
+.mission-feat {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px;
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    transition: all 0.25s ease;
+}
 
-    .btn-outline-custom:hover {
-        background: var(--primary-red);
-        color: white;
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(199, 30, 53, 0.3);
-    }
+body.dark-mode .mission-feat {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.06);
+}
 
-    /* Animations */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+.mission-feat:hover {
+    border-color: var(--border);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-warm);
+}
 
-    .fade-in-up {
-        animation: fadeInUp 0.8s ease-out;
-    }
+.mission-feat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--crimson-pale);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--crimson);
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .about-hero h1 {
-            font-size: 2.5rem;
-        }
+.mission-feat:hover .mission-feat-icon {
+    background: var(--crimson);
+    border-color: var(--crimson);
+    color: white;
+}
 
-        .section-heading {
-            font-size: 2rem;
-        }
+.mission-feat-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 3px;
+}
 
-        .stat-number {
-            font-size: 3rem;
-        }
+body.dark-mode .mission-feat-title { color: var(--ink); }
 
-        .cta-title {
-            font-size: 2rem;
-        }
-    }
+.mission-feat-desc {
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Mission image panel */
+.mission-img-wrap {
+    position: relative;
+    padding-bottom: 30px;
+    padding-right: 30px;
+}
+
+.mission-img-frame {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lift);
+    border: 1px solid var(--border-subtle);
+}
+
+.mission-img-frame img {
+    width: 100%;
+    height: 480px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.mission-img-frame:hover img { transform: scale(1.04); }
+
+.mission-img-card {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow-lift);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 180px;
+}
+
+body.dark-mode .mission-img-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.08);
+}
+
+.mission-img-card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--crimson-pale);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--crimson);
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.mission-img-card-num {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+}
+
+body.dark-mode .mission-img-card-num { color: var(--ink); }
+
+.mission-img-card-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* ── STATS BAND ──────────────────────────────────────────── */
+.stats-band {
+    background: var(--ink);
+    padding: 72px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-band-rule {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--crimson-light), var(--gold), transparent);
+}
+
+.stats-band-bottom-rule {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--crimson-light), var(--gold), transparent);
+}
+
+.stat-item {
+    text-align: center;
+    padding: 16px;
+    position: relative;
+}
+
+.stat-item::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 20%; bottom: 20%;
+    width: 1px;
+    background: rgba(196, 146, 74, 0.2);
+}
+
+.stat-item:last-child::after { display: none; }
+
+.stat-num {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.stat-num sup {
+    font-size: 0.5em;
+    color: var(--gold-light);
+    vertical-align: top;
+    margin-top: 12px;
+    display: inline-block;
+}
+
+.stat-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(240, 232, 222, 0.45);
+    font-weight: 600;
+}
+
+.stat-sub {
+    font-size: 12.5px;
+    color: rgba(240, 232, 222, 0.5);
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+/* ── VALUES SECTION ──────────────────────────────────────── */
+.values-section {
+    background: var(--ivory-mid);
+    padding: 96px 0;
+}
+
+body.dark-mode .values-section { background: var(--ivory-dark); }
+
+.value-card {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 32px 26px;
+    height: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+body.dark-mode .value-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.05);
+}
+
+.value-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+}
+
+.value-card:hover::before { transform: scaleX(1); }
+
+.value-card:hover {
+    border-color: var(--border);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lift);
+}
+
+.value-num {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 700;
+    color: rgba(155, 23, 40, 0.08);
+    line-height: 1;
+    margin-bottom: 16px;
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .value-num { color: rgba(196, 146, 74, 0.1); }
+
+.value-card:hover .value-num { color: rgba(155, 23, 40, 0.15); }
+
+.value-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--crimson-pale);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--crimson);
+    font-size: 20px;
+    margin-bottom: 18px;
+    transition: all 0.25s ease;
+}
+
+.value-card:hover .value-icon {
+    background: var(--crimson);
+    border-color: var(--crimson);
+    color: white;
+}
+
+.value-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 10px;
+}
+
+body.dark-mode .value-title { color: var(--ink); }
+
+.value-desc {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ink-light);
+    margin: 0;
+}
+
+/* ── COMMUNITY BANNER ────────────────────────────────────── */
+.community-banner {
+    position: relative;
+    height: 380px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.community-banner-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url("{% static 'images/community.jpg' %}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    filter: brightness(0.3);
+    z-index: 0;
+}
+
+.community-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(155,23,40,0.6) 0%, rgba(10,8,6,0.5) 100%);
+    z-index: 1;
+}
+
+.community-banner-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.community-banner-content h2 {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 4vw, 48px);
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.3px;
+    margin-bottom: 12px;
+}
+
+.community-banner-content h2 em {
+    font-style: italic;
+    color: var(--gold-light, #e8c97a);
+}
+
+.community-banner-content p {
+    font-size: 15.5px;
+    color: rgba(240,232,222,0.65);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.75;
+}
+
+/* ── TEAM SECTION ────────────────────────────────────────── */
+.team-section {
+    background: var(--ivory);
+    padding: 96px 0;
+}
+
+body.dark-mode .team-section { background: var(--ivory); }
+
+.team-intro {
+    font-size: 15.5px;
+    line-height: 1.88;
+    color: var(--ink-light);
+    max-width: 540px;
+}
+
+.team-card {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+body.dark-mode .team-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.team-card:hover {
+    border-color: var(--border);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lift);
+}
+
+.team-card-top {
+    background: var(--ivory-mid);
+    padding: 40px 32px 32px;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+body.dark-mode .team-card-top {
+    background: #221c17;
+    border-bottom-color: rgba(255,255,255,0.06);
+}
+
+.team-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 14px;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(155, 23, 40, 0.2);
+    position: relative;
+    border: 2px solid rgba(155, 23, 40, 0.15);
+}
+
+.team-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+}
+
+.team-name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+}
+
+body.dark-mode .team-name { color: var(--ink); }
+
+.team-role {
+    font-size: 11.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--crimson);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.team-social {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.team-soc {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.team-soc:hover {
+    border-color: var(--crimson);
+    color: var(--crimson);
+    background: var(--crimson-pale);
+}
+
+.team-card-body {
+    padding: 24px 32px;
+}
+
+.team-bio {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ink-light);
+    margin-bottom: 20px;
+}
+
+.team-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.team-skill {
+    padding: 4px 12px;
+    background: var(--ivory-mid);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink-light);
+    letter-spacing: 0.2px;
+}
+
+body.dark-mode .team-skill {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+    color: var(--ink-light);
+}
+
+/* ── PROCESS SECTION ─────────────────────────────────────── */
+.process-section {
+    background: var(--ivory-mid);
+    padding: 96px 0;
+}
+
+body.dark-mode .process-section { background: var(--ivory-dark); }
+
+.process-card {
+    background: white;
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 36px 28px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .process-card {
+    background: #1a1410;
+    border-color: rgba(255,255,255,0.05);
+}
+
+.process-card:hover {
+    border-color: var(--border);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lift);
+}
+
+.process-step-num {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.process-step-num::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: var(--gold);
+}
+
+.process-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: var(--crimson-pale);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--crimson);
+    font-size: 22px;
+    margin-bottom: 20px;
+    transition: all 0.25s ease;
+}
+
+.process-card:hover .process-icon {
+    background: var(--crimson);
+    border-color: var(--crimson);
+    color: white;
+}
+
+.process-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 10px;
+}
+
+body.dark-mode .process-title { color: var(--ink); }
+
+.process-desc {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ink-light);
+    margin: 0;
+}
+
+/* ── CTA STRIP ───────────────────────────────────────────── */
+.about-cta {
+    background: var(--ink);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-cta-ornament {
+    position: absolute;
+    right: 10%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(196, 146, 74, 0.1);
+    pointer-events: none;
+}
+
+.about-cta-ornament::before {
+    content: '';
+    position: absolute;
+    inset: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(196, 146, 74, 0.06);
+}
+
+.cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.5vw, 46px);
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.3px;
+    line-height: 1.15;
+    margin-bottom: 14px;
+}
+
+.cta-title em { font-style: italic; color: var(--crimson-light); }
+
+.cta-sub {
+    font-size: 15.5px;
+    color: rgba(240, 232, 222, 0.55);
+    max-width: 440px;
+    line-height: 1.78;
+}
+
+.btn-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 28px;
+    background: white;
+    color: var(--crimson);
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border: 1.5px solid white;
+}
+
+.btn-cta-primary:hover {
+    background: var(--ivory);
+    color: var(--crimson-mid);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+.btn-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 26px;
+    background: transparent;
+    color: rgba(240, 232, 222, 0.65);
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border: 1.5px solid rgba(240, 232, 222, 0.2);
+}
+
+.btn-cta-secondary:hover {
+    border-color: rgba(196, 146, 74, 0.45);
+    color: var(--gold-light);
+    background: rgba(196, 146, 74, 0.08);
+}
+
+/* ── SCROLL REVEAL ───────────────────────────────────────── */
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .mission-feature-row { grid-template-columns: 1fr; }
+    .team-card-top { flex-direction: column; align-items: flex-start; }
+    .stat-item::after { display: none; }
+    .stat-num { font-size: 38px; }
+    .mission-img-wrap { padding-bottom: 0; padding-right: 0; }
+    .mission-img-card { position: static; margin-top: 16px; }
+    .about-cta-ornament { display: none; }
+    .community-banner { height: 280px; }
+    .about-hero-bg { background-attachment: scroll; }
+    .community-banner-bg { background-attachment: scroll; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="about-hero text-white text-center">
-    <div class="container py-5 fade-in-up">
-        <h1 class="display-3 fw-bold">Life Link Nepal</h1>
-        <p class="lead fs-3">Revolutionizing Emergency Blood Access Across Nepal</p>
+
+<!-- ── HERO ───────────────────────────────────────────────────── -->
+<section class="about-hero">
+    <div class="about-hero-bg"></div>
+    <div class="about-hero-overlay"></div>
+    <div class="about-hero-rule"></div>
+    <div class="about-hero-bg-text">About</div>
+    <div class="about-hero-content">
+        <div class="container">
+            <div class="about-hero-eyebrow reveal">
+                <div class="about-hero-eyebrow-line"></div>
+                <span>Our Story</span>
+            </div>
+            <h1 class="reveal reveal-delay-1">
+                Built on <em>urgency.</em><br>
+                Driven by purpose.
+            </h1>
+            <p class="about-hero-desc reveal reveal-delay-2">
+                LifeLink Nepal was born from a simple but devastating observation — people were dying in Nepal because blood couldn't be found fast enough. We built the infrastructure to fix that.
+            </p>
+        </div>
+    </div>
+    <div class="about-hero-scroll-hint">
+        <span>Scroll</span>
+        <i class="bi bi-chevron-down"></i>
     </div>
 </section>
 
-<!-- Mission Section -->
+<!-- ── MISSION ────────────────────────────────────────────────── -->
 <section class="mission-section">
     <div class="container">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6 fade-in-up">
-                <span class="mission-badge">OUR MISSION</span>
-                <h2 class="section-heading">Bridging the Gap When Seconds Count</h2>
-                <p class="mission-content mb-4">
-                    In Nepal, an accident or emergency shouldn't be a gamble on social media reach. We built Life Link Nepal because we saw families losing precious time posting on Facebook and waiting for "shares" while their loved ones were in surgery.
+        <div class="row align-items-center g-5 g-xl-6">
+
+            <div class="col-lg-6">
+                <div class="sec-eyebrow reveal">
+                    <div class="sec-eyebrow-line"></div>
+                    <span>Our Mission</span>
+                    <div class="sec-eyebrow-line"></div>
+                </div>
+                <h2 class="sec-title reveal reveal-delay-1">Bridging the Gap<br>When Seconds Count</h2>
+
+                <p class="mission-body reveal reveal-delay-1">
+                    In Nepal, emergencies shouldn't be a gamble on social media reach. We saw families losing precious time posting on Facebook, waiting for "shares" while their loved ones were in surgery.
                 </p>
-                <p class="mission-content mb-4">
-                    Social media algorithms don't prioritize life-and-death situations—but we do. Our platform connects hospitals directly with verified blood donors in real-time, eliminating the chaos and uncertainty of emergency blood searches.
+
+                <div class="mission-highlight reveal reveal-delay-2">
+                    <i class="bi bi-quote"></i>
+                    <p>Social media algorithms don't prioritize life-and-death situations — but we do. LifeLink Nepal connects hospitals directly with verified blood donors in real-time, eliminating the chaos of emergency blood searches.</p>
+                </div>
+
+                <p class="mission-body reveal reveal-delay-2">
+                    Every feature we build is guided by one question: <strong>how fast can we get blood where it's needed?</strong> That relentless focus is what sets us apart.
                 </p>
-                <div class="row g-3 mt-4">
-                    <div class="col-sm-6">
-                        <div class="feature-box">
-                            <div class="feature-icon">
-                                <i class="bi bi-lightning-charge-fill"></i>
-                            </div>
-                            <h5 class="fw-bold">Instant Response</h5>
-                            <p class="text-muted mb-0">No waiting for shares or viral posts</p>
+
+                <div class="mission-feature-row reveal reveal-delay-3">
+                    <div class="mission-feat">
+                        <div class="mission-feat-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+                        <div>
+                            <div class="mission-feat-title">Instant Response</div>
+                            <p class="mission-feat-desc">No waiting for shares or viral posts</p>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="feature-box">
-                            <div class="feature-icon">
-                                <i class="bi bi-geo-alt-fill"></i>
-                            </div>
-                            <h5 class="fw-bold">Local Network</h5>
-                            <p class="text-muted mb-0">Find verified donors near you</p>
+                    <div class="mission-feat">
+                        <div class="mission-feat-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div>
+                            <div class="mission-feat-title">Local Network</div>
+                            <p class="mission-feat-desc">Verified donors near every hospital</p>
+                        </div>
+                    </div>
+                    <div class="mission-feat">
+                        <div class="mission-feat-icon"><i class="bi bi-shield-check"></i></div>
+                        <div>
+                            <div class="mission-feat-title">Verified Donors</div>
+                            <p class="mission-feat-desc">Every donor screened and trusted</p>
+                        </div>
+                    </div>
+                    <div class="mission-feat">
+                        <div class="mission-feat-icon"><i class="bi bi-clock-fill"></i></div>
+                        <div>
+                            <div class="mission-feat-title">24/7 Emergency</div>
+                            <p class="mission-feat-desc">Round-the-clock live monitoring</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 fade-in-up">
-                <div class="image-container">
-                    <img src="{% static 'images/community.png' %}" alt="Nepali Community" class="img-fluid">
-                    <div class="image-overlay">
-                        <h5 class="fw-bold mb-2"><i class="bi bi-heart-fill text-danger me-2"></i>Trusted by Thousands</h5>
-                        <p class="mb-0">Directly connecting hospitals, donors, and patients across Nepal to save lives every single day.</p>
+
+            <div class="col-lg-6 reveal reveal-delay-2">
+                <div class="mission-img-wrap">
+                    <div class="mission-img-frame">
+                        <img src="{% static 'images/community.png' %}" alt="LifeLink Nepal Community">
+                    </div>
+                    <div class="mission-img-card">
+                        <div class="mission-img-card-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+                        <div>
+                            <div class="mission-img-card-num">1,200+</div>
+                            <div class="mission-img-card-label">Lives Saved</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -394,92 +1064,279 @@
     </div>
 </section>
 
-<!-- Stats Section -->
-<section class="stats-section">
-    <div class="container position-relative">
-        <div class="text-center mb-5 fade-in-up">
-            <h2 class="display-4 fw-bold text-white mb-3">Our Impact in Numbers</h2>
-            <p class="lead text-white opacity-75">Making a real difference across Nepal</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-3 col-sm-6 fade-in-up">
-                <div class="stat-card">
-                    <div class="stat-number">5000+</div>
+<!-- ── STATS BAND ─────────────────────────────────────────────── -->
+<div class="stats-band">
+    <div class="stats-band-rule"></div>
+    <div class="stats-band-bottom-rule"></div>
+    <div class="container">
+        <div class="row g-0">
+            <div class="col-6 col-md-3">
+                <div class="stat-item reveal">
+                    <div class="stat-num">5,000<sup>+</sup></div>
                     <div class="stat-label">Registered Donors</div>
+                    <div class="stat-sub">Across Nepal</div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 fade-in-up" style="animation-delay: 0.1s;">
-                <div class="stat-card">
-                    <div class="stat-number">1200+</div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item reveal reveal-delay-1">
+                    <div class="stat-num">1,200<sup>+</sup></div>
                     <div class="stat-label">Lives Saved</div>
+                    <div class="stat-sub">And counting</div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 fade-in-up" style="animation-delay: 0.2s;">
-                <div class="stat-card">
-                    <div class="stat-number">50+</div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item reveal reveal-delay-2">
+                    <div class="stat-num">50<sup>+</sup></div>
                     <div class="stat-label">Partner Hospitals</div>
+                    <div class="stat-sub">Bagmati Province</div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 fade-in-up" style="animation-delay: 0.3s;">
-                <div class="stat-card">
-                    <div class="stat-number">24/7</div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item reveal reveal-delay-3">
+                    <div class="stat-num">24<sup>/7</sup></div>
                     <div class="stat-label">Emergency Support</div>
+                    <div class="stat-sub">Always online</div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
-<!-- How It Works -->
-<section class="py-5 bg-light">
+<!-- ── VALUES ─────────────────────────────────────────────────── -->
+<section class="values-section">
     <div class="container">
-        <div class="text-center mb-5 fade-in-up">
-            <span class="mission-badge">THE PROCESS</span>
-            <h2 class="section-heading mt-3">How Life Link Works</h2>
-            <p class="lead text-muted">A simple platform designed for fast, life-saving action</p>
+        <div class="sec-header text-center reveal">
+            <div class="sec-eyebrow" style="justify-content: center;">
+                <div class="sec-eyebrow-line"></div>
+                <span>What We Stand For</span>
+                <div class="sec-eyebrow-line"></div>
+            </div>
+            <h2 class="sec-title">Our Core Values</h2>
+            <p class="sec-subtitle mx-auto">Everything we build, every decision we make, comes back to these principles.</p>
         </div>
-        
+
         <div class="row g-4">
-            <div class="col-md-4 fade-in-up">
-                <div class="process-step">
-                    <div class="process-number">1</div>
-                    <h5 class="fw-bold mb-3">Request Posted</h5>
-                    <p class="text-muted">Hospitals  submit an urgent blood request with specific blood type and location details.</p>
+            <div class="col-md-6 col-lg-3">
+                <div class="value-card reveal">
+                    <div class="value-num">01</div>
+                    <div class="value-icon"><i class="bi bi-stopwatch-fill"></i></div>
+                    <div class="value-title">Speed Above All</div>
+                    <p class="value-desc">Every second in an emergency matters. We engineer for response time, not convenience.</p>
                 </div>
             </div>
-            <div class="col-md-4 fade-in-up" style="animation-delay: 0.15s;">
-                <div class="process-step">
-                    <div class="process-number">2</div>
-                    <h5 class="fw-bold mb-3">Donors Notified</h5>
-                    <p class="text-muted">Our system instantly alerts all matching verified donors in the nearby area through the app, email, and SMS.</p>
+            <div class="col-md-6 col-lg-3">
+                <div class="value-card reveal reveal-delay-1">
+                    <div class="value-num">02</div>
+                    <div class="value-icon"><i class="bi bi-shield-fill-check"></i></div>
+                    <div class="value-title">Trust is Sacred</div>
+                    <p class="value-desc">Hospitals trust us with lives. Every donor in our network is verified. No exceptions.</p>
                 </div>
             </div>
-            <div class="col-md-4 fade-in-up" style="animation-delay: 0.3s;">
-                <div class="process-step">
-                    <div class="process-number">3</div>
-                    <h5 class="fw-bold mb-3">Life Saved</h5>
-                    <p class="text-muted">The donor confirms availability, arrives at the hospital, and donates blood to save a precious life.</p>
+            <div class="col-md-6 col-lg-3">
+                <div class="value-card reveal reveal-delay-2">
+                    <div class="value-num">03</div>
+                    <div class="value-icon"><i class="bi bi-people-fill"></i></div>
+                    <div class="value-title">Community First</div>
+                    <p class="value-desc">We're not a tech company. We're a community of Nepalis looking out for each other.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="value-card reveal reveal-delay-3">
+                    <div class="value-num">04</div>
+                    <div class="value-icon"><i class="bi bi-transparency"></i></div>
+                    <div class="value-title">Radical Transparency</div>
+                    <p class="value-desc">Donors see their impact. Hospitals see real-time status. No black boxes here.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
-<section class="cta-section">
+<!-- ── COMMUNITY PHOTO BANNER ─────────────────────────────────── -->
+<div class="community-banner reveal">
+    <div class="community-banner-bg"></div>
+    <div class="community-banner-overlay"></div>
+    <div class="community-banner-content">
+        <h2>Every drop counts.<br><em>Every donor matters.</em></h2>
+        <p>Join thousands of Nepalis who have already made a difference — one donation at a time.</p>
+    </div>
+</div>
+
+<!-- ── TEAM ───────────────────────────────────────────────────── -->
+<section class="team-section">
     <div class="container">
-        <div class="cta-card fade-in-up">
-            <h2 class="cta-title">Become Part of Life Link Nepal</h2>
-            <p class="lead text-muted mb-5">Your contribution today could be someone's tomorrow. Join our network of life-savers and make an impact when it matters most.</p>
-            <div class="d-flex flex-wrap gap-4 justify-content-center">
-                <a href="{% url 'accounts:register' %}?type=donor" class="btn btn-custom">
-                    <i class="bi bi-person-plus-fill me-2"></i>Join as a Donor
-                </a>
-                <a href="{% url 'accounts:register' %}?type=hospital" class="btn btn-outline-custom">
-                    <i class="bi bi-hospital me-2"></i>Register Your Hospital
-                </a>
+        <div class="row align-items-end mb-5 g-4">
+            <div class="col-lg-6">
+                <div class="sec-eyebrow reveal">
+                    <div class="sec-eyebrow-line"></div>
+                    <span>The People Behind It</span>
+                </div>
+                <h2 class="sec-title reveal reveal-delay-1">A Small Team.<br>A Focused Mission.</h2>
+            </div>
+            <div class="col-lg-6 reveal reveal-delay-1">
+                <p class="team-intro">LifeLink Nepal was founded by two people who refused to accept that blood shortages in Nepal were inevitable. Small team, long hours, and one clear purpose.</p>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+
+            <!-- Founder 1 — Yukta Dhungana -->
+            <div class="col-md-6 col-lg-5">
+                <div class="team-card reveal reveal-delay-1">
+                    <div class="team-card-top">
+                        <div class="team-avatar">
+                            <img src="{% static 'images/Founder1.jpeg' %}" alt="Yukta Dhungana">
+                        </div>
+                        <div>
+                            <div class="team-name">Yukta Dhungana</div>
+                            <div class="team-role">Co-Founder &amp; Backend Lead</div>
+                            <p style="font-size: 13px; color: var(--ink-muted); margin: 0;">Kathmandu, Nepal</p>
+                            <div class="team-social">
+                                <a href="https://www.linkedin.com/in/yukta-dhungana-71b21b2b7/" target="_blank" rel="noopener noreferrer" class="team-soc"><i class="bi bi-linkedin"></i></a>
+                                <a href="https://github.com/dhunganayukta" target="_blank" rel="noopener noreferrer" class="team-soc"><i class="bi bi-github"></i></a>
+                                <a href="mailto:yuktadhungana8@gmail.com" class="team-soc"><i class="bi bi-envelope"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-card-body">
+                        <p class="team-bio">
+                            Yukta built the core matching engine and API infrastructure that powers LifeLink Nepal. With a background in Django and systems design, she focuses on making sure every notification reaches the right donor at the right time — reliably, every time.
+                        </p>
+                        <div class="team-skills">
+                            <span class="team-skill">Django</span>
+                            <span class="team-skill">Python</span>
+                            <span class="team-skill">REST APIs</span>
+                            <span class="team-skill">PostgreSQL</span>
+                            <span class="team-skill">Systems Design</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Founder 2 — Nitu Joshi -->
+            <div class="col-md-6 col-lg-5">
+                <div class="team-card reveal reveal-delay-2">
+                    <div class="team-card-top">
+                        <div class="team-avatar" style="border-color: rgba(196,146,74,0.2); box-shadow: 0 8px 20px rgba(196,146,74,0.2);">
+                            <img src="{% static 'images/founder2.png' %}" alt="Nitu Joshi">
+                        </div>
+                        <div>
+                            <div class="team-name">Nitu Joshi</div>
+                            <div class="team-role">Co-Founder &amp; Frontend Lead</div>
+                            <p style="font-size: 13px; color: var(--ink-muted); margin: 0;">Kathmandu, Nepal</p>
+                            <div class="team-social">
+                                <a href="https://www.linkedin.com/in/nitu-joshi-521838319/" target="_blank" rel="noopener noreferrer" class="team-soc"><i class="bi bi-linkedin"></i></a>
+                                <a href="https://github.com/nitu-joshi" target="_blank" rel="noopener noreferrer" class="team-soc"><i class="bi bi-github"></i></a>
+                                <a href="mailto:nitu.joshi@example.com" class="team-soc"><i class="bi bi-envelope"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-card-body">
+                        <p class="team-bio">
+                            Nitu leads the user experience and front-end design of LifeLink Nepal. She believes that in emergencies, interfaces must be instant and frictionless. Her work ensures that hospitals and donors can act within seconds — no confusion, no wasted time.
+                        </p>
+                        <div class="team-skills">
+                            <span class="team-skill">HTML/CSS</span>
+                            <span class="team-skill">JavaScript</span>
+                            <span class="team-skill">Bootstrap</span>
+                            <span class="team-skill">UX Design</span>
+                            <span class="team-skill">Django Templates</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Team note -->
+        <div class="text-center mt-5 reveal">
+            <p style="font-style: italic; font-family: var(--font-display); font-size: 16px; color: var(--ink-muted);">
+                "Two people. One mission. A thousand reasons to keep going."
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ── HOW IT WORKS ───────────────────────────────────────────── -->
+<section class="process-section">
+    <div class="container">
+        <div class="sec-header text-center reveal">
+            <div class="sec-eyebrow" style="justify-content: center;">
+                <div class="sec-eyebrow-line"></div>
+                <span>The Platform</span>
+                <div class="sec-eyebrow-line"></div>
+            </div>
+            <h2 class="sec-title">How Life Link Works</h2>
+            <p class="sec-subtitle mx-auto">Designed for fast, life-saving action — from first post to blood delivered.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="process-card reveal">
+                    <div class="process-step-num">Step 01</div>
+                    <div class="process-icon"><i class="bi bi-hospital-fill"></i></div>
+                    <div class="process-title">Hospital Posts Request</div>
+                    <p class="process-desc">The hospital logs an urgent request — blood type, units needed, urgency level. It takes under a minute.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="process-card reveal reveal-delay-1">
+                    <div class="process-step-num">Step 02</div>
+                    <div class="process-icon"><i class="bi bi-bell-fill"></i></div>
+                    <div class="process-title">Donors Are Notified</div>
+                    <p class="process-desc">Our system instantly alerts compatible verified donors nearby — ranked by proximity, compatibility, and availability.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="process-card reveal reveal-delay-2">
+                    <div class="process-step-num">Step 03</div>
+                    <div class="process-icon"><i class="bi bi-heart-fill"></i></div>
+                    <div class="process-title">A Life is Saved</div>
+                    <p class="process-desc">The donor confirms, arrives, and donates. The request is fulfilled. The donation is logged. A family goes home together.</p>
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- ── CTA ────────────────────────────────────────────────────── -->
+<section class="about-cta">
+    <div class="about-cta-ornament"></div>
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-8 reveal">
+                <div class="sec-eyebrow">
+                    <div class="sec-eyebrow-line" style="background: rgba(196,146,74,0.5);"></div>
+                    <span>Join the Mission</span>
+                </div>
+                <div class="cta-title">Become Part of<br><em>Life Link Nepal.</em></div>
+                <p class="cta-sub">Your contribution today could be someone's tomorrow. Join our growing network and make an impact when it matters most.</p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <a href="{% url 'accounts:register_page' %}?type=donor" class="btn-cta-primary">
+                        <i class="bi bi-heart-pulse"></i> Join as a Donor
+                    </a>
+                    <a href="{% url 'accounts:register_page' %}?type=hospital" class="btn-cta-secondary">
+                        <i class="bi bi-hospital"></i> Register Hospital
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => {
+    revealObserver.observe(el);
+});
+// Trigger above-fold elements immediately
+document.querySelectorAll('.about-hero .reveal').forEach(el => el.classList.add('visible'));
+</script>
 {% endblock %}

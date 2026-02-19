@@ -1,348 +1,350 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Blood Request Details - Life Link Nepal{% endblock %}
+{% block title %}Blood Request Details — LifeLink Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
-    .info-card {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
+.dash-wrap { background: var(--ivory); min-height: 100vh; padding: 0 0 80px; }
 
-    .fade-in-up {
-        animation: fadeInUp 0.6s ease-out;
-    }
+/* HERO */
+.dash-hero { background: var(--ink); padding: 40px 0; position: relative; overflow: hidden; margin-bottom: 48px; }
+.dash-hero::before { content:''; position:absolute; top:-100px; right:-100px; width:340px; height:340px; border-radius:50%; border:1px solid rgba(196,146,74,0.1); pointer-events:none; }
+.dash-hero::after  { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; border:1px solid rgba(196,146,74,0.06); pointer-events:none; }
+.dash-hero-crimson-bar { position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(90deg, var(--crimson), var(--gold), var(--crimson-light)); }
+.dash-hero-eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; }
+.dash-hero-eyebrow span { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; font-weight:600; color:var(--gold); }
+.dash-hero-eyebrow-line { width:20px; height:1px; background:var(--gold); opacity:0.5; }
+.dash-hero h2 { font-family:var(--font-display); font-size:clamp(26px,3.5vw,42px); font-weight:600; color:white; letter-spacing:-0.3px; line-height:1.15; margin-bottom:6px; }
+.dash-hero-sub { font-size:14px; color:rgba(240,232,222,0.55); display:flex; align-items:center; gap:6px; }
+.btn-hero-outline { display:inline-flex; align-items:center; gap:8px; padding:12px 26px; background:transparent; color:rgba(255,255,255,0.8); font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid rgba(255,255,255,0.3); }
+.btn-hero-outline:hover { background:rgba(255,255,255,0.1); color:white; border-color:rgba(255,255,255,0.5); }
 
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+/* CARDS */
+.dash-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; overflow:hidden; margin-bottom:24px; }
+body.dark-mode .dash-card { background:#1a1410; border-color:rgba(255,255,255,0.06); }
+.dash-card-header { padding:20px 24px; border-bottom:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:var(--ivory-mid); }
+body.dark-mode .dash-card-header { background:#221c17; border-color:rgba(255,255,255,0.05); }
+.dash-card-title { font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:10px; }
+.dash-card-title i { color:var(--crimson); font-size:16px; }
+.dash-card-body { padding:20px 24px; }
 
-    body.dark-mode .info-card {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
+/* STAT MINI BLOCKS */
+.stat-block { background:var(--ivory-mid); border:1px solid var(--border-subtle); border-radius:10px; padding:16px; text-align:center; }
+body.dark-mode .stat-block { background:#221c17; border-color:rgba(255,255,255,0.05); }
+.stat-block-label { font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase; font-weight:600; color:var(--ink-muted); margin-bottom:6px; }
+.stat-block-value { font-family:var(--font-display); font-size:26px; font-weight:700; color:var(--ink); line-height:1; }
+body.dark-mode .stat-block-value { color:var(--ink); }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; letter-spacing:0.3px; }
+.tag-crimson { background:var(--crimson-pale); color:var(--crimson); border:1px solid var(--border); }
+.tag-gold    { background:var(--gold-pale);    color:var(--gold);    border:1px solid rgba(196,146,74,0.25); }
+.tag-ink     { background:rgba(28,20,16,0.06); color:var(--ink-mid); border:1px solid var(--border-subtle); }
+.tag-green   { background:rgba(74,222,128,0.1); color:#16a34a;       border:1px solid rgba(74,222,128,0.2); }
+.tag-blue    { background:rgba(59,130,246,0.1); color:#2563eb;       border:1px solid rgba(59,130,246,0.2); }
+
+/* NOTICE BAR */
+.notice-bar { border-radius:10px; padding:14px 18px; font-size:13px; display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; }
+.notice-bar.warning { background:rgba(196,146,74,0.08); border:1px solid rgba(196,146,74,0.25); color:var(--ink-mid); }
+.notice-bar.info    { background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2);  color:var(--ink-mid); }
+.notice-bar.success { background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.25); color:var(--ink-mid); }
+.notice-bar i { margin-top:1px; flex-shrink:0; }
+.notice-bar.warning i { color:var(--gold); }
+.notice-bar.info    i { color:#2563eb; }
+.notice-bar.success i { color:#16a34a; }
+
+/* DONOR CARD */
+.donor-item { border:1px solid var(--border-subtle); border-radius:12px; padding:20px; margin-bottom:14px; background:white; transition:all 0.25s ease; }
+body.dark-mode .donor-item { background:#221c17; border-color:rgba(255,255,255,0.06); }
+.donor-item:hover { border-color:var(--border); box-shadow:var(--shadow-warm); transform:translateY(-2px); }
+.donor-avatar { width:48px; height:48px; border-radius:12px; background:var(--crimson-pale); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--crimson); flex-shrink:0; }
+.donor-metric { background:var(--ivory-mid); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 14px; text-align:center; }
+body.dark-mode .donor-metric { background:#1a1410; }
+.donor-metric-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; font-weight:600; color:var(--ink-muted); margin-bottom:4px; }
+.donor-metric-value { font-family:var(--font-display); font-size:18px; font-weight:700; color:var(--ink); line-height:1; }
+
+/* ACCEPTED DONOR */
+.accepted-card { border:2px solid rgba(74,222,128,0.4); border-radius:14px; padding:24px; background:rgba(74,222,128,0.04); margin-bottom:20px; }
+body.dark-mode .accepted-card { background:rgba(74,222,128,0.06); }
+
+/* STEP LIST */
+.step-item { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--border-subtle); }
+.step-item:last-child { border-bottom:none; padding-bottom:0; }
+.step-num { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
+.step-num.blue   { background:rgba(59,130,246,0.1); color:#2563eb; }
+.step-num.gold   { background:var(--gold-pale);     color:var(--gold); }
+.step-num.green  { background:rgba(74,222,128,0.1); color:#16a34a; }
+.step-title { font-size:13.5px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+.step-sub   { font-size:12px; color:var(--ink-muted); }
+
+/* PRIVACY LIST */
+.privacy-item { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border-subtle); font-size:13px; color:var(--ink-mid); }
+.privacy-item:last-child { border-bottom:none; }
+.privacy-item i { color:#16a34a; font-size:14px; }
+
+/* ACTION BUTTONS */
+.btn-action-fill { display:flex; align-items:center; justify-content:center; gap:8px; padding:11px 20px; background:var(--crimson); color:white; font-size:13.5px; font-weight:700; border-radius:8px; border:1.5px solid var(--crimson); cursor:pointer; transition:all 0.25s ease; width:100%; text-decoration:none; }
+.btn-action-fill:hover { background:var(--crimson-mid); border-color:var(--crimson-mid); color:white; transform:translateY(-1px); box-shadow:0 6px 18px rgba(155,23,40,0.3); }
+.btn-action-outline { display:flex; align-items:center; justify-content:center; gap:8px; padding:11px 20px; background:transparent; color:var(--crimson); font-size:13.5px; font-weight:600; border-radius:8px; border:1.5px solid rgba(155,23,40,0.3); transition:all 0.25s ease; width:100%; text-decoration:none; }
+.btn-action-outline:hover { background:var(--crimson-pale); border-color:var(--crimson); }
+
+/* AI BADGE */
+.ai-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); border-radius:20px; font-size:11px; font-weight:700; color:#2563eb; letter-spacing:0.5px; }
+
+/* EMPTY STATE */
+.empty-state { text-align:center; padding:56px 24px; }
+.empty-state-icon { width:72px; height:72px; border-radius:50%; background:var(--ivory-mid); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:28px; color:var(--ink-muted); }
+.empty-state h6 { font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--ink); margin-bottom:6px; }
+.empty-state p { font-size:13.5px; color:var(--ink-muted); margin-bottom:20px; }
+.btn-create { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:var(--crimson); color:white; font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid var(--crimson); }
+.btn-create:hover { background:var(--crimson-mid); color:white; transform:translateY(-2px); box-shadow:0 6px 18px rgba(155,23,40,0.35); }
+
+body.dark-mode .dash-wrap { background:var(--ivory); }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Header -->
-<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
-            <div class="mb-3 mb-md-0">
-                <h2 class="fw-bold mb-1">
-                    <i class="bi bi-search me-2"></i>Blood Request Details
-                </h2>
-                <p class="mb-0">Donor information is privacy protected</p>
-            </div>
-            <div class="text-end">
-                <a href="{% url 'hospital_dashboard' %}" class="btn btn-light">
-                    <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-                </a>
+<div class="dash-wrap">
+
+    <!-- HERO -->
+    <div class="dash-hero">
+        <div class="dash-hero-crimson-bar"></div>
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <div class="dash-hero-eyebrow">
+                        <div class="dash-hero-eyebrow-line"></div>
+                        <span>Request Details</span>
+                        <div class="dash-hero-eyebrow-line"></div>
+                    </div>
+                    <h2>Blood Request Details</h2>
+                    <div class="dash-hero-sub">
+                        <i class="bi bi-shield-fill-check"></i>
+                        Donor information is privacy protected
+                    </div>
+                </div>
+                <div class="col-lg-4 d-flex justify-content-lg-end">
+                    <a href="{% url 'hospital_dashboard' %}" class="btn-hero-outline">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-</section>
 
-<section class="py-5">
     <div class="container">
-        <div class="row">
-            <!-- Main Content -->
+        <div class="row g-4">
+
+            <!-- LEFT COLUMN -->
             <div class="col-lg-8">
-                <!-- Request Info Card -->
-                <div class="info-card mb-4 fade-in-up" style="background: linear-gradient(135deg, rgba(199, 30, 53, 0.1) 0%, rgba(229, 57, 73, 0.1) 100%);">
-                    <h4 class="fw-bold mb-3">
-                        <i class="bi bi-clipboard-pulse text-danger me-2"></i>
-                        Blood Request Details
-                    </h4>
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="text-center p-3 bg-white rounded">
-                                <small class="text-muted d-block mb-1">Blood Type</small>
-                                <h3 class="fw-bold text-danger mb-0">{{ blood_request.blood_type }}</h3>
-                            </div>
+
+                <!-- Request Summary Card -->
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title">
+                            <i class="bi bi-clipboard-pulse"></i> Request Summary
                         </div>
-                        <div class="col-md-3">
-                            <div class="text-center p-3 bg-white rounded">
-                                <small class="text-muted d-block mb-1">Units Needed</small>
-                                <h3 class="fw-bold text-primary mb-0">{{ blood_request.units_needed }}</h3>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center p-3 bg-white rounded">
-                                <small class="text-muted d-block mb-1">Patient</small>
-                                <h6 class="fw-bold mb-0">{{ blood_request.patient_name }}</h6>
-                                {% if blood_request.patient_age %}
-                                    <small class="text-muted">{{ blood_request.patient_age }} yrs</small>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center p-3 bg-white rounded">
-                                <small class="text-muted d-block mb-1">Urgency</small>
-                                <span class="badge 
-                                    {% if blood_request.urgency_level == 'critical' %}bg-danger
-                                    {% elif blood_request.urgency_level == 'urgent' %}bg-warning text-dark
-                                    {% else %}bg-success{% endif %} fs-6">
-                                    {{ blood_request.urgency_level|upper }}
-                                </span>
-                            </div>
-                        </div>
+                        {% if blood_request.status == 'fulfilled' %}
+                            <span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Fulfilled</span>
+                        {% elif blood_request.status == 'pending' %}
+                            <span class="tag tag-gold"><i class="bi bi-clock-history"></i> Pending</span>
+                        {% elif blood_request.status == 'cancelled' %}
+                            <span class="tag tag-ink"><i class="bi bi-x-circle"></i> Cancelled</span>
+                        {% endif %}
                     </div>
-                    
-                    <!-- Status -->
-                    <div class="mt-3 text-center">
-                        <span class="badge 
-                            {% if blood_request.status == 'fulfilled' %}bg-success
-                            {% elif blood_request.status == 'pending' %}bg-warning text-dark
-                            {% elif blood_request.status == 'cancelled' %}bg-secondary
-                            {% else %}bg-info{% endif %} fs-5 px-4 py-2">
-                            Status: {{ blood_request.status|upper }}
-                        </span>
+                    <div class="dash-card-body">
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <div class="stat-block">
+                                    <div class="stat-block-label">Blood Type</div>
+                                    <div class="stat-block-value" style="color:var(--crimson);">{{ blood_request.blood_type }}</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-block">
+                                    <div class="stat-block-label">Units</div>
+                                    <div class="stat-block-value">{{ blood_request.units_needed }}</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-block">
+                                    <div class="stat-block-label">Patient</div>
+                                    <div style="font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--ink); margin-top:4px;">
+                                        {{ blood_request.patient_name }}
+                                        {% if blood_request.patient_age %}<div style="font-size:12px; color:var(--ink-muted); font-weight:400;">{{ blood_request.patient_age }} yrs</div>{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-block">
+                                    <div class="stat-block-label">Urgency</div>
+                                    <div style="margin-top:6px;">
+                                        {% if blood_request.urgency_level == 'critical' %}
+                                            <span class="tag tag-crimson">Critical</span>
+                                        {% elif blood_request.urgency_level == 'urgent' %}
+                                            <span class="tag tag-gold">Urgent</span>
+                                        {% else %}
+                                            <span class="tag tag-green">{{ blood_request.urgency_level|title }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Privacy Notice -->
-                <div class="alert alert-warning border-warning mb-4">
-                    <i class="bi bi-shield-exclamation me-2"></i>
-                    <strong>Privacy Protected:</strong> For donor safety, only username, blood type, and distance are visible. 
-                    Full donor details are managed by admin. Admin will handle donor notifications.
+                <div class="notice-bar warning">
+                    <i class="bi bi-shield-exclamation"></i>
+                    <div><strong style="color:var(--ink);">Privacy Protected:</strong> For donor safety, only username, blood type, and distance are visible. Full donor details are managed by admin.</div>
                 </div>
 
-                <!-- Results Header -->
-                <div class="info-card mb-4 fade-in-up">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="fw-bold mb-0">
-                            <i class="bi bi-people-fill text-danger me-2"></i>
-                            {{ total_donors_found }} Donors Found
-                        </h4>
-                        <span class="badge bg-info fs-6">
-                            <i class="bi bi-cpu me-1"></i>Admin Managed
-                        </span>
+                <!-- Donors Found Header -->
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title">
+                            <i class="bi bi-people-fill"></i> {{ total_donors_found }} Donors Found
+                        </div>
+                        <span class="ai-badge"><i class="bi bi-cpu"></i> Admin Managed</span>
                     </div>
                 </div>
 
-                <!-- Accepted Donor (if any) -->
+                <!-- Accepted Donor -->
                 {% if accepted_donor %}
-                <div class="info-card mb-4 fade-in-up border-start border-5 border-success">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h5 class="fw-bold text-success mb-0">
-                            <i class="bi bi-check-circle-fill me-2"></i>
-                            Donor Accepted!
-                        </h5>
-                        <span class="badge bg-success fs-6">MATCHED</span>
+                <div class="accepted-card">
+                    <div class="d-flex align-items-center justify-content-between mb-16" style="margin-bottom:16px;">
+                        <div style="font-family:var(--font-display); font-size:18px; font-weight:600; color:#16a34a; display:flex; align-items:center; gap:8px;">
+                            <i class="bi bi-check-circle-fill"></i> Donor Accepted!
+                        </div>
+                        <span class="tag tag-green">Matched</span>
                     </div>
-                    
                     <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="text-center p-3 bg-light rounded">
-                                <small class="text-muted d-block mb-1">Username</small>
-                                <h6 class="fw-bold mb-0">@{{ accepted_donor.username }}</h6>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center p-3 bg-light rounded">
-                                <small class="text-muted d-block mb-1">Blood Type</small>
-                                <h5 class="fw-bold text-danger mb-0">{{ accepted_donor.blood_type }}</h5>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center p-3 bg-light rounded">
-                                <small class="text-muted d-block mb-1">Distance</small>
-                                <h6 class="fw-bold mb-0">
-                                    {% if accepted_donor.distance %}
-                                        {{ accepted_donor.distance }} km
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </h6>
-                            </div>
-                        </div>
+                        <div class="col-4"><div class="donor-metric"><div class="donor-metric-label">Username</div><div class="donor-metric-value" style="font-size:14px;">@{{ accepted_donor.username }}</div></div></div>
+                        <div class="col-4"><div class="donor-metric"><div class="donor-metric-label">Blood Type</div><div class="donor-metric-value" style="color:var(--crimson);">{{ accepted_donor.blood_type }}</div></div></div>
+                        <div class="col-4"><div class="donor-metric"><div class="donor-metric-label">Distance</div><div class="donor-metric-value" style="font-size:15px;">{% if accepted_donor.distance %}{{ accepted_donor.distance }} km{% else %}N/A{% endif %}</div></div></div>
                     </div>
-                    
-                    <div class="alert alert-info mt-3 mb-0">
-                        <i class="bi bi-info-circle-fill me-2"></i>
-                        <strong>Next Steps:</strong> The donor will contact you directly through the admin. 
-                        Please coordinate donation details.
+                    <div class="notice-bar info" style="margin-top:16px; margin-bottom:0;">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <div><strong style="color:var(--ink);">Next Steps:</strong> The donor will contact you directly through the admin. Please coordinate donation details.</div>
                     </div>
                 </div>
                 {% endif %}
 
-                <!-- Donors List (LIMITED INFO) -->
+                <!-- Donor Queue -->
                 {% if donor_data %}
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-list-ul me-2"></i>Queued Donors (Top {{ donor_data|length }})
-                    </h5>
-                    {% for donor in donor_data %}
-                    <div class="info-card mb-3 fade-in-up"
-                        style="animation-delay: {{ forloop.counter0|stringformat:'d' }}00ms;">
-                        
-                        <!-- Donor Header -->
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                     style="width: 50px; height: 50px;">
-                                    <i class="bi bi-person-fill text-danger fs-4"></i>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold mb-0">@{{ donor.username }}</h5>
-                                    <small class="text-muted">Anonymous Donor</small>
-                                </div>
-                            </div>
-                            <span class="badge bg-{{ donor.status|lower }} fs-6">
-                                {{ donor.status }}
-                            </span>
-                        </div>
-
-                        <!-- LIMITED Metrics -->
-                        <div class="row g-2">
-                            <div class="col-4">
-                                <div class="bg-light rounded p-2 text-center">
-                                    <div class="text-danger fw-bold fs-5">{{ donor.blood_type }}</div>
-                                    <small class="text-muted">Blood Type</small>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="bg-light rounded p-2 text-center">
-                                    <div class="text-primary fw-bold fs-5">
-                                        {% if donor.distance %}
-                                            {{ donor.distance }} km
-                                        {% else %}
-                                            N/A
-                                        {% endif %}
-                                    </div>
-                                    <small class="text-muted">Distance</small>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="bg-light rounded p-2 text-center">
-                                    <div class="text-muted fw-bold fs-5">
-                                        <i class="bi bi-shield-lock-fill"></i>
-                                    </div>
-                                    <small class="text-muted">Private</small>
-                                </div>
+                <div style="font-family:var(--font-display); font-size:17px; font-weight:600; color:var(--ink); margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+                    <i class="bi bi-list-ul" style="color:var(--crimson);"></i>
+                    Queued Donors (Top {{ donor_data|length }})
+                </div>
+                {% for donor in donor_data %}
+                <div class="donor-item">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-12" style="gap:12px;">
+                            <div class="donor-avatar"><i class="bi bi-person-fill"></i></div>
+                            <div>
+                                <div style="font-weight:700; color:var(--ink); font-size:14px;">@{{ donor.username }}</div>
+                                <div style="font-size:12px; color:var(--ink-muted);">Anonymous Donor</div>
                             </div>
                         </div>
+                        <span class="tag tag-green">{{ donor.status }}</span>
                     </div>
-                    {% endfor %}
-                    
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle-fill me-2"></i>
-                        <strong>Note:</strong> Admin is managing donor notifications sequentially. 
-                        You will be notified when a donor accepts.
+                    <div class="row g-2">
+                        <div class="col-4"><div class="donor-metric"><div class="donor-metric-label">Blood</div><div class="donor-metric-value" style="color:var(--crimson);">{{ donor.blood_type }}</div></div></div>
+                        <div class="col-4"><div class="donor-metric"><div class="donor-metric-label">Distance</div><div class="donor-metric-value" style="font-size:15px;">{% if donor.distance %}{{ donor.distance }} km{% else %}N/A{% endif %}</div></div></div>
+                        <div class="col-4"><div class="donor-metric"><div class="donor-metric-label">Details</div><div style="text-align:center; margin-top:4px;"><i class="bi bi-shield-lock-fill" style="color:var(--ink-muted); font-size:18px;"></i></div></div></div>
                     </div>
+                </div>
+                {% endfor %}
+                <div class="notice-bar info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <div><strong style="color:var(--ink);">Note:</strong> Admin is managing donor notifications sequentially. You will be notified when a donor accepts.</div>
+                </div>
                 {% else %}
-                    <div class="info-card text-center py-5 fade-in-up">
-                        <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
-                        <h4 class="text-muted mt-3">No Matching Donors Found</h4>
-                        <p class="text-muted">No compatible donors are currently available within 50km</p>
-                        <a href="{% url 'hospital_donors' %}" class="btn btn-primary mt-3">
+                <div class="dash-card">
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="bi bi-search"></i></div>
+                        <h6>No Matching Donors Found</h6>
+                        <p>No compatible donors are currently available within 50km.</p>
+                        <a href="{% url 'hospital_donors' %}" class="btn-create">
                             <i class="bi bi-search"></i> Browse All Donors
                         </a>
                     </div>
+                </div>
                 {% endif %}
+
             </div>
 
-            <!-- Sidebar -->
+            <!-- RIGHT SIDEBAR -->
             <div class="col-lg-4">
+
                 <!-- Request Actions -->
-                <div class="info-card fade-in-up mb-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-gear text-danger me-2"></i>
-                        Request Actions
-                    </h5>
-                    
-                    {% if blood_request.status == 'pending' %}
-                    <form method="POST" action="{% url 'mark_fulfilled' blood_request.id %}" class="mb-2">
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ request.path }}">
-                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Mark this request as fulfilled?');">
-                            <i class="bi bi-check-circle me-2"></i>Mark as Fulfilled
-                        </button>
-                    </form>
-                    
-                    <a href="{% url 'cancel_request' blood_request.id %}" 
-                       class="btn btn-outline-danger w-100"
-                       onclick="return confirm('Cancel this blood request?');">
-                        <i class="bi bi-x-circle me-2"></i>Cancel Request
-                    </a>
-                    {% elif blood_request.status == 'fulfilled' %}
-                    <div class="alert alert-success mb-0">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        This request has been fulfilled!
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title"><i class="bi bi-lightning-charge-fill"></i> Actions</div>
                     </div>
-                    {% elif blood_request.status == 'cancelled' %}
-                    <div class="alert alert-secondary mb-0">
-                        <i class="bi bi-x-circle-fill me-2"></i>
-                        This request has been cancelled.
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Algorithm Info -->
-                <div class="info-card fade-in-up mb-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-cpu text-danger me-2"></i>
-                        Matching Process
-                    </h5>
-                    <div class="mb-3 pb-3 border-bottom">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-1-circle-fill text-primary me-2 fs-5"></i>
-                            <strong>Find Compatible Donors</strong>
+                    <div class="dash-card-body">
+                        {% if blood_request.status == 'pending' %}
+                        <form method="POST" action="{% url 'mark_fulfilled' blood_request.id %}" class="mb-2" onsubmit="return confirm('Mark this request as fulfilled?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button type="submit" class="btn-action-fill" style="background:#16a34a; border-color:#16a34a;">
+                                <i class="bi bi-check-circle"></i> Mark as Fulfilled
+                            </button>
+                        </form>
+                        <a href="{% url 'cancel_request' blood_request.id %}" class="btn-action-outline" onclick="return confirm('Cancel this blood request?');">
+                            <i class="bi bi-x-circle"></i> Cancel Request
+                        </a>
+                        {% elif blood_request.status == 'fulfilled' %}
+                        <div class="notice-bar success" style="margin-bottom:0;">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <div><strong style="color:var(--ink);">Fulfilled!</strong> This request has been successfully fulfilled.</div>
                         </div>
-                        <small class="text-muted">System searches for donors with compatible blood type within 50km</small>
-                    </div>
-                    <div class="mb-3 pb-3 border-bottom">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-2-circle-fill text-warning me-2 fs-5"></i>
-                            <strong>Rank Using AI</strong>
+                        {% elif blood_request.status == 'cancelled' %}
+                        <div class="notice-bar" style="background:rgba(28,20,16,0.04); border:1px solid var(--border-subtle); margin-bottom:0;">
+                            <i class="bi bi-x-circle-fill" style="color:var(--ink-muted);"></i>
+                            <div>This request has been cancelled.</div>
                         </div>
-                        <small class="text-muted">MCDM algorithm ranks donors by distance, history, and compatibility</small>
-                    </div>
-                    <div>
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-3-circle-fill text-success me-2 fs-5"></i>
-                            <strong>Admin Notifies</strong>
-                        </div>
-                        <small class="text-muted">Admin manages sequential donor notifications until one accepts</small>
+                        {% endif %}
                     </div>
                 </div>
 
-                <!-- Privacy Info -->
-                <div class="info-card bg-light fade-in-up" style="animation-delay: 0.2s;">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-shield-check text-success me-2"></i>
-                        Privacy Protection
-                    </h5>
-                    <div class="mb-2">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        <small>Only basic info shown</small>
+                <!-- Matching Process -->
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title"><i class="bi bi-cpu"></i> Matching Process</div>
                     </div>
-                    <div class="mb-2">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        <small>Full details via admin only</small>
-                    </div>
-                    <div class="mb-2">
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        <small>Donor safety prioritized</small>
-                    </div>
-                    <div>
-                        <i class="bi bi-check-circle text-success me-2"></i>
-                        <small>Contact through platform</small>
+                    <div class="dash-card-body" style="padding-top:8px; padding-bottom:8px;">
+                        <div class="step-item">
+                            <div class="step-num blue">1</div>
+                            <div><div class="step-title">Find Compatible Donors</div><div class="step-sub">System searches for donors with compatible blood type within 50km</div></div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num gold">2</div>
+                            <div><div class="step-title">Rank Using AI</div><div class="step-sub">MCDM algorithm ranks donors by distance, history, and compatibility</div></div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num green">3</div>
+                            <div><div class="step-title">Admin Notifies</div><div class="step-sub">Admin manages sequential donor notifications until one accepts</div></div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Privacy Protection -->
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title"><i class="bi bi-shield-check"></i> Privacy</div>
+                    </div>
+                    <div class="dash-card-body" style="padding-top:8px; padding-bottom:8px;">
+                        <div class="privacy-item"><i class="bi bi-check-circle-fill"></i> Only basic info shown</div>
+                        <div class="privacy-item"><i class="bi bi-check-circle-fill"></i> Full details via admin only</div>
+                        <div class="privacy-item"><i class="bi bi-check-circle-fill"></i> Donor safety prioritized</div>
+                        <div class="privacy-item"><i class="bi bi-check-circle-fill"></i> Contact through platform</div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

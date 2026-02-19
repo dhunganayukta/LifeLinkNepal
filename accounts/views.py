@@ -1,4 +1,4 @@
-# accounts/views.py - UPDATED REGISTER VIEW WITH GEOCODING
+# accounts/views.py - FIXED VERSION WITH CSRF EXEMPTION
 
 from logging import config
 from django.contrib.auth import authenticate, get_user_model, login as auth_login
@@ -72,7 +72,7 @@ def geocode_address(address):
         return None, None, False
 
 # ========================================
-# PAGE VIEWS
+# PAGE VIEWS (These don't need CSRF exemption)
 # ========================================
 def register_page(request):
     """Renders the registration page"""
@@ -90,9 +90,11 @@ def admin_login_page(request):
     """Renders the admin login page"""
     return render(request, 'admin_login.html')
 
+
 # ========================================
 # ADMIN REGISTRATION API (WITH SECRET KEY)
 # ========================================
+@csrf_exempt  # ✅ ADDED - API endpoints don't need CSRF
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def admin_register(request):
@@ -158,6 +160,7 @@ def admin_register(request):
 # ========================================
 # ADMIN LOGIN API
 # ========================================
+@csrf_exempt  # ✅ ADDED - API endpoints don't need CSRF
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def admin_login(request):
@@ -227,6 +230,7 @@ def admin_login(request):
 # ========================================
 # REGISTER API (DONOR & HOSPITAL) - WITH GEOCODING
 # ========================================
+@csrf_exempt  # ✅ ADDED - API endpoints don't need CSRF
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
@@ -343,46 +347,73 @@ def register(request):
     )
 
 # ========================================
-# LOGIN API (DONOR & HOSPITAL)
+# LOGIN API (DONOR & HOSPITAL) - UPDATED TO ACCEPT EMAIL OR USERNAME
 # ========================================
+@csrf_exempt  # ✅ ADDED - API endpoints don't need CSRF for JWT auth
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
     """
     JWT login for donor and hospital users
+    NOW SUPPORTS LOGIN WITH EMAIL OR USERNAME!
     (Admin users should use /admin/login/ instead)
     """
-    username = request.data.get('username')
+    username_or_email = request.data.get('username')
     password = request.data.get('password')
 
-    user = User.objects.filter(username=username).first()
+    if not username_or_email or not password:
+        return Response({
+            'detail': 'Please provide both username/email and password'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Try to find user by username first, then by email
+    user = User.objects.filter(username=username_or_email).first()
+    
+    if not user:
+        # If not found by username, try email
+        user = User.objects.filter(email=username_or_email).first()
 
     if not user:
-        raise AuthenticationFailed("Invalid credentials")
+        return Response({
+            'detail': 'Invalid credentials'
+        }, status=status.HTTP_401_UNAUTHORIZED)
 
-    # ✅ BLOCK ADMIN USERS FROM REGULAR LOGIN
+    # BLOCK ADMIN USERS FROM REGULAR LOGIN
     if user.is_staff or user.is_superuser:
         return Response({
             'detail': '⛔ Please use the admin login page for administrator accounts.',
             'redirect': '/accounts/admin/login-page/'
         }, status=status.HTTP_403_FORBIDDEN)
 
+    # Check if account is locked
     if user.is_locked:
-        raise AuthenticationFailed("Account locked due to multiple failed attempts")
+        return Response({
+            'detail': 'Account locked due to multiple failed attempts'
+        }, status=status.HTTP_403_FORBIDDEN)
 
-    # Check password
-    user_auth = authenticate(username=username, password=password)
+    # Authenticate using the actual username (not email)
+    user_auth = authenticate(username=user.username, password=password)
+    
     if user_auth is None:
         # Increment failed attempts
         user.failed_attempts += 1
         if user.failed_attempts >= 5:
             user.is_locked = True
         user.save()
-        raise AuthenticationFailed("Invalid credentials")
+        return Response({
+            'detail': 'Invalid credentials'
+        }, status=status.HTTP_401_UNAUTHORIZED)
+    
+    # Check password expiration (use user_auth, not user)
+    if hasattr(user_auth, 'is_password_expired') and user_auth.is_password_expired():
+        return Response({
+            'detail': 'Your password has expired. Please reset your password.',
+            'password_expired': True
+        }, status=status.HTTP_403_FORBIDDEN)
 
-    # Reset failed attempts
-    user.failed_attempts = 0
-    user.save()
+    # Reset failed attempts on successful login
+    user_auth.failed_attempts = 0
+    user_auth.save()
 
     # Generate tokens
     tokens = get_tokens_for_user(user_auth)
@@ -398,17 +429,17 @@ def login(request):
     except Exception:
         pass
 
-    # Return response with is_staff status
+    # Return response
     return Response({
         "message": "Login successful",
         "access": tokens['access'],
         "refresh": tokens['refresh'],
         "user_type": user_auth.user_type,
-        "is_staff": False,  # ✅ Always False for regular users
+        "is_staff": False,
         "is_superuser": False,
         "username": user_auth.username,
         "email": user_auth.email
-    })
+    }, status=status.HTTP_200_OK)
 
 # ========================================
 # DONOR DASHBOARD API

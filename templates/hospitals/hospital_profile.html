@@ -1,161 +1,231 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Hospital Profile - {{ hospital.hospital_name }}{% endblock %}
-
-{% block content %}
-<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
-            <div>
-                <h2 class="fw-bold mb-1">Hospital Profile</h2>
-                <p class="mb-0">View and manage your hospital information</p>
-            </div>
-            <div>
-                <a href="{% url 'edit_hospital_profile' %}" class="btn btn-light me-2">
-                    <i class="bi bi-pencil-fill me-1"></i>Edit Profile
-                </a>
-                <a href="{% url 'hospital_dashboard' %}" class="btn btn-outline-light">
-                    <i class="bi bi-arrow-left me-1"></i>Dashboard
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <!-- Location Status Alert -->
-                {% if hospital.latitude and hospital.longitude %}
-                <div class="alert alert-success border-success mb-4">
-                    <i class="bi bi-geo-alt-fill me-2"></i>
-                    <strong>Location Configured:</strong> Distance-based donor search is enabled.
-                </div>
-                {% else %}
-                <div class="alert alert-warning border-warning mb-4">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <strong>Location Not Set:</strong> Distance filtering is disabled. 
-                    <a href="{% url 'edit_hospital_profile' %}" class="alert-link fw-bold">Update your address</a> 
-                    to enable distance-based donor searches.
-                </div>
-                {% endif %}
-
-                <div class="info-card">
-                    <div class="text-center mb-4">
-                        <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
-                             style="width: 100px; height: 100px;">
-                            <i class="bi bi-hospital-fill text-danger" style="font-size: 3rem;"></i>
-                        </div>
-                        <h3 class="fw-bold">{{ hospital.hospital_name }}</h3>
-                        {% if hospital.is_verified %}
-                            <span class="badge bg-success">
-                                <i class="bi bi-patch-check-fill me-1"></i>Verified
-                            </span>
-                        {% else %}
-                            <span class="badge bg-warning text-dark">
-                                <i class="bi bi-hourglass-split me-1"></i>Pending Verification
-                            </span>
-                        {% endif %}
-                    </div>
-
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label class="text-muted small">Hospital Name</label>
-                            <p class="fw-bold">{{ hospital.hospital_name }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small">Phone Number</label>
-                            <p class="fw-bold">{{ hospital.phone }}</p>
-                        </div>
-                        <div class="col-12">
-                            <label class="text-muted small">Address</label>
-                            <p class="fw-bold">{{ hospital.address }}</p>
-                        </div>
-                        {% if hospital.license_number %}
-                        <div class="col-md-6">
-                            <label class="text-muted small">License Number</label>
-                            <p class="fw-bold">{{ hospital.license_number }}</p>
-                        </div>
-                        {% endif %}
-                        <div class="col-md-6">
-                            <label class="text-muted small">Account Created</label>
-                            <p class="fw-bold">{{ hospital.created_at|date:"M d, Y" }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Location Coordinates Section -->
-                    <div class="border-top mt-4 pt-4">
-                        <h5 class="fw-bold mb-3">
-                            <i class="bi bi-geo-alt-fill text-success me-2"></i>Location Coordinates
-                        </h5>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="text-muted small">Latitude</label>
-                                {% if hospital.latitude %}
-                                    <p class="fw-bold text-success">
-                                        <i class="bi bi-check-circle-fill me-1"></i>{{ hospital.latitude|floatformat:6 }}
-                                    </p>
-                                {% else %}
-                                    <p class="text-danger">
-                                        <i class="bi bi-x-circle-fill me-1"></i>Not set
-                                    </p>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="text-muted small">Longitude</label>
-                                {% if hospital.longitude %}
-                                    <p class="fw-bold text-success">
-                                        <i class="bi bi-check-circle-fill me-1"></i>{{ hospital.longitude|floatformat:6 }}
-                                    </p>
-                                {% else %}
-                                    <p class="text-danger">
-                                        <i class="bi bi-x-circle-fill me-1"></i>Not set
-                                    </p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        {% if hospital.latitude and hospital.longitude %}
-                        <div class="alert alert-info mt-3 mb-0">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            <small>
-                                <strong>Distance-based features enabled:</strong> You can now filter donors by distance 
-                                and see accurate routing information for blood requests.
-                            </small>
-                        </div>
-                        {% else %}
-                        <div class="alert alert-warning mt-3 mb-0">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <small>
-                                <strong>Action Required:</strong> To enable distance-based donor filtering, please 
-                                <a href="{% url 'edit_hospital_profile' %}" class="alert-link fw-bold">update your profile</a> 
-                                with a valid address. The system will automatically geocode your location.
-                            </small>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{% endblock %}
+{% block title %}Hospital Profile — {{ hospital.hospital_name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .info-card {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
-    
-    body.dark-mode .info-card {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
+.dash-wrap { background: var(--ivory); min-height: 100vh; padding: 0 0 80px; }
+
+/* HERO */
+.dash-hero { background: var(--ink); padding: 40px 0; position: relative; overflow: hidden; margin-bottom: 48px; }
+.dash-hero::before { content:''; position:absolute; top:-100px; right:-100px; width:340px; height:340px; border-radius:50%; border:1px solid rgba(196,146,74,0.1); pointer-events:none; }
+.dash-hero::after  { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; border:1px solid rgba(196,146,74,0.06); pointer-events:none; }
+.dash-hero-crimson-bar { position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(90deg, var(--crimson), var(--gold), var(--crimson-light)); }
+.dash-hero-eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; }
+.dash-hero-eyebrow span { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; font-weight:600; color:var(--gold); }
+.dash-hero-eyebrow-line { width:20px; height:1px; background:var(--gold); opacity:0.5; }
+.dash-hero h2 { font-family:var(--font-display); font-size:clamp(26px,3.5vw,42px); font-weight:600; color:white; letter-spacing:-0.3px; line-height:1.15; margin-bottom:6px; }
+.dash-hero-sub { font-size:14px; color:rgba(240,232,222,0.55); display:flex; align-items:center; gap:6px; }
+.btn-new-request { display:inline-flex; align-items:center; gap:8px; padding:12px 26px; background:white; color:var(--crimson); font-size:13.5px; font-weight:700; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid white; }
+.btn-new-request:hover { background:var(--ivory); color:var(--crimson-mid); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.25); }
+.btn-hero-outline { display:inline-flex; align-items:center; gap:8px; padding:12px 26px; background:transparent; color:rgba(255,255,255,0.8); font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid rgba(255,255,255,0.3); }
+.btn-hero-outline:hover { background:rgba(255,255,255,0.1); color:white; border-color:rgba(255,255,255,0.5); }
+
+/* CARDS */
+.dash-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; overflow:hidden; margin-bottom:24px; }
+body.dark-mode .dash-card { background:#1a1410; border-color:rgba(255,255,255,0.06); }
+.dash-card-header { padding:20px 24px; border-bottom:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:var(--ivory-mid); }
+body.dark-mode .dash-card-header { background:#221c17; border-color:rgba(255,255,255,0.05); }
+.dash-card-title { font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:10px; }
+.dash-card-title i { color:var(--crimson); font-size:16px; }
+.dash-card-body { padding:28px; }
+
+/* NOTICE */
+.notice-bar { border-radius:10px; padding:14px 18px; font-size:13px; display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; }
+.notice-bar.success { background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.25); color:var(--ink-mid); }
+.notice-bar.warning { background:rgba(196,146,74,0.08); border:1px solid rgba(196,146,74,0.25); color:var(--ink-mid); }
+.notice-bar.info    { background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2);  color:var(--ink-mid); }
+.notice-bar i { margin-top:1px; flex-shrink:0; }
+.notice-bar.success i { color:#16a34a; }
+.notice-bar.warning i { color:var(--gold); }
+.notice-bar.info    i { color:#2563eb; }
+
+/* HOSPITAL ICON */
+.hospital-icon-wrap { width:90px; height:90px; border-radius:18px; background:var(--crimson-pale); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:40px; color:var(--crimson); margin:0 auto 20px; transition:all 0.3s ease; }
+.dash-card:hover .hospital-icon-wrap { background:var(--crimson); color:white; }
+
+/* PROFILE FIELDS */
+.profile-row { display:flex; justify-content:space-between; align-items:flex-start; padding:14px 0; border-bottom:1px solid var(--border-subtle); }
+.profile-row:last-child { border-bottom:none; padding-bottom:0; }
+.profile-row:first-child { padding-top:0; }
+.profile-label { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; font-weight:600; color:var(--ink-muted); margin-bottom:2px; }
+.profile-value { font-size:14px; font-weight:600; color:var(--ink); }
+
+/* COORD BLOCKS */
+.coord-block { background:var(--ivory-mid); border:1px solid var(--border-subtle); border-radius:10px; padding:16px; }
+body.dark-mode .coord-block { background:#221c17; }
+.coord-label { font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase; font-weight:600; color:var(--ink-muted); margin-bottom:6px; }
+.coord-value { font-family:var(--font-display); font-size:15px; font-weight:600; }
+.coord-value.set   { color:#16a34a; }
+.coord-value.unset { color:var(--crimson); }
+
+/* TAG */
+.tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; letter-spacing:0.3px; }
+.tag-green  { background:rgba(74,222,128,0.1); color:#16a34a; border:1px solid rgba(74,222,128,0.2); }
+.tag-gold   { background:var(--gold-pale); color:var(--gold); border:1px solid rgba(196,146,74,0.25); }
+
+/* BUTTONS */
+.btn-create { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:var(--crimson); color:white; font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid var(--crimson); }
+.btn-create:hover { background:var(--crimson-mid); color:white; transform:translateY(-2px); box-shadow:0 6px 18px rgba(155,23,40,0.35); }
+.btn-outline-edit { display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 22px; background:transparent; color:var(--ink-mid); font-size:13px; font-weight:600; border-radius:8px; text-decoration:none; border:1.5px solid var(--border-subtle); transition:all 0.25s ease; }
+.btn-outline-edit:hover { border-color:var(--border); color:var(--ink); }
+
+body.dark-mode .dash-wrap { background:var(--ivory); }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-wrap">
+
+    <!-- HERO -->
+    <div class="dash-hero">
+        <div class="dash-hero-crimson-bar"></div>
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <div class="dash-hero-eyebrow">
+                        <div class="dash-hero-eyebrow-line"></div>
+                        <span>Hospital Profile</span>
+                        <div class="dash-hero-eyebrow-line"></div>
+                    </div>
+                    <h2>{{ hospital.hospital_name }}</h2>
+                    <div class="dash-hero-sub">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        {{ hospital.address }}
+                    </div>
+                </div>
+                <div class="col-lg-4 d-flex justify-content-lg-end gap-2 flex-wrap">
+                    <a href="{% url 'edit_hospital_profile' %}" class="btn-new-request">
+                        <i class="bi bi-pencil-fill"></i> Edit Profile
+                    </a>
+                    <a href="{% url 'hospital_dashboard' %}" class="btn-hero-outline">
+                        <i class="bi bi-arrow-left"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Location Alert -->
+                {% if hospital.latitude and hospital.longitude %}
+                <div class="notice-bar success">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <div><strong style="color:var(--ink);">Location Configured:</strong> Distance-based donor search is enabled.</div>
+                </div>
+                {% else %}
+                <div class="notice-bar warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <div><strong style="color:var(--ink);">Location Not Set:</strong> Distance filtering is disabled.
+                        <a href="{% url 'edit_hospital_profile' %}" style="color:var(--crimson); font-weight:700;">Update your address</a>
+                        to enable distance-based donor searches.
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Profile Card -->
+                <div class="dash-card">
+                    <div class="dash-card-body text-center">
+                        <div class="hospital-icon-wrap">
+                            <i class="bi bi-hospital-fill"></i>
+                        </div>
+                        <h4 style="font-family:var(--font-display); font-size:24px; font-weight:600; color:var(--ink); margin-bottom:8px;">
+                            {{ hospital.hospital_name }}
+                        </h4>
+                        {% if hospital.is_verified %}
+                            <span class="tag tag-green"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                        {% else %}
+                            <span class="tag tag-gold"><i class="bi bi-hourglass-split"></i> Pending Verification</span>
+                        {% endif %}
+                        <div class="d-grid gap-2 mt-4" style="max-width:320px; margin-left:auto; margin-right:auto;">
+                            <a href="{% url 'edit_hospital_profile' %}" class="btn-create justify-content-center">
+                                <i class="bi bi-pencil-fill"></i> Edit Profile
+                            </a>
+                            <a href="{% url 'hospital_dashboard' %}" class="btn-outline-edit">
+                                <i class="bi bi-speedometer2"></i> Go to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Details -->
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title"><i class="bi bi-info-circle-fill"></i> Hospital Details</div>
+                    </div>
+                    <div class="dash-card-body" style="padding-top:8px; padding-bottom:8px;">
+                        <div class="profile-row">
+                            <div><div class="profile-label">Hospital Name</div><div class="profile-value">{{ hospital.hospital_name }}</div></div>
+                        </div>
+                        <div class="profile-row">
+                            <div><div class="profile-label">Phone Number</div><div class="profile-value">{{ hospital.phone }}</div></div>
+                        </div>
+                        <div class="profile-row">
+                            <div><div class="profile-label">Address</div><div class="profile-value">{{ hospital.address }}</div></div>
+                        </div>
+                        {% if hospital.license_number %}
+                        <div class="profile-row">
+                            <div><div class="profile-label">License Number</div><div class="profile-value">{{ hospital.license_number }}</div></div>
+                        </div>
+                        {% endif %}
+                        <div class="profile-row">
+                            <div><div class="profile-label">Account Created</div><div class="profile-value">{{ hospital.created_at|date:"M d, Y" }}</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coordinates Card -->
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title"><i class="bi bi-geo-alt-fill"></i> Location Coordinates</div>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="coord-block">
+                                    <div class="coord-label">Latitude</div>
+                                    {% if hospital.latitude %}
+                                        <div class="coord-value set"><i class="bi bi-check-circle-fill me-1" style="font-size:13px;"></i>{{ hospital.latitude|floatformat:6 }}</div>
+                                    {% else %}
+                                        <div class="coord-value unset"><i class="bi bi-x-circle-fill me-1" style="font-size:13px;"></i>Not set</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="coord-block">
+                                    <div class="coord-label">Longitude</div>
+                                    {% if hospital.longitude %}
+                                        <div class="coord-value set"><i class="bi bi-check-circle-fill me-1" style="font-size:13px;"></i>{{ hospital.longitude|floatformat:6 }}</div>
+                                    {% else %}
+                                        <div class="coord-value unset"><i class="bi bi-x-circle-fill me-1" style="font-size:13px;"></i>Not set</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if hospital.latitude and hospital.longitude %}
+                        <div class="notice-bar info" style="margin-bottom:0;">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <div><strong style="color:var(--ink);">Distance-based features enabled:</strong> You can now filter donors by distance and see accurate routing information for blood requests.</div>
+                        </div>
+                        {% else %}
+                        <div class="notice-bar warning" style="margin-bottom:0;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <div><strong style="color:var(--ink);">Action Required:</strong> To enable distance-based donor filtering, please
+                                <a href="{% url 'edit_hospital_profile' %}" style="color:var(--crimson); font-weight:700;">update your profile</a>
+                                with a valid address. The system will automatically geocode your location.
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

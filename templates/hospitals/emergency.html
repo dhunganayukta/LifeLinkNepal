@@ -1,224 +1,274 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}New Blood Request - Life Link Nepal{% endblock %}
+{% block title %}New Blood Request — LifeLink Nepal{% endblock %}
 
 {% block extra_css %}
 <style>
-    .info-card {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
+.dash-wrap { background: var(--ivory); min-height: 100vh; padding: 0 0 80px; }
 
-    .form-label {
-        font-weight: 600;
-        color: #333;
-    }
+/* HERO */
+.dash-hero { background: var(--ink); padding: 40px 0; position: relative; overflow: hidden; margin-bottom: 48px; }
+.dash-hero::before { content:''; position:absolute; top:-100px; right:-100px; width:340px; height:340px; border-radius:50%; border:1px solid rgba(196,146,74,0.1); pointer-events:none; }
+.dash-hero::after  { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; border:1px solid rgba(196,146,74,0.06); pointer-events:none; }
+.dash-hero-crimson-bar { position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(90deg, var(--crimson), var(--gold), var(--crimson-light)); }
+.dash-hero-eyebrow { display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; }
+.dash-hero-eyebrow span { font-size:10.5px; letter-spacing:3px; text-transform:uppercase; font-weight:600; color:var(--gold); }
+.dash-hero-eyebrow-line { width:20px; height:1px; background:var(--gold); opacity:0.5; }
+.dash-hero h2 { font-family:var(--font-display); font-size:clamp(26px,3.5vw,42px); font-weight:600; color:white; letter-spacing:-0.3px; line-height:1.15; margin-bottom:6px; }
+.dash-hero-sub { font-size:14px; color:rgba(240,232,222,0.55); display:flex; align-items:center; gap:6px; }
+.btn-hero-outline { display:inline-flex; align-items:center; gap:8px; padding:12px 26px; background:transparent; color:rgba(255,255,255,0.8); font-size:13.5px; font-weight:600; border-radius:8px; text-decoration:none; transition:all 0.25s ease; border:1.5px solid rgba(255,255,255,0.3); }
+.btn-hero-outline:hover { background:rgba(255,255,255,0.1); color:white; border-color:rgba(255,255,255,0.5); }
 
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #c71e35;
-        box-shadow: 0 0 0 0.25rem rgba(199, 30, 53, 0.15);
-    }
+/* CARDS */
+.dash-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; overflow:hidden; margin-bottom:24px; }
+body.dark-mode .dash-card { background:#1a1410; border-color:rgba(255,255,255,0.06); }
+.dash-card-header { padding:20px 24px; border-bottom:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:var(--ivory-mid); }
+body.dark-mode .dash-card-header { background:#221c17; border-color:rgba(255,255,255,0.05); }
+.dash-card-title { font-family:var(--font-display); font-size:19px; font-weight:600; color:var(--ink); display:flex; align-items:center; gap:10px; }
+.dash-card-title i { color:var(--crimson); font-size:16px; }
+.dash-card-body { padding:28px; }
 
-    .text-danger {
-        color: #c71e35 !important;
-    }
+/* FORM */
+.form-group { margin-bottom:22px; }
+.form-label-styled { display:block; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700; color:var(--ink-muted); margin-bottom:8px; }
+.form-label-styled i { color:var(--crimson); margin-right:4px; }
+.form-label-req { color:var(--crimson); }
+.form-control-styled { width:100%; padding:11px 14px; background:var(--ivory-mid); border:1.5px solid var(--border-subtle); border-radius:8px; font-size:13.5px; color:var(--ink); font-family:var(--font-body, 'Jost', sans-serif); transition:all 0.2s ease; outline:none; appearance:none; }
+body.dark-mode .form-control-styled { background:#221c17; border-color:rgba(255,255,255,0.08); color:var(--ink); }
+.form-control-styled:focus { border-color:var(--crimson); background:white; box-shadow:0 0 0 3px rgba(155,23,40,0.08); }
+body.dark-mode .form-control-styled:focus { background:#2a2018; }
+.form-control-styled::placeholder { color:var(--ink-muted); opacity:0.6; }
+.form-hint { font-size:11.5px; color:var(--ink-muted); margin-top:5px; }
 
-    /* Dark mode support */
-    body.dark-mode .info-card {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
+/* SELECT WRAPPER */
+.select-wrap { position:relative; }
+.select-wrap::after { content:'\F282'; font-family:'Bootstrap-icons'; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--ink-muted); pointer-events:none; font-size:13px; }
+.select-wrap select.form-control-styled { padding-right:36px; cursor:pointer; }
 
-    body.dark-mode .form-label {
-        color: #e0e0e0;
-    }
+/* NOTICE BAR */
+.notice-bar { border-radius:10px; padding:14px 18px; font-size:13px; display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; }
+.notice-bar.info { background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2); color:var(--ink-mid); }
+.notice-bar.info i { color:#2563eb; margin-top:1px; flex-shrink:0; }
+.notice-bar ul { margin:6px 0 0 0; padding-left:16px; }
+.notice-bar ul li { margin-bottom:3px; }
+
+/* ALGO CARD */
+.algo-card { border:1px solid var(--border-subtle); border-radius:12px; padding:20px 16px; text-align:center; transition:all 0.3s ease; background:white; }
+body.dark-mode .algo-card { background:#221c17; border-color:rgba(255,255,255,0.06); }
+.algo-card:hover { border-color:var(--border); transform:translateY(-4px); box-shadow:var(--shadow-warm); }
+.algo-card-icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 12px; }
+.algo-card-title { font-family:var(--font-display); font-size:16px; font-weight:600; color:var(--ink); margin-bottom:4px; }
+body.dark-mode .algo-card-title { color:var(--ink); }
+.algo-card-sub { font-size:12px; color:var(--ink-muted); }
+
+/* BUTTONS */
+.btn-submit { display:inline-flex; align-items:center; gap:8px; padding:12px 28px; background:var(--crimson); color:white; font-size:13.5px; font-weight:700; border-radius:8px; border:1.5px solid var(--crimson); cursor:pointer; transition:all 0.25s ease; }
+.btn-submit:hover { background:var(--crimson-mid); border-color:var(--crimson-mid); transform:translateY(-1px); box-shadow:0 6px 18px rgba(155,23,40,0.3); }
+.btn-cancel { display:inline-flex; align-items:center; gap:8px; padding:12px 22px; background:transparent; color:var(--ink-mid); font-size:13.5px; font-weight:600; border-radius:8px; border:1.5px solid var(--border-subtle); text-decoration:none; transition:all 0.2s ease; }
+.btn-cancel:hover { border-color:var(--border); color:var(--ink); }
+
+body.dark-mode .dash-wrap { background:var(--ivory); }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Header -->
-<section class="py-4" style="background: linear-gradient(135deg, #c71e35 0%, #e53949 100%);">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center text-white flex-wrap">
-            <div>
-                <h2 class="fw-bold mb-1">
-                    <i class="bi bi-plus-circle-fill me-2"></i>Create Blood Request
-                </h2>
-                <p class="mb-0">Fill in the details to request blood</p>
+<div class="dash-wrap">
+
+    <!-- HERO -->
+    <div class="dash-hero">
+        <div class="dash-hero-crimson-bar"></div>
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <div class="dash-hero-eyebrow">
+                        <div class="dash-hero-eyebrow-line"></div>
+                        <span>Blood Request</span>
+                        <div class="dash-hero-eyebrow-line"></div>
+                    </div>
+                    <h2>Create Blood Request</h2>
+                    <div class="dash-hero-sub">
+                        <i class="bi bi-clipboard-pulse"></i>
+                        Fill in the details to request blood
+                    </div>
+                </div>
+                <div class="col-lg-4 d-flex justify-content-lg-end">
+                    <a href="{% url 'hospital_dashboard' %}" class="btn-hero-outline">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
             </div>
-            <a href="{% url 'hospital_dashboard' %}" class="btn btn-light">
-                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-            </a>
         </div>
     </div>
-</section>
 
-<section class="py-5">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="info-card">
-                    <h4 class="fw-bold mb-4">
-                        <i class="bi bi-clipboard-pulse text-danger me-2"></i>
-                        Patient & Request Details
-                    </h4>
 
-                    <form method="POST" action="{% url 'create_blood_request' %}">
-                        {% csrf_token %}
-                        
-                        <div class="row g-3">
-                            <!-- Patient Information -->
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    <i class="bi bi-person-fill text-danger me-1"></i>
-                                    Patient Name <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="patient_name" class="form-control" 
-                                       placeholder="Enter patient name" required>
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <label class="form-label">
-                                    <i class="bi bi-calendar-check text-danger me-1"></i>
-                                    Age <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" name="patient_age" class="form-control" 
-                                       placeholder="Age" min="0" max="120" required>
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <label class="form-label">
-                                    <i class="bi bi-gender-ambiguous text-danger me-1"></i>
-                                    Gender
-                                </label>
-                                <select name="gender" class="form-select">
-                                    <option value="">Select</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-
-                            <!-- Blood Request Details -->
-                            <div class="col-md-4">
-                                <label class="form-label">
-                                    <i class="bi bi-droplet-fill text-danger me-1"></i>
-                                    Blood Type <span class="text-danger">*</span>
-                                </label>
-                                <select name="blood_type" class="form-select" required>
-                                    <option value="">Select Blood Type</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <label class="form-label">
-                                    <i class="bi bi-hash text-danger me-1"></i>
-                                    Units Needed <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" name="units_needed" class="form-control" 
-                                       placeholder="Number of units" min="1" max="10" value="1" required>
-                                <small class="text-muted">1 unit = 450ml</small>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <label class="form-label">
-                                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>
-                                    Urgency Level <span class="text-danger">*</span>
-                                </label>
-                                <select name="urgency_level" class="form-select" required>
-                                    <option value="">Select Urgency</option>
-                                    <option value="critical" class="text-danger">🔴 Critical - Life Threatening</option>
-                                    <option value="urgent" class="text-warning">🟡 Urgent - Within 24 Hours</option>
-                                    <option value="normal" class="text-success">🟢 Normal - Within 48 Hours</option>
-                                </select>
-                            </div>
-
-                            <!-- Medical Condition (Optional) -->
-                            <div class="col-12">
-                                <label class="form-label">
-                                    <i class="bi bi-file-medical text-danger me-1"></i>
-                                    Medical Condition / Reason
-                                </label>
-                                <textarea name="condition" class="form-control" rows="2" 
-                                          placeholder="Brief description of patient's condition (optional)"></textarea>
-                            </div>
-
-                            <!-- Additional Notes -->
-                            <div class="col-12">
-                                <label class="form-label">
-                                    <i class="bi bi-chat-square-text text-danger me-1"></i>
-                                    Additional Notes
-                                </label>
-                                <textarea name="notes" class="form-control" rows="3" 
-                                          placeholder="Any special requirements or instructions (optional)"></textarea>
-                            </div>
-
-                            <!-- Info Alert -->
-                            <div class="col-12">
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle-fill me-2"></i>
-                                    <strong>What happens next?</strong>
-                                    <ul class="mb-0 mt-2">
-                                        <li>Our algorithms will find the best matching donors</li>
-                                        <li>Top donors will receive SMS/Call alerts immediately</li>
-                                        <li>You'll be notified when donors respond</li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <!-- Action Buttons -->
-                            <div class="col-12">
-                                <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{% url 'hospital_dashboard' %}" class="btn btn-outline-secondary">
-                                        <i class="bi bi-x-circle me-1"></i>Cancel
-                                    </a>
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="bi bi-megaphone-fill me-1"></i>Create Request & Notify Donors
-                                    </button>
-                                </div>
-                            </div>
+                <!-- FORM CARD -->
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title">
+                            <i class="bi bi-clipboard-pulse"></i> Patient & Request Details
                         </div>
-                    </form>
+                    </div>
+                    <div class="dash-card-body">
+                        <form method="POST" action="{% url 'create_blood_request' %}">
+                            {% csrf_token %}
+                            <div class="row g-3">
+
+                                <!-- Patient Name -->
+                                <div class="col-md-6 form-group">
+                                    <label class="form-label-styled"><i class="bi bi-person-fill"></i>Patient Name <span class="form-label-req">*</span></label>
+                                    <input type="text" name="patient_name" class="form-control-styled"
+                                           placeholder="Enter patient name" required>
+                                </div>
+
+                                <!-- Age -->
+                                <div class="col-md-3 form-group">
+                                    <label class="form-label-styled"><i class="bi bi-calendar-check"></i>Age <span class="form-label-req">*</span></label>
+                                    <input type="number" name="patient_age" class="form-control-styled"
+                                           placeholder="Age" min="0" max="120" required>
+                                </div>
+
+                                <!-- Gender -->
+                                <div class="col-md-3 form-group">
+                                    <label class="form-label-styled"><i class="bi bi-gender-ambiguous"></i>Gender</label>
+                                    <div class="select-wrap">
+                                        <select name="gender" class="form-control-styled">
+                                            <option value="">Select</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Divider -->
+                                <div class="col-12" style="padding-top:4px; padding-bottom:4px;">
+                                    <div style="height:1px; background:var(--border-subtle);"></div>
+                                </div>
+
+                                <!-- Blood Type -->
+                                <div class="col-md-4 form-group">
+                                    <label class="form-label-styled"><i class="bi bi-droplet-fill"></i>Blood Type <span class="form-label-req">*</span></label>
+                                    <div class="select-wrap">
+                                        <select name="blood_type" class="form-control-styled" required>
+                                            <option value="">Select Blood Type</option>
+                                            <option value="A+">A+</option>
+                                            <option value="A-">A-</option>
+                                            <option value="B+">B+</option>
+                                            <option value="B-">B-</option>
+                                            <option value="O+">O+</option>
+                                            <option value="O-">O-</option>
+                                            <option value="AB+">AB+</option>
+                                            <option value="AB-">AB-</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Units -->
+                                <div class="col-md-4 form-group">
+                                    <label class="form-label-styled"><i class="bi bi-hash"></i>Units Needed <span class="form-label-req">*</span></label>
+                                    <input type="number" name="units_needed" class="form-control-styled"
+                                           placeholder="Units" min="1" max="10" value="1" required>
+                                    <div class="form-hint">1 unit = 450ml</div>
+                                </div>
+
+                                <!-- Urgency -->
+                                <div class="col-md-4 form-group">
+                                    <label class="form-label-styled"><i class="bi bi-exclamation-triangle-fill"></i>Urgency <span class="form-label-req">*</span></label>
+                                    <div class="select-wrap">
+                                        <select name="urgency_level" class="form-control-styled" required>
+                                            <option value="">Select Urgency</option>
+                                            <option value="critical">🔴 Critical — Life Threatening</option>
+                                            <option value="urgent">🟡 Urgent — Within 24 Hours</option>
+                                            <option value="normal">🟢 Normal — Within 48 Hours</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Medical Condition -->
+                                <div class="col-12 form-group">
+                                    <label class="form-label-styled"><i class="bi bi-file-medical"></i>Medical Condition / Reason</label>
+                                    <textarea name="condition" class="form-control-styled" rows="2"
+                                              placeholder="Brief description of patient's condition (optional)"></textarea>
+                                </div>
+
+                                <!-- Notes -->
+                                <div class="col-12 form-group">
+                                    <label class="form-label-styled"><i class="bi bi-chat-square-text"></i>Additional Notes</label>
+                                    <textarea name="notes" class="form-control-styled" rows="3"
+                                              placeholder="Any special requirements or instructions (optional)"></textarea>
+                                </div>
+
+                                <!-- Info Notice -->
+                                <div class="col-12">
+                                    <div class="notice-bar info">
+                                        <i class="bi bi-info-circle-fill"></i>
+                                        <div>
+                                            <strong style="color:var(--ink);">What happens next?</strong>
+                                            <ul>
+                                                <li>Our algorithms will find the best matching donors</li>
+                                                <li>Top donors will receive alerts immediately</li>
+                                                <li>You'll be notified when donors respond</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="col-12">
+                                    <div style="height:1px; background:var(--border-subtle); margin-bottom:20px;"></div>
+                                    <div class="d-flex gap-2 justify-content-end flex-wrap">
+                                        <a href="{% url 'hospital_dashboard' %}" class="btn-cancel">
+                                            <i class="bi bi-x-circle"></i> Cancel
+                                        </a>
+                                        <button type="submit" class="btn-submit">
+                                            <i class="bi bi-megaphone-fill"></i> Create Request & Notify Donors
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
-                <!-- Algorithm Info Card -->
-                <div class="info-card mt-4 bg-light">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-cpu text-danger me-2"></i>
-                        AI-Powered Donor Matching
-                    </h5>
-                    <div class="row g-3">
-                        <div class="col-md-4 text-center">
-                            <i class="bi bi-heart-pulse-fill text-danger fs-1"></i>
-                            <h6 class="mt-2">Blood Compatibility</h6>
-                            <small class="text-muted">Filters compatible donors</small>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <i class="bi bi-geo-alt-fill text-success fs-1"></i>
-                            <h6 class="mt-2">Haversine Distance</h6>
-                            <small class="text-muted">Finds nearby donors</small>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <i class="bi bi-star-fill text-warning fs-1"></i>
-                            <h6 class="mt-2">MCDM Ranking</h6>
-                            <small class="text-muted">Ranks best matches</small>
+                <!-- AI Matching Info -->
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <div class="dash-card-title"><i class="bi bi-cpu"></i> AI-Powered Donor Matching</div>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="algo-card">
+                                    <div class="algo-card-icon" style="background:rgba(155,23,40,0.08); color:var(--crimson);"><i class="bi bi-heart-pulse-fill"></i></div>
+                                    <div class="algo-card-title">Blood Compatibility</div>
+                                    <div class="algo-card-sub">Filters compatible donors</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="algo-card">
+                                    <div class="algo-card-icon" style="background:rgba(74,222,128,0.1); color:#16a34a;"><i class="bi bi-geo-alt-fill"></i></div>
+                                    <div class="algo-card-title">Haversine Distance</div>
+                                    <div class="algo-card-sub">Finds nearby donors</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="algo-card">
+                                    <div class="algo-card-icon" style="background:var(--gold-pale); color:var(--gold);"><i class="bi bi-star-fill"></i></div>
+                                    <div class="algo-card-title">MCDM Ranking</div>
+                                    <div class="algo-card-sub">Ranks best matches</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}
