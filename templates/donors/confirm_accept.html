@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Accept – LifeLink Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  :root {
+    --blood: #C0392B; --blood-dk: #922B21; --blood-lt: #F9EBEA;
+    --ink: #1A1A2E; --muted: #6B7280; --border: #E5E7EB;
+    --surface: #FFFFFF; --bg: #F7F3F0; --success: #10B981;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+
+  .ca-card {
+    background: var(--surface);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 40px rgba(0,0,0,.10);
+    max-width: 520px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .ca-top {
+    background: linear-gradient(135deg, var(--success), #059669);
+    padding: 32px 32px 28px;
+    text-align: center;
+    color: #fff;
+  }
+  .ca-icon { font-size: 3rem; display: block; margin-bottom: 12px; }
+  .ca-top h1 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; }
+  .ca-top p  { font-size: .9rem; opacity: .85; margin-top: 6px; }
+
+  .ca-body { padding: 28px 32px; }
+
+  .ca-info {
+    background: var(--blood-lt);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+  }
+  .ca-info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(192,57,43,.12); font-size: .875rem; }
+  .ca-info-row:last-child { border-bottom: none; }
+  .ca-info-row dt { color: var(--muted); font-weight: 500; }
+  .ca-info-row dd { font-weight: 600; color: var(--ink); }
+
+  .ca-label { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block; }
+  .ca-textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: .9rem;
+    resize: vertical; min-height: 80px; outline: none;
+    transition: border-color .2s;
+    background: #FAFAFA;
+  }
+  .ca-textarea:focus { border-color: var(--success); box-shadow: 0 0 0 3px rgba(16,185,129,.10); }
+
+  .ca-warning {
+    background: #FEF3C7; border: 1px solid #FDE68A; border-radius: 10px;
+    padding: 12px 16px; font-size: .83rem; color: #92400E;
+    display: flex; gap: 10px; align-items: flex-start; margin: 18px 0;
+  }
+
+  .ca-actions { display: flex; gap: 12px; margin-top: 22px; }
+  .btn {
+    flex: 1; padding: 13px; border-radius: 10px; border: none; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem;
+    text-decoration: none; text-align: center; display: inline-flex;
+    align-items: center; justify-content: center; gap: 8px; transition: all .2s;
+  }
+  .btn-confirm {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: #fff; box-shadow: 0 4px 14px rgba(16,185,129,.30);
+  }
+  .btn-confirm:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,185,129,.40); }
+  .btn-cancel {
+    background: transparent; color: var(--muted);
+    border: 1.5px solid var(--border); flex: 0 0 auto; padding: 13px 20px;
+  }
+  .btn-cancel:hover { border-color: var(--ink); color: var(--ink); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ca-card">
+
+  <div class="ca-top">
+    <span class="ca-icon">🩸</span>
+    <h1>Confirm Your Donation</h1>
+    <p>You're about to accept this blood request. The hospital will be notified.</p>
+  </div>
+
+  <div class="ca-body">
+    <dl class="ca-info">
+      <div class="ca-info-row">
+        <dt>Hospital</dt>
+        <dd>{{ blood_request.hospital.hospital_name }}</dd>
+      </div>
+      <div class="ca-info-row">
+        <dt>Patient</dt>
+        <dd>{{ blood_request.patient_name }}</dd>
+      </div>
+      <div class="ca-info-row">
+        <dt>Blood Type</dt>
+        <dd>{{ blood_request.blood_type }}</dd>
+      </div>
+      <div class="ca-info-row">
+        <dt>Urgency</dt>
+        <dd>{{ blood_request.urgency_level|title }}</dd>
+      </div>
+      {% if notification.distance %}
+      <div class="ca-info-row">
+        <dt>Distance</dt>
+        <dd>{{ notification.distance|floatformat:1 }} km</dd>
+      </div>
+      {% endif %}
+    </dl>
+
+    <form method="POST">
+      {% csrf_token %}
+      <label class="ca-label" for="notes">Additional message (optional)</label>
+      <textarea class="ca-textarea" id="notes" name="notes" placeholder="e.g. I'll arrive around 2pm, please confirm..."></textarea>
+
+      <div class="ca-warning">
+        ⚠️ By confirming, you commit to donating. The hospital will contact you shortly. Please only accept if you are genuinely available.
+      </div>
+
+      <div class="ca-actions">
+        <a href="{% url 'donor_dashboard' %}" class="btn btn-cancel">Cancel</a>
+        <button type="submit" class="btn btn-confirm">
+          ✅ Yes, I'll Donate
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

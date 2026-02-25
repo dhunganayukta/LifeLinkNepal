@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
 from .models import BloodRequest, HospitalProfile
-from donors.models import DonorNotification
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -173,8 +172,7 @@ class BloodRequestAdmin(admin.ModelAdmin):
                     {round(notif.distance, 2) if notif.distance else 'N/A'} km
                 </td>
                 <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
-                    {int(notif.match_score * 10
-                         ) if notif.match_score else 0}%
+                    {int(notif.match_score * 100) if notif.match_score else 0}%
                 </td>
                 <td style="border: 1px solid #ddd; padding: 8px; color: {status_color};">
                     <strong>{notif.status.upper()}</strong>
@@ -183,7 +181,6 @@ class BloodRequestAdmin(admin.ModelAdmin):
             '''
         
         html += '</tbody></table>'
-        # Use format_html with an argument to avoid Django expecting format placeholders
         return format_html('{}', html)
     donor_list_display.short_description = 'Matched Donors (Full Details - Admin Only)'
     
@@ -291,44 +288,3 @@ class HospitalProfileAdmin(admin.ModelAdmin):
             total, pending, fulfilled
         )
     total_requests.short_description = 'Requests'
-
-
-@admin.register(DonorNotification)
-class DonorNotificationAdmin(admin.ModelAdmin):
-    list_display = [
-        'id',
-        'priority_order',
-        'donor_name',
-        'blood_request_id',
-        'status',
-        'distance',
-        'match_score',
-        'notified_at',
-        'action_buttons'
-    ]
-    list_filter = ['status', 'is_notified', 'blood_request__urgency_level']
-    search_fields = ['donor__full_name', 'donor__user__username', 'blood_request__patient_name']
-    readonly_fields = ['sent_at', 'notified_at', 'responded_at']
-    
-    def donor_name(self, obj):
-        return f"{obj.donor.full_name} ({obj.donor.user.username})"
-    donor_name.short_description = 'Donor'
-    
-    def action_buttons(self, obj):
-        """Manual accept/reject buttons"""
-        if obj.status in ['accepted', 'rejected', 'cancelled']:
-            return format_html('<span>{}</span>', obj.status.upper())
-        
-        if obj.status == 'notified':
-            return format_html(
-                '<a class="button" href="/admin/donors/donornotification/{}/accept/" '
-                'style="background-color: green; color: white; padding: 5px 10px; margin-right: 5px;">'
-                '✅ Accept</a>'
-                '<a class="button" href="/admin/donors/donornotification/{}/reject/" '
-                'style="background-color: red; color: white; padding: 5px 10px;">'
-                '❌ Reject</a>',
-                obj.id, obj.id
-            )
-        
-        return format_html('{}', '<span style="color: gray;">Pending</span>')
-    action_buttons.short_description = 'Manual Actions'

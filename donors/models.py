@@ -34,6 +34,7 @@ class DonorProfile(models.Model):
 
     # Donation tracking
     donation_count = models.PositiveIntegerField(default=0)
+    points = models.PositiveIntegerField(default=0)          # ← ADDED
     last_donation_date = models.DateField(null=True, blank=True)
     is_available = models.BooleanField(default=True)
 
@@ -46,14 +47,10 @@ class DonorProfile(models.Model):
 
     @property
     def can_donate(self) -> bool:
-        """
-        Donors can donate every 90 days
-        """
+        """Donors can donate every 90 days"""
         from datetime import date
-
         if not self.last_donation_date:
             return True
-
         return (date.today() - self.last_donation_date).days >= 90
 
     def __str__(self):
@@ -66,17 +63,14 @@ class DonorProfile(models.Model):
 
 
 class DonorNotification(models.Model):
-    """
-    UPDATED MODEL - Now supports sequential notification workflow
-    """
     STATUS_CHOICES = [
-        ('pending', 'Pending'),        # Not notified yet
-        ('notified', 'Notified'),      # Notified, waiting for response
-        ('accepted', 'Accepted'),      # Donor accepted
-        ('rejected', 'Rejected'),      # Donor rejected
-        ('cancelled', 'Cancelled'),    # Request cancelled or another donor accepted
+        ('pending',   'Pending'),
+        ('notified',  'Notified'),
+        ('accepted',  'Accepted'),
+        ('rejected',  'Rejected'),
+        ('cancelled', 'Cancelled'),
     ]
-    
+
     donor = models.ForeignKey(
         DonorProfile,
         on_delete=models.CASCADE,
@@ -88,36 +82,25 @@ class DonorNotification(models.Model):
         related_name='donor_notifications'
     )
 
-    match_score = models.FloatField(
-        null=True,
-        blank=True,
-        help_text="Match score between 0 and 1"
-    )
-    distance = models.FloatField(
-        null=True,
-        blank=True,
-        help_text="Distance in kilometers"
-    )
+    match_score = models.FloatField(null=True, blank=True)
+    distance = models.FloatField(null=True, blank=True)
 
-    # Existing fields
     is_read = models.BooleanField(default=False)
-    responded = models.BooleanField(default=False)  # Keep for backward compatibility
+    responded = models.BooleanField(default=False)
     sent_at = models.DateTimeField(auto_now_add=True)
 
-    # NEW FIELDS - Sequential notification support
-    is_notified = models.BooleanField(default=False, help_text="Has this donor been notified?")
-    priority_order = models.IntegerField(default=0, help_text="Order to notify (1, 2, 3...)")
+    is_notified = models.BooleanField(default=False)
+    priority_order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    notified_at = models.DateTimeField(null=True, blank=True, help_text="When donor was notified")
-    responded_at = models.DateTimeField(null=True, blank=True, help_text="When donor responded")
-    response_notes = models.TextField(blank=True, help_text="Donor's response notes/reason")
+    notified_at = models.DateTimeField(null=True, blank=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+    response_notes = models.TextField(blank=True)
 
     def __str__(self):
         return f"Notification → {self.donor.full_name} | Request #{self.blood_request_id} (Priority: {self.priority_order})"
 
     @property
     def response_time_hours(self):
-        """Calculate response time in hours"""
         if self.notified_at and self.responded_at:
             delta = self.responded_at - self.notified_at
             return round(delta.total_seconds() / 3600, 2)
@@ -133,10 +116,9 @@ class DonorNotification(models.Model):
 
 
 class DonorResponse(models.Model):
-    """Keep existing DonorResponse model for backward compatibility"""
     STATUS_CHOICES = [
-        ('accepted', 'Accepted'),
-        ('declined', 'Declined'),
+        ('accepted',  'Accepted'),
+        ('declined',  'Declined'),
         ('completed', 'Donation Completed'),
     ]
 

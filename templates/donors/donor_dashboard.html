@@ -656,6 +656,291 @@ body.dark-mode .quick-action-btn {
 body.dark-mode .dash-wrap     { background: var(--ivory); }
 body.dark-mode .notif-item    { color: var(--ink); }
 body.dark-mode .eligibility-bar { border-color: rgba(255,255,255,0.08); }
+
+/* ══════════════════════════════════════════════════════════
+   NEW FEATURE STYLES (added — nothing above changed)
+   ══════════════════════════════════════════════════════════ */
+
+/* ── PAST NOTIFICATION EXPANDABLE ────────────────────────── */
+.past-notif-row {
+    cursor: pointer;
+    user-select: none;
+}
+
+.past-notif-row:hover {
+    border-color: var(--border) !important;
+}
+
+.past-notif-toggle-icon {
+    transition: transform 0.25s ease;
+    color: var(--ink-muted);
+    font-size: 13px;
+}
+
+.past-notif-toggle-icon.open {
+    transform: rotate(180deg);
+}
+
+.past-notif-detail {
+    display: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.past-notif-detail.show {
+    display: block;
+}
+
+.past-notif-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+}
+
+.past-notif-detail-item label {
+    display: block;
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-muted);
+    margin-bottom: 3px;
+}
+
+.past-notif-detail-item span {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+body.dark-mode .past-notif-detail-item span { color: var(--ink); }
+
+/* ── FULFILL BUTTON ───────────────────────────────────────── */
+.btn-notif-fulfill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 16px;
+    background: linear-gradient(135deg, var(--crimson), #c0392b);
+    color: white;
+    font-size: 12.5px; font-weight: 700;
+    border-radius: 7px; border: none; cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.3px;
+}
+
+.btn-notif-fulfill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(155,23,40,0.4);
+    background: linear-gradient(135deg, #a91b2c, var(--crimson));
+}
+
+/* ── NEARBY HOSPITALS TABLE ───────────────────────────────── */
+.hospital-table-wrap {
+    overflow-x: auto;
+}
+
+.hospital-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    font-size: 13.5px;
+}
+
+.hospital-table thead th {
+    font-size: 10.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-muted);
+    padding: 0 14px 8px;
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+}
+
+.hospital-table tbody tr {
+    background: white;
+    transition: all 0.2s ease;
+}
+
+body.dark-mode .hospital-table tbody tr {
+    background: #221c17;
+}
+
+.hospital-table tbody tr:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-warm);
+}
+
+.hospital-table tbody td {
+    padding: 14px;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+    color: var(--ink);
+}
+
+body.dark-mode .hospital-table tbody td { color: var(--ink); }
+
+.hospital-table tbody td:first-child {
+    border-left: 1px solid var(--border-subtle);
+    border-radius: 10px 0 0 10px;
+    padding-left: 18px;
+}
+
+.hospital-table tbody td:last-child {
+    border-right: 1px solid var(--border-subtle);
+    border-radius: 0 10px 10px 0;
+    padding-right: 18px;
+}
+
+.hospital-name-cell {
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.hospital-name-cell small {
+    display: block;
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.urgency-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.urgency-critical { background: rgba(155,23,40,0.1); color: var(--crimson); border: 1px solid rgba(155,23,40,0.2); }
+.urgency-high     { background: var(--gold-pale);    color: #b45309;         border: 1px solid rgba(196,146,74,0.25); }
+.urgency-medium   { background: rgba(59,130,246,0.1); color: #1d4ed8;        border: 1px solid rgba(59,130,246,0.2); }
+.urgency-low      { background: rgba(28,20,16,0.06);  color: var(--ink-mid); border: 1px solid var(--border-subtle); }
+
+.distance-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600;
+    color: var(--ink-mid);
+}
+
+/* ── DONATION HISTORY TABLE ───────────────────────────────── */
+.history-table-wrap {
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    font-size: 13.5px;
+}
+
+.history-table thead th {
+    font-size: 10.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-muted);
+    padding: 0 14px 10px;
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+}
+
+.history-table tbody tr {
+    background: white;
+    transition: all 0.2s ease;
+}
+
+body.dark-mode .history-table tbody tr {
+    background: #221c17;
+}
+
+.history-table tbody tr:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-warm);
+}
+
+.history-table tbody td {
+    padding: 13px 14px;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+    color: var(--ink);
+}
+
+body.dark-mode .history-table tbody td { color: var(--ink); }
+
+.history-table tbody td:first-child {
+    border-left: 1px solid var(--border-subtle);
+    border-radius: 10px 0 0 10px;
+    padding-left: 18px;
+}
+
+.history-table tbody td:last-child {
+    border-right: 1px solid var(--border-subtle);
+    border-radius: 0 10px 10px 0;
+    padding-right: 18px;
+    text-align: right;
+}
+
+.points-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11.5px; font-weight: 700;
+    background: var(--gold-pale);
+    color: #92400e;
+    border: 1px solid rgba(196,146,74,0.25);
+}
+
+/* ── TOAST NOTIFICATION ───────────────────────────────────── */
+.ll-toast {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    z-index: 9999;
+    background: var(--ink);
+    color: white;
+    border-radius: 12px;
+    padding: 16px 22px;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.35);
+    font-size: 13.5px; font-weight: 500;
+    max-width: 360px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+}
+
+.ll-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ll-toast-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: rgba(74,222,128,0.2);
+    color: #4ade80;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.ll-toast strong {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 2px;
+    font-size: 14px;
+}
+
+.ll-toast small {
+    font-size: 12px;
+    color: rgba(240,232,222,0.6);
+}
 </style>
 {% endblock %}
 
@@ -841,6 +1126,16 @@ body.dark-mode .eligibility-bar { border-color: rgba(255,255,255,0.08); }
                                                 </button>
                                             </form>
                                         </div>
+                                        {% elif notification.status == 'accepted' %}
+                                        <!-- NEW: Fulfill button for accepted notifications -->
+                                        <form method="post" action="{% url 'fulfill_blood_request' notification.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-notif-fulfill w-100"
+                                                    onclick="return confirm('Confirm that you have donated blood for this request? This will update your donation record and notify the admin.')"
+                                                    data-fulfill>
+                                                <i class="bi bi-droplet-fill"></i> Mark as Donated
+                                            </button>
+                                        </form>
                                         {% else %}
                                         <span class="tag tag-ink">{{ notification.status|title }}</span>
                                         {% endif %}
@@ -907,33 +1202,239 @@ body.dark-mode .eligibility-bar { border-color: rgba(255,255,255,0.08); }
                 </div>
             </div>
 
-            <!-- Past Notifications -->
+            <!-- ── NEW: Nearby Hospitals Section ─────────────── -->
+            <div class="dash-card" id="nearby-hospitals-section">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="bi bi-hospital-fill"></i>
+                        Find Nearby Hospitals
+                    </div>
+                    <a href="{% url 'find_nearby_hospitals' %}" class="btn-notif-view" style="white-space:nowrap;">
+                        <i class="bi bi-arrow-up-right-square"></i> View All
+                    </a>
+                </div>
+                <div class="dash-card-body">
+                    {% if nearby_hospitals %}
+                    <div class="hospital-table-wrap">
+                        <table class="hospital-table">
+                            <thead>
+                                <tr>
+                                    <th>Hospital</th>
+                                    <th>Blood Needed</th>
+                                    <th>Units</th>
+                                    <th>Urgency</th>
+                                    <th>Distance</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for h in nearby_hospitals %}
+                                <tr>
+                                    <td>
+                                        <div class="hospital-name-cell">
+                                            {{ h.hospital_name }}
+                                            <small>{{ h.address }}</small>
+                                        </div>
+                                    </td>
+                                    <td><span class="tag tag-crimson">{{ h.blood_type }}</span></td>
+                                    <td><span class="tag tag-gold">{{ h.units_needed }} u</span></td>
+                                    <td>
+                                        <span class="urgency-badge urgency-{{ h.urgency_level }}">
+                                            {{ h.urgency_level|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="distance-pill">
+                                            <i class="bi bi-geo-alt-fill" style="color:var(--crimson);"></i>
+                                            {{ h.distance|floatformat:1 }} km
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'view_hospital_detail' h.hospital_id %}" class="btn-notif-view">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="bi bi-geo-alt"></i></div>
+                        <h6>No Nearby Hospitals Found</h6>
+                        <p>Enable location access or update your address in your profile to see hospitals near you.</p>
+                        <a href="{% url 'edit_profile' %}" class="btn-notif-view mt-3" style="display:inline-flex;">
+                            <i class="bi bi-pencil-square"></i> Update Address
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ── NEW: Donation History Section ─────────────── -->
+            <div class="dash-card" id="donation-history-section">
+                <div class="dash-card-header">
+                    <div class="dash-card-title">
+                        <i class="bi bi-table"></i>
+                        Donation History
+                    </div>
+                    <a href="{% url 'donation_history' %}" class="btn-notif-view" style="white-space:nowrap;">
+                        <i class="bi bi-arrow-up-right-square"></i> Full History
+                    </a>
+                </div>
+                <div class="dash-card-body">
+                    {% if history %}
+                    <div class="history-table-wrap">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Hospital</th>
+                                    <th>Blood Type</th>
+                                    <th>Units</th>
+                                    <th>Status</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for donation in history|slice:":8" %}
+                                <tr>
+                                    <td style="white-space:nowrap; font-weight:600;">
+                                        {{ donation.date_donated|date:"M d, Y" }}
+                                    </td>
+                                    <td>{{ donation.hospital.hospital_name }}</td>
+                                    <td><span class="tag tag-crimson">{{ donation.blood_type }}</span></td>
+                                    <td><span class="tag tag-gold">{{ donation.units_donated }} u</span></td>
+                                    <td>
+                                        {% if donation.status == 'fulfilled' or donation.status == 'completed' %}
+                                            <span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Completed</span>
+                                        {% elif donation.status == 'pending' %}
+                                            <span class="tag tag-gold"><i class="bi bi-hourglass-split"></i> Pending</span>
+                                        {% else %}
+                                            <span class="tag tag-ink">{{ donation.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="points-badge">
+                                            <i class="bi bi-star-fill"></i>
+                                            +{{ donation.points_earned|default:"50" }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if history|length > 8 %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'donation_history' %}" class="btn-notif-view" style="display:inline-flex;">
+                            <i class="bi bi-arrow-right-circle"></i> View All {{ history|length }} Donations
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="bi bi-droplet"></i></div>
+                        <h6>No Donations Yet</h6>
+                        <p>Your donation history will appear here after your first donation.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Past Notifications — with expandable detail -->
             {% if past_notifications %}
             <div class="dash-card">
                 <div class="dash-card-header">
                     <div class="dash-card-title">
                         <i class="bi bi-archive"></i> Past Notifications
                     </div>
+                    <span class="dash-card-count">{{ past_notifications|length }}</span>
                 </div>
                 <div class="dash-card-body">
                     {% for notification in past_notifications %}
-                    <div class="notif-item">
+                    <!-- NEW: clickable row that expands to show full details -->
+                    <div class="notif-item past-notif-row" onclick="togglePastNotif(this)" style="cursor:pointer;">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <div class="fw-bold" style="font-size:13.5px; color:var(--ink);">
+                                    <i class="bi bi-hospital" style="color:var(--crimson); margin-right:4px;"></i>
                                     {{ notification.blood_request.hospital.hospital_name }}
                                 </div>
                                 <div style="font-size:12px; color:var(--ink-muted); margin-top:4px;">
                                     <i class="bi bi-calendar"></i> {{ notification.sent_at|date:"M d, Y" }}
+                                    &nbsp;·&nbsp;
+                                    <span class="tag tag-crimson" style="padding:1px 7px; font-size:10.5px;">
+                                        {{ notification.blood_request.blood_type }}
+                                    </span>
+                                    &nbsp;{{ notification.blood_request.units_needed }} units
                                 </div>
                             </div>
-                            {% if notification.status == 'accepted' %}
-                                <span class="tag tag-green"><i class="bi bi-check"></i> Accepted</span>
-                            {% elif notification.status == 'rejected' %}
-                                <span class="tag tag-crimson"><i class="bi bi-x"></i> Rejected</span>
-                            {% elif notification.status == 'cancelled' %}
-                                <span class="tag tag-ink"><i class="bi bi-dash"></i> Cancelled</span>
-                            {% endif %}
+                            <div class="d-flex align-items-center gap-3">
+                                {% if notification.status == 'accepted' or notification.status == 'fulfilled' %}
+                                    <span class="tag tag-green"><i class="bi bi-check"></i> {{ notification.status|title }}</span>
+                                {% elif notification.status == 'rejected' %}
+                                    <span class="tag tag-crimson"><i class="bi bi-x"></i> Rejected</span>
+                                {% elif notification.status == 'cancelled' %}
+                                    <span class="tag tag-ink"><i class="bi bi-dash"></i> Cancelled</span>
+                                {% endif %}
+                                <i class="bi bi-chevron-down past-notif-toggle-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Expandable detail panel -->
+                        <div class="past-notif-detail">
+                            <div class="past-notif-detail-grid">
+                                <div class="past-notif-detail-item">
+                                    <label>Patient Name</label>
+                                    <span>{{ notification.blood_request.patient_name }}</span>
+                                </div>
+                                <div class="past-notif-detail-item">
+                                    <label>Blood Type</label>
+                                    <span><span class="tag tag-crimson">{{ notification.blood_request.blood_type }}</span></span>
+                                </div>
+                                <div class="past-notif-detail-item">
+                                    <label>Units Required</label>
+                                    <span>{{ notification.blood_request.units_needed }} unit(s)</span>
+                                </div>
+                                {% if notification.blood_request.ward %}
+                                <div class="past-notif-detail-item">
+                                    <label>Ward / Dept.</label>
+                                    <span>{{ notification.blood_request.ward }}</span>
+                                </div>
+                                {% endif %}
+                                {% if notification.blood_request.contact_number %}
+                                <div class="past-notif-detail-item">
+                                    <label>Contact</label>
+                                    <span>
+                                        <a href="tel:{{ notification.blood_request.contact_number }}"
+                                           style="color:var(--crimson); text-decoration:none;"
+                                           onclick="event.stopPropagation();">
+                                            <i class="bi bi-telephone-fill"></i>
+                                            {{ notification.blood_request.contact_number }}
+                                        </a>
+                                    </span>
+                                </div>
+                                {% endif %}
+                                <div class="past-notif-detail-item">
+                                    <label>Required By</label>
+                                    <span>{{ notification.blood_request.required_by|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="past-notif-detail-item">
+                                    <label>Your Response</label>
+                                    <span>{{ notification.status|title }}</span>
+                                </div>
+                                <div class="past-notif-detail-item">
+                                    <label>Notified At</label>
+                                    <span>{{ notification.notified_at|date:"M d, Y H:i" }}</span>
+                                </div>
+                            </div>
+                            <div class="mt-3" onclick="event.stopPropagation();">
+                                <a href="{% url 'view_notification_detail' notification.id %}" class="btn-notif-view">
+                                    <i class="bi bi-arrow-up-right-square"></i> Full Request Page
+                                </a>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
@@ -1040,11 +1541,11 @@ body.dark-mode .eligibility-bar { border-color: rgba(255,255,255,0.08); }
                 </div>
                 <div class="dash-card-body">
                     <div class="d-flex flex-column gap-2">
-                        <a href="{% url 'find_nearby_hospitals' %}" class="quick-action-btn">
+                        <a href="#nearby-hospitals-section" class="quick-action-btn" onclick="document.getElementById('nearby-hospitals-section').scrollIntoView({behavior:'smooth'}); return false;">
                             <i class="bi bi-geo-alt-fill"></i>
                             Find Nearby Hospitals
                         </a>
-                        <a href="{% url 'donation_history' %}" class="quick-action-btn">
+                        <a href="#donation-history-section" class="quick-action-btn" onclick="document.getElementById('donation-history-section').scrollIntoView({behavior:'smooth'}); return false;">
                             <i class="bi bi-clock-history"></i>
                             Donation History
                         </a>
@@ -1066,6 +1567,16 @@ body.dark-mode .eligibility-bar { border-color: rgba(255,255,255,0.08); }
 
 </div>
 </div>
+
+<!-- ── TOAST NOTIFICATION (for fulfill action) ─────────────── -->
+<div class="ll-toast" id="fulfillToast">
+    <div class="ll-toast-icon"><i class="bi bi-check-circle-fill"></i></div>
+    <div>
+        <strong>Donation Recorded!</strong>
+        <small>+50 points added · Admin has been notified</small>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -1076,5 +1587,49 @@ body.dark-mode .eligibility-bar { border-color: rgba(255,255,255,0.08); }
             new bootstrap.Alert(el).close();
         });
     }, 5000);
+
+    // ── NEW: Toggle past notification detail panels ──────────
+    function togglePastNotif(row) {
+        const detail = row.querySelector('.past-notif-detail');
+        const icon   = row.querySelector('.past-notif-toggle-icon');
+        if (!detail) return;
+        const isOpen = detail.classList.contains('show');
+        // Close all others first
+        document.querySelectorAll('.past-notif-detail.show').forEach(d => {
+            d.classList.remove('show');
+        });
+        document.querySelectorAll('.past-notif-toggle-icon.open').forEach(i => {
+            i.classList.remove('open');
+        });
+        // Toggle clicked one
+        if (!isOpen) {
+            detail.classList.add('show');
+            icon.classList.add('open');
+        }
+    }
+
+    // ── NEW: Toast on fulfill form submit ───────────────────
+    document.querySelectorAll('[data-fulfill]').forEach(btn => {
+        btn.closest('form').addEventListener('submit', function(e) {
+            // Show toast after a tiny delay so page can process
+            setTimeout(() => showFulfillToast(), 200);
+        });
+    });
+
+    function showFulfillToast() {
+        const toast = document.getElementById('fulfillToast');
+        if (!toast) return;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4500);
+    }
+
+    // Show toast if redirected back after fulfillment
+    {% if messages %}
+        {% for message in messages %}
+            {% if 'fulfilled' in message.message|lower or 'donated' in message.message|lower %}
+                document.addEventListener('DOMContentLoaded', () => showFulfillToast());
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 </script>
 {% endblock %}

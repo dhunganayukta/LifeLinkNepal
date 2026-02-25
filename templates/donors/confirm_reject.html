@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Decline Request – LifeLink Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  :root {
+    --blood: #C0392B; --blood-dk: #922B21; --blood-lt: #F9EBEA;
+    --ink: #1A1A2E; --muted: #6B7280; --border: #E5E7EB;
+    --surface: #FFFFFF; --bg: #F7F3F0;
+    --danger: #EF4444; --danger-lt: #FEE2E2;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+
+  .cr-card {
+    background: var(--surface);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 40px rgba(0,0,0,.10);
+    max-width: 520px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .cr-top {
+    background: linear-gradient(135deg, #6B7280, #374151);
+    padding: 32px 32px 28px;
+    text-align: center;
+    color: #fff;
+  }
+  .cr-icon { font-size: 3rem; display: block; margin-bottom: 12px; }
+  .cr-top h1 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; }
+  .cr-top p  { font-size: .9rem; opacity: .85; margin-top: 6px; }
+
+  .cr-body { padding: 28px 32px; }
+
+  .cr-info {
+    background: #F3F4F6;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+  }
+  .cr-info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #E5E7EB; font-size: .875rem; }
+  .cr-info-row:last-child { border-bottom: none; }
+  .cr-info-row dt { color: var(--muted); font-weight: 500; }
+  .cr-info-row dd { font-weight: 600; color: var(--ink); }
+
+  .cr-label { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block; }
+
+  .cr-reasons { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .cr-reason-opt { display: none; }
+  .cr-reason-label {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+    cursor: pointer; font-size: .875rem; transition: all .2s;
+  }
+  .cr-reason-opt:checked + .cr-reason-label {
+    border-color: var(--danger); background: var(--danger-lt); color: #991B1B;
+  }
+  .cr-reason-label:hover { border-color: #9CA3AF; }
+
+  .cr-textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: .9rem;
+    resize: vertical; min-height: 70px; outline: none;
+    transition: border-color .2s; background: #FAFAFA;
+  }
+  .cr-textarea:focus { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239,68,68,.10); }
+
+  .cr-note {
+    background: var(--danger-lt); border: 1px solid #FCA5A5; border-radius: 10px;
+    padding: 12px 16px; font-size: .83rem; color: #991B1B;
+    display: flex; gap: 10px; margin: 18px 0;
+  }
+
+  .cr-actions { display: flex; gap: 12px; margin-top: 22px; }
+  .btn {
+    flex: 1; padding: 13px; border-radius: 10px; border: none; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem;
+    text-decoration: none; text-align: center; display: inline-flex;
+    align-items: center; justify-content: center; gap: 8px; transition: all .2s;
+  }
+  .btn-decline {
+    background: linear-gradient(135deg, var(--danger), #DC2626);
+    color: #fff; box-shadow: 0 4px 14px rgba(239,68,68,.25);
+  }
+  .btn-decline:hover { transform: translateY(-1px); }
+  .btn-back {
+    background: transparent; color: var(--muted);
+    border: 1.5px solid var(--border); flex: 0 0 auto; padding: 13px 20px;
+  }
+  .btn-back:hover { border-color: var(--ink); color: var(--ink); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cr-card">
+
+  <div class="cr-top">
+    <span class="cr-icon">🙏</span>
+    <h1>Decline This Request?</h1>
+    <p>That's okay — please give a reason so we can notify the next donor quickly.</p>
+  </div>
+
+  <div class="cr-body">
+    <dl class="cr-info">
+      <div class="cr-info-row">
+        <dt>Hospital</dt>
+        <dd>{{ blood_request.hospital.hospital_name }}</dd>
+      </div>
+      <div class="cr-info-row">
+        <dt>Patient</dt>
+        <dd>{{ blood_request.patient_name }}</dd>
+      </div>
+      <div class="cr-info-row">
+        <dt>Blood Type</dt>
+        <dd>{{ blood_request.blood_type }}</dd>
+      </div>
+      <div class="cr-info-row">
+        <dt>Urgency</dt>
+        <dd>{{ blood_request.urgency_level|title }}</dd>
+      </div>
+    </dl>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <span class="cr-label">Reason for declining</span>
+      <div class="cr-reasons">
+        {% for value, label in reasons %}
+          <input class="cr-reason-opt" type="radio" name="reason" id="r_{{ forloop.counter }}" value="{{ value }}" {% if forloop.first %}checked{% endif %}>
+          <label class="cr-reason-label" for="r_{{ forloop.counter }}">{{ label }}</label>
+        {% empty %}
+          <input class="cr-reason-opt" type="radio" name="reason" id="r1" value="Not available right now" checked>
+          <label class="cr-reason-label" for="r1">🚫 Not available right now</label>
+          <input class="cr-reason-opt" type="radio" name="reason" id="r2" value="Feeling unwell">
+          <label class="cr-reason-label" for="r2">🤒 Feeling unwell</label>
+          <input class="cr-reason-opt" type="radio" name="reason" id="r3" value="Recently donated blood">
+          <label class="cr-reason-label" for="r3">🩸 Recently donated blood</label>
+          <input class="cr-reason-opt" type="radio" name="reason" id="r4" value="Cannot travel to hospital">
+          <label class="cr-reason-label" for="r4">🚗 Cannot travel to hospital</label>
+          <input class="cr-reason-opt" type="radio" name="reason" id="r5" value="Other">
+          <label class="cr-reason-label" for="r5">💬 Other reason</label>
+        {% endfor %}
+      </div>
+
+      <span class="cr-label">Additional details (optional)</span>
+      <textarea class="cr-textarea" name="notes" placeholder="Any extra info for the admin..."></textarea>
+
+      <div class="cr-note">
+        ❤️ Thank you for your honesty. The next eligible donor will be notified immediately.
+      </div>
+
+      <div class="cr-actions">
+        <a href="{% url 'donor_dashboard' %}" class="btn btn-back">Go Back</a>
+        <button type="submit" class="btn btn-decline">
+          Confirm Decline
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

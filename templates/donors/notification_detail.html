@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notification Detail | LifeLink Nepal{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --red-deep:    #c0392b;
+    --red-bright:  #e74c3c;
+    --red-soft:    #fdecea;
+    --charcoal:    #1a1a2e;
+    --slate:       #2c3e50;
+    --muted:       #7f8c9b;
+    --divider:     #e8ecf0;
+    --bg:          #f5f7fa;
+    --card:        #ffffff;
+    --green:       #27ae60;
+    --green-soft:  #eafaf1;
+    --orange:      #e67e22;
+    --orange-soft: #fef5ec;
+    --blue:        #2980b9;
+    --blue-soft:   #eaf4fb;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--charcoal);
+  }
+
+  /* ── Page wrapper ── */
+  .nd-page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  /* ── Breadcrumb ── */
+  .nd-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .82rem;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .03em;
+  }
+  .nd-breadcrumb a {
+    color: var(--red-deep);
+    text-decoration: none;
+  }
+  .nd-breadcrumb a:hover { text-decoration: underline; }
+  .nd-breadcrumb .sep { opacity: .4; }
+
+  /* ── Status banner ── */
+  .nd-status-banner {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .9rem 1.25rem;
+    border-radius: 8px;
+    font-size: .9rem;
+    font-weight: 600;
+    margin-bottom: 1.75rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .nd-status-banner.notified   { background: var(--blue-soft);   color: var(--blue);     border-left: 4px solid var(--blue); }
+  .nd-status-banner.accepted   { background: var(--green-soft);  color: var(--green);    border-left: 4px solid var(--green); }
+  .nd-status-banner.rejected   { background: var(--red-soft);    color: var(--red-deep); border-left: 4px solid var(--red-deep); }
+  .nd-status-banner.cancelled  { background: #f4f4f4;            color: var(--muted);    border-left: 4px solid #ccc; }
+  .nd-status-banner .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    animation: pulse-dot 1.8s infinite;
+  }
+  .nd-status-banner.notified .dot { animation: pulse-dot 1.8s infinite; }
+  .nd-status-banner:not(.notified) .dot { animation: none; }
+  @keyframes pulse-dot {
+    0%,100% { transform: scale(1);   opacity: 1; }
+    50%      { transform: scale(1.5); opacity: .6; }
+  }
+
+  /* ── Card shell ── */
+  .nd-card {
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,.07);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .nd-card-header {
+    background: var(--charcoal);
+    padding: 1.1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+  }
+  .nd-card-header .icon {
+    font-size: 1.3rem;
+  }
+  .nd-card-header h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .nd-card-body {
+    padding: 1.5rem;
+  }
+
+  /* ── Info grid ── */
+  .nd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.5rem;
+  }
+  @media (max-width: 560px) { .nd-grid { grid-template-columns: 1fr; } }
+
+  .nd-field label {
+    display: block;
+    font-size: .72rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: .25rem;
+  }
+  .nd-field .value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--charcoal);
+  }
+  .nd-field .value.blood-type {
+    display: inline-block;
+    background: var(--red-soft);
+    color: var(--red-deep);
+    padding: .2rem .7rem;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .05em;
+  }
+  .nd-field .value.urgency-critical { color: var(--red-bright); }
+  .nd-field .value.urgency-high     { color: var(--orange); }
+  .nd-field .value.urgency-medium   { color: var(--blue); }
+  .nd-field .value.urgency-low      { color: var(--green); }
+
+  hr.nd-divider {
+    border: none;
+    border-top: 1px solid var(--divider);
+    margin: 1.25rem 0;
+  }
+
+  /* ── Hospital block ── */
+  .nd-hospital-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--divider);
+  }
+  .nd-hospital-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--red-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .nd-hospital-info h3 {
+    margin: 0 0 .2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--charcoal);
+  }
+  .nd-hospital-info p {
+    margin: 0;
+    font-size: .85rem;
+    color: var(--muted);
+    font-family: 'Courier New', monospace;
+  }
+
+  /* ── Timeline ── */
+  .nd-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .nd-timeline-item {
+    display: flex;
+    gap: 1rem;
+    position: relative;
+  }
+  .nd-timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 24px;
+    width: 2px;
+    height: calc(100% + .5rem);
+    background: var(--divider);
+  }
+  .nd-tl-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--red-soft);
+    border: 2px solid var(--red-deep);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: .1rem;
+    font-size: .65rem;
+    color: var(--red-deep);
+  }
+  .nd-tl-content {
+    padding-bottom: 1.25rem;
+  }
+  .nd-tl-content strong {
+    display: block;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: .15rem;
+  }
+  .nd-tl-content span {
+    font-size: .8rem;
+    color: var(--muted);
+    font-family: 'Courier New', monospace;
+  }
+
+  /* ── Action buttons ── */
+  .nd-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: .25rem;
+  }
+  .btn-accept {
+    flex: 1;
+    min-width: 160px;
+    padding: .85rem 1.5rem;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: .95rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    transition: background .2s, transform .15s;
+  }
+  .btn-accept:hover { background: #219150; transform: translateY(-1px); }
+
+  .btn-reject {
+    flex: 1;
+    min-width: 160px;
+    padding: .85rem 1.5rem;
+    background: transparent;
+    color: var(--red-deep);
+    border: 2px solid var(--red-deep);
+    border-radius: 8px;
+    font-size: .95rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    transition: background .2s, color .2s, transform .15s;
+  }
+  .btn-reject:hover {
+    background: var(--red-soft);
+    transform: translateY(-1px);
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    color: var(--muted);
+    font-size: .85rem;
+    text-decoration: none;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .04em;
+    transition: color .2s;
+  }
+  .btn-back:hover { color: var(--charcoal); }
+
+  /* ── Already responded notice ── */
+  .nd-responded-notice {
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    font-size: .9rem;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+  }
+  .nd-responded-notice.accepted { background: var(--green-soft); color: var(--green); border: 1px solid #a9dfbf; }
+  .nd-responded-notice.rejected { background: var(--red-soft);   color: var(--red-deep); border: 1px solid #f5b7b1; }
+  .nd-responded-notice.cancelled { background: #f4f4f4; color: var(--muted); border: 1px solid #ddd; }
+
+  /* ── Notes box ── */
+  .nd-notes {
+    background: var(--bg);
+    border-left: 3px solid var(--red-deep);
+    padding: .8rem 1rem;
+    border-radius: 0 6px 6px 0;
+    font-size: .9rem;
+    color: var(--slate);
+    margin-top: 1rem;
+    font-style: italic;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="nd-page">
+
+  <!-- Breadcrumb -->
+  <nav class="nd-breadcrumb">
+    <a href="{% url 'donor_dashboard' %}">Dashboard</a>
+    <span class="sep">›</span>
+    <span>Notification #{{ notification.id }}</span>
+  </nav>
+
+  <!-- Status Banner -->
+  <div class="nd-status-banner {{ notification.status }}">
+    <span class="dot"></span>
+    {% if notification.status == 'notified' %}
+      Awaiting Your Response
+    {% elif notification.status == 'accepted' %}
+      You Accepted This Request
+    {% elif notification.status == 'rejected' %}
+      You Declined This Request
+    {% elif notification.status == 'cancelled' %}
+      This Request Has Been Cancelled
+    {% else %}
+      Status: {{ notification.status|title }}
+    {% endif %}
+  </div>
+
+  <!-- ── Blood Request Details ── -->
+  <div class="nd-card">
+    <div class="nd-card-header">
+      <span class="icon">🩸</span>
+      <h2>Blood Request Details</h2>
+    </div>
+    <div class="nd-card-body">
+      <div class="nd-grid">
+        <div class="nd-field">
+          <label>Patient Name</label>
+          <div class="value">{{ blood_request.patient_name }}</div>
+        </div>
+        <div class="nd-field">
+          <label>Blood Type Required</label>
+          <div class="value blood-type">{{ blood_request.blood_type }}</div>
+        </div>
+        <div class="nd-field">
+          <label>Units Needed</label>
+          <div class="value">{{ blood_request.units_needed }} unit{{ blood_request.units_needed|pluralize }}</div>
+        </div>
+        <div class="nd-field">
+          <label>Urgency Level</label>
+          <div class="value urgency-{{ blood_request.urgency_level }}">
+            {% if blood_request.urgency_level == 'critical' %}🔴{% elif blood_request.urgency_level == 'high' %}🟠{% elif blood_request.urgency_level == 'medium' %}🔵{% else %}🟢{% endif %}
+            {{ blood_request.urgency_level|title }}
+          </div>
+        </div>
+        <div class="nd-field">
+          <label>Request Status</label>
+          <div class="value">{{ blood_request.status|title }}</div>
+        </div>
+        <div class="nd-field">
+          <label>Request Date</label>
+          <div class="value">{{ blood_request.created_at|date:"M d, Y" }}</div>
+        </div>
+      </div>
+
+      {% if blood_request.notes %}
+        <hr class="nd-divider">
+        <div class="nd-field">
+          <label>Additional Notes</label>
+          <div class="nd-notes">{{ blood_request.notes }}</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── Hospital Info ── -->
+  <div class="nd-card">
+    <div class="nd-card-header">
+      <span class="icon">🏥</span>
+      <h2>Hospital Information</h2>
+    </div>
+    <div class="nd-card-body">
+      <div class="nd-hospital-block">
+        <div class="nd-hospital-icon">🏥</div>
+        <div class="nd-hospital-info">
+          <h3>{{ hospital.hospital_name }}</h3>
+          <p>{{ hospital.address }}</p>
+          {% if notification.distance %}
+            <p style="margin-top:.35rem; color: var(--blue);">
+              📍 {{ notification.distance|floatformat:1 }} km from your location
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Notification Timeline ── -->
+  <div class="nd-card">
+    <div class="nd-card-header">
+      <span class="icon">📋</span>
+      <h2>Notification Timeline</h2>
+    </div>
+    <div class="nd-card-body">
+      <div class="nd-timeline">
+        {% if notification.notified_at %}
+        <div class="nd-timeline-item">
+          <div class="nd-tl-dot">✉</div>
+          <div class="nd-tl-content">
+            <strong>Notification Sent</strong>
+            <span>{{ notification.notified_at|date:"M d, Y • H:i" }}</span>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if notification.sent_at and notification.sent_at != notification.notified_at %}
+        <div class="nd-timeline-item">
+          <div class="nd-tl-dot">📬</div>
+          <div class="nd-tl-content">
+            <strong>Received</strong>
+            <span>{{ notification.sent_at|date:"M d, Y • H:i" }}</span>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if notification.responded_at %}
+        <div class="nd-timeline-item">
+          <div class="nd-tl-dot">{% if notification.status == 'accepted' %}✔{% else %}✖{% endif %}</div>
+          <div class="nd-tl-content">
+            <strong>
+              {% if notification.status == 'accepted' %}Accepted{% elif notification.status == 'rejected' %}Declined{% else %}Responded{% endif %}
+            </strong>
+            <span>{{ notification.responded_at|date:"M d, Y • H:i" }}</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Response Notes ── -->
+  {% if notification.response_notes %}
+  <div class="nd-card">
+    <div class="nd-card-header">
+      <span class="icon">📝</span>
+      <h2>Response Notes</h2>
+    </div>
+    <div class="nd-card-body">
+      <div class="nd-notes">{{ notification.response_notes }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Action Area ── -->
+  <div class="nd-card">
+    <div class="nd-card-body">
+      {% if can_respond %}
+        <p style="margin: 0 0 1rem; font-size:.9rem; color: var(--muted); font-family:'Courier New',monospace;">
+          Please respond to this blood request as soon as possible.
+        </p>
+        <div class="nd-actions">
+          <a href="{% url 'accept_blood_request' notification.id %}" class="btn-accept">
+            ✔ Accept Request
+          </a>
+          <a href="{% url 'reject_blood_request' notification.id %}" class="btn-reject">
+            ✖ Decline Request
+          </a>
+        </div>
+      {% else %}
+        <div class="nd-responded-notice {{ notification.status }}">
+          {% if notification.status == 'accepted' %}
+            ✔ You have already accepted this request. The hospital has been notified.
+          {% elif notification.status == 'rejected' %}
+            ✖ You declined this request. The admin has been notified to contact the next donor.
+          {% elif notification.status == 'cancelled' %}
+            ⊘ This request has been cancelled or fulfilled by another donor.
+          {% else %}
+            This notification is no longer active.
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div style="margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--divider);">
+        <a href="{% url 'donor_dashboard' %}" class="btn-back">
+          ← Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

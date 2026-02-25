@@ -6,37 +6,21 @@ from .models import DonorProfile
 
 
 class DonorRegisterForm(UserCreationForm):
-    """
-    Enhanced donor registration form with all required fields
-    """
-    # User fields
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={
         'class': 'form-control',
         'placeholder': 'your.email@example.com'
     }))
-    
-    # Donor profile fields
     full_name = forms.CharField(max_length=200, required=True, widget=forms.TextInput(attrs={
         'class': 'form-control',
         'placeholder': 'Full Name'
     }))
-    
     age = forms.IntegerField(
-        required=True, 
-        min_value=18, 
-        max_value=65,
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Age (18-65)'
-        })
+        required=True, min_value=18, max_value=65,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Age (18-65)'})
     )
-    
     phone = forms.CharField(max_length=15, required=True, widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': '9812345678',
-        'pattern': '[0-9]{10}'
+        'class': 'form-control', 'placeholder': '9812345678', 'pattern': '[0-9]{10}'
     }))
-    
     blood_type = forms.ChoiceField(
         choices=[
             ('', 'Select Blood Group'),
@@ -48,24 +32,16 @@ class DonorRegisterForm(UserCreationForm):
         required=True,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    
     address = forms.CharField(
         required=True,
         widget=forms.Textarea(attrs={
-            'class': 'form-control',
-            'rows': 2,
-            'placeholder': 'City, District (e.g., Kathmandu, Bagmati)'
+            'class': 'form-control', 'rows': 2,
+            'placeholder': 'City, District (e.g., Itahari, Sunsari)'
         })
     )
-    
-    # Optional: Weight (useful for donation eligibility)
     weight = forms.FloatField(
-        required=False,
-        min_value=45,
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Weight in kg (optional)'
-        })
+        required=False, min_value=45,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Weight in kg (optional)'})
     )
 
     class Meta:
@@ -73,22 +49,14 @@ class DonorRegisterForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
     def save(self, commit=True):
-        """
-        Create user and associated donor profile
-        Automatically geocode address to get lat/lon (optional)
-        """
         user = super().save(commit=False)
         user.user_type = 'donor'
         user.email = self.cleaned_data['email']
-        
+
         if commit:
             user.save()
-            
-            # Get or estimate location coordinates
             address = self.cleaned_data['address']
             lat, lon = geocode_address(address)
-            
-            # Create donor profile
             DonorProfile.objects.create(
                 user=user,
                 full_name=self.cleaned_data['full_name'],
@@ -102,96 +70,111 @@ class DonorRegisterForm(UserCreationForm):
                 is_available=True,
                 donation_count=0,
             )
-        
         return user
 
 
 def geocode_address(address):
     """
-    Convert address to latitude/longitude coordinates
-    
-    Options:
-    1. Use Nominatim API (free, no API key needed)
-    2. Use Google Maps Geocoding API (requires API key)
-    3. Manual mapping for major Nepal cities (fallback)
-    
-    Returns:
-        tuple: (latitude, longitude)
+    Convert address string to (latitude, longitude).
+    Covers all major Nepal cities/towns.
+    Falls back to Kathmandu if no match found.
     """
-    # Option 1: Manual mapping for major Nepal cities (simple fallback)
     city_coordinates = {
+        # Kathmandu Valley
         'kathmandu': (27.7172, 85.3240),
-        'pokhara': (28.2096, 83.9856),
-        'lalitpur': (27.6667, 85.3167),
+        'lalitpur':  (27.6667, 85.3167),
+        'patan':     (27.6667, 85.3167),
         'bhaktapur': (27.6721, 85.4298),
+        'kirtipur':  (27.6767, 85.2792),
+        'pokhara':   (28.2096, 83.9856),
+
+        # Eastern Nepal
         'biratnagar': (26.4525, 87.2718),
-        'bharatpur': (27.6764, 84.4336),
-        'birgunj': (27.0000, 84.8833),
-        'dharan': (26.8125, 87.2833),
-        'hetauda': (27.4287, 85.0328),
-        'janakpur': (26.7288, 85.9242),
+        'itahari':    (26.6641, 87.2796),
+        'dharan':     (26.8125, 87.2833),
+        'damak':      (26.6538, 87.6959),
+        'birtamod':   (26.6458, 87.9934),
+        'mechinagar': (26.6104, 87.9221),
+        'ilam':       (26.9101, 87.9261),
+        'urlabari':   (26.6333, 87.4167),
+        'inaruwa':    (26.6237, 87.1479),
+        'lahan':      (26.7230, 86.4808),
+        'rajbiraj':   (26.5378, 86.7406),
+        'siraha':     (26.6514, 86.2059),
+        'gaur':       (26.7725, 85.2797),
+        'janakpur':   (26.7288, 85.9242),
+
+        # Central Nepal
+        'hetauda':    (27.4287, 85.0328),
+        'bharatpur':  (27.6764, 84.4336),
+        'narayanghat':(27.6953, 84.4314),
+        'birgunj':    (27.0000, 84.8833),
+        'muglin':     (27.8583, 84.5295),
+        'damauli':    (27.9667, 84.2833),
+        'gorkha':     (28.0000, 84.6333),
+        'tansen':     (27.8667, 83.5500),
+        'butwal':     (27.7000, 83.4500),
+        'bhairahawa': (27.5050, 83.4544),
+        'siddharthanagar': (27.5050, 83.4544),
+
+        # Western Nepal
+        'nepalgunj':  (28.0500, 81.6167),
+        'tulsipur':   (28.1333, 82.3000),
+        'surkhet':    (28.5970, 81.6137),
+        'birendranagar': (28.5970, 81.6137),
+        'baglung':    (28.2667, 83.5833),
+        'waling':     (28.0667, 83.7833),
+
+        # Far-western Nepal
+        'dhangadhi':  (28.6833, 80.6000),
+        'mahendranagar': (28.9681, 80.1773),
+        'dipayal':    (29.2653, 81.2108),
+        'dadeldhura': (29.2975, 80.5786),
     }
-    
-    # Check if address contains any major city
+
     address_lower = address.lower()
     for city, coords in city_coordinates.items():
         if city in address_lower:
             return coords
-    
-    # Default to Kathmandu if no match
+
+    # Fallback: Kathmandu
     return (27.7172, 85.3240)
-    
-    # Option 2: Use Nominatim API (uncomment to use)
-    """
-    try:
-        from geopy.geocoders import Nominatim
-        geolocator = Nominatim(user_agent="lifelink_nepal")
-        location = geolocator.geocode(f"{address}, Nepal")
-        
-        if location:
-            return (location.latitude, location.longitude)
-    except:
-        pass
-    
-    # Fallback to Kathmandu
-    return (27.7172, 85.3240)
-    """
 
 
 class DonorProfileUpdateForm(forms.ModelForm):
     """
-    Form for donors to update their profile information
+    Form for donors to update their profile.
+    Re-geocodes latitude/longitude automatically when address changes.
     """
     class Meta:
         model = DonorProfile
         fields = [
-            'full_name', 'phone', 'address', 
+            'full_name', 'phone', 'address',
             'weight', 'is_available', 'medical_conditions'
         ]
         widgets = {
-            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control', 'pattern': '[0-9]{10}'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'weight': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1'}),
-            'is_available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'full_name':          forms.TextInput(attrs={'class': 'form-control'}),
+            'phone':              forms.TextInput(attrs={'class': 'form-control', 'pattern': '[0-9]{10}'}),
+            'address':            forms.Textarea(attrs={'class': 'form-control', 'rows': 2,
+                                                        'placeholder': 'e.g. Itahari, Sunsari'}),
+            'weight':             forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1'}),
+            'is_available':       forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'medical_conditions': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
         labels = {
-            'is_available': 'Available to donate',
+            'is_available':       'Available to donate',
             'medical_conditions': 'Medical Conditions (if any)',
         }
-    
+
     def save(self, commit=True):
-        """Update location coordinates when address changes"""
         profile = super().save(commit=False)
-        
-        # Re-geocode if address changed
+
+        # Re-geocode whenever address field changes
         if 'address' in self.changed_data:
             lat, lon = geocode_address(profile.address)
             profile.latitude = lat
             profile.longitude = lon
-        
+
         if commit:
             profile.save()
-        
         return profile

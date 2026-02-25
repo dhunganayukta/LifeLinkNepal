@@ -140,7 +140,7 @@ body.dark-mode .dash-wrap { background:var(--ivory); }
                             <div class="select-wrap">
                                 <select name="blood_type" class="form-control-styled">
                                     <option value="">All Blood Types</option>
-                                    {% for bt in "A+,A-,B+,B-,AB+,AB-,O+,O-"|split:"," %}
+                                    {% for bt in blood_types %}
                                     <option value="{{ bt }}" {% if blood_type_filter == bt %}selected{% endif %}>{{ bt }}</option>
                                     {% endfor %}
                                 </select>
