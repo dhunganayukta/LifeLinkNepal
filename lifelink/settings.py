@@ -22,8 +22,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS =  [
-    "lifelink-production.up.railway.app",
+ALLOWED_HOSTS = [
+    "lifelinknepal-production.up.railway.app",
 ]
 
 # ========================
