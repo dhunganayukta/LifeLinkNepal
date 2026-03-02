@@ -59,8 +59,6 @@ class BloodRequestAdmin(admin.ModelAdmin):
     donor_count.short_description = 'Donors'
     
     def current_donor(self, obj):
-        """Show currently notified donor or accepted donor"""
-        # Check if someone accepted
         accepted = obj.donor_notifications.filter(status='accepted').first()
         if accepted:
             return format_html(
@@ -71,7 +69,6 @@ class BloodRequestAdmin(admin.ModelAdmin):
                 round(accepted.distance, 2) if accepted.distance else 'N/A'
             )
         
-        # Check who's currently notified
         notified = obj.donor_notifications.filter(status='notified', is_notified=True).first()
         if notified:
             return format_html(
@@ -86,22 +83,18 @@ class BloodRequestAdmin(admin.ModelAdmin):
     current_donor.short_description = 'Current Status'
     
     def action_buttons(self, obj):
-        """Action buttons for notifying donors"""
         if obj.status != 'pending':
             return format_html('<span style="color: gray;">Request {}</span>', obj.status)
         
-        # Check if accepted
         if obj.donor_notifications.filter(status='accepted').exists():
             return format_html('{}', '<span style="color: green;">✅ Donor Accepted</span>')
         
-        # Check if someone is currently waiting
         waiting = obj.donor_notifications.filter(status='notified', is_notified=True).exists()
         if waiting:
             return format_html(
                 '<span style="color: orange;">⏳ Waiting for donor response...</span>'
             )
         
-        # Show "Notify Next Donor" button
         next_donor = obj.donor_notifications.filter(
             is_notified=False, 
             status='pending'
@@ -121,7 +114,6 @@ class BloodRequestAdmin(admin.ModelAdmin):
     action_buttons.short_description = 'Actions'
     
     def donor_list_display(self, obj):
-        """Display full donor list with all details (only visible in admin)"""
         notifications = obj.donor_notifications.all().order_by('priority_order')
         
         if not notifications:
@@ -144,10 +136,8 @@ class BloodRequestAdmin(admin.ModelAdmin):
         <tbody>
         '''
         
-        for notif in notifications[:20]:  # Show top 20
+        for notif in notifications[:20]:
             donor = notif.donor
-            
-            # Color code status
             status_colors = {
                 'pending': 'gray',
                 'notified': 'orange',
@@ -185,7 +175,6 @@ class BloodRequestAdmin(admin.ModelAdmin):
     donor_list_display.short_description = 'Matched Donors (Full Details - Admin Only)'
     
     def get_urls(self):
-        """Add custom URL for notifying next donor"""
         from django.urls import path
         urls = super().get_urls()
         custom_urls = [
@@ -198,23 +187,19 @@ class BloodRequestAdmin(admin.ModelAdmin):
         return custom_urls + urls
     
     def notify_next_donor_view(self, request, request_id):
-        """Handle notifying the next donor"""
         from django.shortcuts import redirect
         from django.contrib import messages
         
         blood_request = BloodRequest.objects.get(id=request_id)
         
-        # Check if already accepted
         if blood_request.donor_notifications.filter(status='accepted').exists():
             messages.warning(request, "A donor has already accepted this request.")
             return redirect('admin:hospitals_bloodrequest_change', request_id)
         
-        # Check if someone is waiting
         if blood_request.donor_notifications.filter(status='notified', is_notified=True).exists():
             messages.warning(request, "A donor is currently reviewing this request. Please wait.")
             return redirect('admin:hospitals_bloodrequest_change', request_id)
         
-        # Get next donor
         next_notification = blood_request.donor_notifications.filter(
             is_notified=False,
             status='pending'
@@ -224,13 +209,11 @@ class BloodRequestAdmin(admin.ModelAdmin):
             messages.error(request, "No more donors available to notify.")
             return redirect('admin:hospitals_bloodrequest_change', request_id)
         
-        # Notify donor
         next_notification.is_notified = True
         next_notification.status = 'notified'
         next_notification.notified_at = timezone.now()
         next_notification.save()
         
-        # Send notification
         self.send_donor_notification(next_notification.donor, blood_request, next_notification)
         
         messages.success(
@@ -242,7 +225,6 @@ class BloodRequestAdmin(admin.ModelAdmin):
         return redirect('admin:hospitals_bloodrequest_change', request_id)
     
     def send_donor_notification(self, donor, blood_request, notification):
-        """Send email/SMS to donor"""
         message = f"""
 🔴 URGENT BLOOD NEEDED
 
@@ -253,12 +235,11 @@ Units: {blood_request.units_needed}
 Urgency: {blood_request.urgency_level.upper()}
 Distance: {notification.distance:.2f}km
 
-You are a {int(notification.match_score * 100)}% match!
+You are a {int(notification.match_score * 100) if notification.match_score else 0}% match!
 
 Please login to LifeLink Nepal to respond.
         """.strip()
         
-        # Send email
         if donor.user.email:
             send_mail(
                 subject=f"🔴 URGENT: Blood Request - {blood_request.blood_type}",
@@ -272,12 +253,21 @@ Please login to LifeLink Nepal to respond.
         print(f"📱 SMS to {donor.phone}: {message}")
 
 
+# ── FIXED: Added save_model to auto-geocode hospital addresses ──
 @admin.register(HospitalProfile)
 class HospitalProfileAdmin(admin.ModelAdmin):
-    list_display = ['hospital_name', 'phone', 'address', 'is_verified', 'total_requests']
+    list_display = ['hospital_name', 'phone', 'address', 'latitude', 'longitude', 'is_verified', 'total_requests']
     list_filter = ['is_verified', 'created_at']
     search_fields = ['hospital_name', 'phone', 'address']
-    
+
+    def save_model(self, request, obj, form, change):
+        from donors.forms import geocode_address
+        if not obj.latitude or not obj.longitude:
+            lat, lon = geocode_address(obj.address)
+            obj.latitude = lat
+            obj.longitude = lon
+        super().save_model(request, obj, form, change)
+
     def total_requests(self, obj):
         total = obj.blood_requests.count()
         pending = obj.blood_requests.filter(status='pending').count()

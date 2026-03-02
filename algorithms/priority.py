@@ -55,14 +55,15 @@ def run_priority_algorithm(blood_requests):
     return ranked_list
 
 
+
+    
 def calculate_urgency_score(urgency_level):
-    """
-    Convert urgency level to a score (0-100)
-    """
+
     urgency_mapping = {
         'critical': 100,
-        'urgent': 70,
-        'normal': 40,
+        'high':     70,   # ← fix
+        'medium':   40,   # ← fix
+        'low':      10,   # ← fix
     }
     return urgency_mapping.get(urgency_level, 40)
 

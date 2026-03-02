@@ -69,6 +69,7 @@ class DonorNotification(models.Model):
         ('accepted',  'Accepted'),
         ('rejected',  'Rejected'),
         ('cancelled', 'Cancelled'),
+        ('fulfilled', 'Fulfilled'),
     ]
 
     donor = models.ForeignKey(

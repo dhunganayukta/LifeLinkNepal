@@ -32,23 +32,23 @@ def donor_dashboard(request):
         last_donation = highest_donor.donation_history.order_by('-date_donated').first()
         last_hospital = last_donation.hospital if last_donation else None
         leaderboard = {
-            'username':    highest_donor.user.username,
-            'blood_type':  highest_donor.blood_type,
+            'username':      highest_donor.user.username,
+            'blood_type':    highest_donor.blood_type,
             'hospital_name': last_hospital.hospital_name if last_hospital else None,
-            'points':      highest_donor.points,
+            'points':        highest_donor.points,
         }
 
-    # Active notifications (waiting for donor response)
+    # Active notifications — notified OR accepted (so donor can see "Mark as Donated" button)
     active_notifications = DonorNotification.objects.filter(
         donor=donor,
-        status='notified',
+        status__in=['notified', 'accepted'],
         is_notified=True
     ).select_related('blood_request', 'blood_request__hospital').order_by('-notified_at')
 
-    # Past notifications (for accordion — rendered by JS via /dashboard/data/)
+    # Past notifications
     past_notifications = DonorNotification.objects.filter(
         donor=donor
-    ).exclude(status='notified').select_related(
+    ).exclude(status__in=['notified', 'accepted']).select_related(
         'blood_request', 'blood_request__hospital'
     ).order_by('-sent_at')[:10]
 
@@ -77,12 +77,12 @@ def donor_dashboard(request):
             continue
 
         eligible_requests.append({
-            'request':        req,
-            'hospital_name':  req.hospital.hospital_name,
+            'request':          req,
+            'hospital_name':    req.hospital.hospital_name,
             'hospital_address': req.hospital.address,
-            'urgency':        req.urgency_level,
-            'distance':       round(distance, 2),
-            'priority_score': calculate_priority_score(req),
+            'urgency':          req.urgency_level,
+            'distance':         round(distance, 2),
+            'priority_score':   calculate_priority_score(req),
         })
 
     ranked_requests = run_priority_algorithm([r['request'] for r in eligible_requests])
@@ -91,19 +91,19 @@ def donor_dashboard(request):
         req = item['request']
         distance = next((r['distance'] for r in eligible_requests if r['request'] == req), None)
         ranked_requests_data.append({
-            'request':        req,
-            'hospital_name':  req.hospital.hospital_name,
+            'request':          req,
+            'hospital_name':    req.hospital.hospital_name,
             'hospital_address': req.hospital.address,
-            'urgency':        item['priority_level'],
-            'priority_score': item['priority_score'],
-            'distance':       distance,
+            'urgency':          item['priority_level'],
+            'priority_score':   item['priority_score'],
+            'distance':         distance,
         })
 
     # Donation history summary
     history = donor.donation_history.all().order_by('-date_donated')
     total_units = sum([d.units_donated for d in history]) if history else 0
 
-    # ── NEW: Nearby hospitals for dashboard card ─────────────
+    # Nearby hospitals
     nearby_hospitals = []
     if donor.latitude and donor.longitude:
         all_hospitals = HospitalProfile.objects.filter(is_verified=True)
@@ -116,13 +116,9 @@ def donor_dashboard(request):
             )
             if dist > 50:
                 continue
-            # Get the most urgent active blood request for this hospital
             active_req = BloodRequest.objects.filter(
                 hospital=hospital, status='pending'
-            ).order_by(
-                # critical first, then high, medium, low
-                '-urgency_level'
-            ).first()
+            ).order_by('-urgency_level').first()
 
             nearby_hospitals.append({
                 'hospital_id':   hospital.id,
@@ -134,41 +130,35 @@ def donor_dashboard(request):
                 'distance':      round(dist, 1),
             })
         nearby_hospitals.sort(key=lambda x: x['distance'])
-        nearby_hospitals = nearby_hospitals[:6]   # show top 6 on dashboard
-    # ── END NEW ──────────────────────────────────────────────
+        nearby_hospitals = nearby_hospitals[:6]
 
     context = {
-        'donor':               donor,
-        'history':             history,
-        'total_units':         total_units,
-        'ranked_requests':     ranked_requests_data,
-        'leaderboard':         leaderboard,
+        'donor':                donor,
+        'history':              history,
+        'total_units':          total_units,
+        'ranked_requests':      ranked_requests_data,
+        'leaderboard':          leaderboard,
         'active_notifications': active_notifications,
-        'past_notifications':  past_notifications,
-        'can_donate':          donor.can_donate,
-        'days_until_eligible': get_days_until_eligible(donor),
-        'lives_saved':         len(history) * 3,
-        'max_distance':        max_distance,
-        'nearby_hospitals':    nearby_hospitals,   # ← NEW
+        'past_notifications':   past_notifications,
+        'can_donate':           donor.can_donate,
+        'days_until_eligible':  get_days_until_eligible(donor),
+        'lives_saved':          len(history) * 3,
+        'max_distance':         max_distance,
+        'nearby_hospitals':     nearby_hospitals,
     }
     return render(request, 'donors/donor_dashboard.html', context)
 
 
 # ============================================
-# DONOR DASHBOARD DATA  (AJAX / JSON endpoint)
-# Called by the dashboard JS to populate:
-#   - Past notifications accordion
-#   - Donation history modal
-#   - Donor stats (points, count)
+# DONOR DASHBOARD DATA (AJAX / JSON endpoint)
 # ============================================
 @role_required('donor')
 def donor_dashboard_data(request):
     donor = request.user.donor_profile
 
-    # Past notifications
     past_notifs = DonorNotification.objects.filter(
         donor=donor
-    ).exclude(status='notified').select_related(
+    ).exclude(status__in=['notified', 'accepted']).select_related(
         'blood_request', 'blood_request__hospital'
     ).order_by('-sent_at')[:10]
 
@@ -176,20 +166,19 @@ def donor_dashboard_data(request):
     for n in past_notifs:
         br = n.blood_request
         notifs_data.append({
-            'id':          n.id,
-            'hospital':    br.hospital.hospital_name,
-            'date':        n.sent_at.strftime('%b %d, %Y'),
-            'status':      n.status,
-            'blood_group': br.blood_type,
-            'units':       br.units_needed,
-            'patient':     getattr(br, 'patient_name', '—'),
-            'ward':        getattr(br, 'ward', '—'),
-            'urgency':     br.urgency_level,
-            'distance':    round(n.distance, 2) if n.distance else None,
+            'id':           n.id,
+            'hospital':     br.hospital.hospital_name,
+            'date':         n.sent_at.strftime('%b %d, %Y'),
+            'status':       n.status,
+            'blood_group':  br.blood_type,
+            'units':        br.units_needed,
+            'patient':      getattr(br, 'patient_name', '—'),
+            'ward':         getattr(br, 'ward', '—'),
+            'urgency':      br.urgency_level,
+            'distance':     round(n.distance, 2) if n.distance else None,
             'fulfilled_at': n.responded_at.strftime('%b %d, %Y') if n.responded_at else None,
         })
 
-    # Donation history
     history_qs = DonationHistory.objects.filter(
         donor=donor
     ).select_related('hospital').order_by('-date_donated')
@@ -234,16 +223,19 @@ def view_notification_detail(request, notification_id):
     hospital      = blood_request.hospital
 
     context = {
-        'notification': notification,
+        'notification':  notification,
         'blood_request': blood_request,
         'hospital':      hospital,
         'can_respond':   notification.status == 'notified',
+        'can_fulfill':   notification.status == 'accepted',
     }
     return render(request, 'donors/notification_detail.html', context)
 
 
 # ============================================
 # ACCEPT BLOOD REQUEST
+# ← Option B: Accept = "I'm coming to donate"
+#   NO history/points here — only on fulfill
 # ============================================
 @role_required('donor')
 def accept_blood_request(request, notification_id):
@@ -256,6 +248,7 @@ def accept_blood_request(request, notification_id):
     if notification.status != 'notified':
         status_messages = {
             'accepted':  "You have already accepted this request.",
+            'fulfilled': "You have already marked this as donated.",
             'rejected':  "You have already rejected this request.",
             'cancelled': "This request has been cancelled or fulfilled by another donor.",
         }
@@ -264,36 +257,21 @@ def accept_blood_request(request, notification_id):
         return redirect('donor_dashboard')
 
     if request.method == 'POST':
-        donor        = notification.donor
+        donor         = notification.donor
         blood_request = notification.blood_request
 
-        # 1. Update notification
-        notification.status        = 'accepted'
-        notification.responded_at  = timezone.now()
-        notification.response_notes = request.POST.get('notes', '')
-        notification.responded     = True
+        # 1. Update notification to accepted
+        notification.status          = 'accepted'
+        notification.responded_at    = timezone.now()
+        notification.response_notes  = request.POST.get('notes', '')
+        notification.responded       = True
         notification.save()
 
-        # 2. Update BloodRequest status
-        blood_request.status = 'fulfilled'
+        # 2. Update BloodRequest to accepted (NOT fulfilled yet)
+        blood_request.status = 'accepted'
         blood_request.save()
 
-        # 3. Create DonationHistory record
-        DonationHistory.objects.create(
-            donor=donor,
-            hospital=blood_request.hospital,
-            blood_request=blood_request,
-            units_donated=blood_request.units_needed,
-            date_donated=date.today(),
-        )
-
-        # 4. Update donor stats + award points
-        donor.donation_count    = donor.donation_history.count()
-        donor.last_donation_date = date.today()
-        donor.points            = (donor.points or 0) + POINTS_PER_DONATION  # ← POINTS AWARDED
-        donor.save()
-
-        # 5. Backward-compat DonorResponse record
+        # 3. Backward-compat DonorResponse record
         DonorResponse.objects.create(
             donor=donor,
             blood_request=blood_request,
@@ -301,28 +279,28 @@ def accept_blood_request(request, notification_id):
             response_notes=notification.response_notes,
         )
 
-        # 6. Cancel all other pending notifications for this request
+        # 4. Cancel all other pending notifications for this request
         DonorNotification.objects.filter(
             blood_request=blood_request,
             status__in=['pending', 'notified']
         ).exclude(id=notification_id).update(status='cancelled')
 
-        # 7. Notify hospital (limited info only)
+        # 5. Notify hospital
         send_hospital_acceptance_notification(donor, blood_request, notification.distance)
 
-        # 8. Notify admin
+        # 6. Notify admin
         send_admin_acceptance_notification(blood_request, donor, notification)
 
         messages.success(
             request,
             f"✅ You have accepted the blood request from "
             f"{blood_request.hospital.hospital_name}. "
-            f"The hospital has been notified. You earned {POINTS_PER_DONATION} points!"
+            f"Please go donate and then click 'Mark as Donated' to earn {POINTS_PER_DONATION} points!"
         )
         return redirect('donor_dashboard')
 
     context = {
-        'notification': notification,
+        'notification':  notification,
         'blood_request': notification.blood_request,
     }
     return render(request, 'donors/confirm_accept.html', context)
@@ -342,6 +320,7 @@ def reject_blood_request(request, notification_id):
     if notification.status != 'notified':
         status_messages = {
             'accepted':  "You have already accepted this request.",
+            'fulfilled': "You have already donated for this request.",
             'rejected':  "You have already rejected this request.",
             'cancelled': "This request has been cancelled or fulfilled by another donor.",
         }
@@ -354,10 +333,10 @@ def reject_blood_request(request, notification_id):
         donor            = notification.donor
         blood_request    = notification.blood_request
 
-        notification.status         = 'rejected'
-        notification.responded_at   = timezone.now()
-        notification.response_notes = rejection_reason
-        notification.responded      = True
+        notification.status          = 'rejected'
+        notification.responded_at    = timezone.now()
+        notification.response_notes  = rejection_reason
+        notification.responded       = True
         notification.save()
 
         DonorResponse.objects.create(
@@ -377,16 +356,16 @@ def reject_blood_request(request, notification_id):
         return redirect('donor_dashboard')
 
     context = {
-        'notification': notification,
+        'notification':  notification,
         'blood_request': notification.blood_request,
     }
     return render(request, 'donors/confirm_reject.html', context)
 
 
 # ============================================
-# FULFILL BLOOD REQUEST  ← NEW
-# Donor confirms they have physically donated.
-# Awards points, creates history record, emails admin.
+# FULFILL BLOOD REQUEST
+# ← Option B: THIS is where points/history happen
+#   Donor confirms they physically donated
 # ============================================
 @role_required('donor')
 def fulfill_blood_request(request, notification_id):
@@ -409,15 +388,15 @@ def fulfill_blood_request(request, notification_id):
         notification.responded_at = timezone.now()
         notification.save()
 
-        # 2. Mark blood request fulfilled (if not already)
-        if blood_request.status != 'fulfilled':
-            blood_request.status = 'fulfilled'
-            blood_request.save()
+        # 2. Mark blood request fulfilled
+        blood_request.status = 'fulfilled'
+        blood_request.save()
 
-        # 3. Create DonationHistory record (only if one doesn't already exist for this request)
+        # 3. Create DonationHistory record (guard against duplicates)
         already_logged = DonationHistory.objects.filter(
             donor=donor, blood_request=blood_request
         ).exists()
+
         if not already_logged:
             DonationHistory.objects.create(
                 donor=donor,
@@ -426,20 +405,22 @@ def fulfill_blood_request(request, notification_id):
                 units_donated=blood_request.units_needed,
                 date_donated=date.today(),
             )
-            # 4. Award points and update donor stats
-            donor.donation_count     = donor.donation_history.count()
-            donor.last_donation_date = date.today()
-            donor.points             = (donor.points or 0) + POINTS_PER_DONATION
-            donor.save()
 
-        # 5. Notify admin that physical donation is confirmed
+        # 4. Award points and update donor stats (always update on fulfill)
+        donor.donation_count     = donor.donation_history.count()
+        donor.last_donation_date = date.today()
+        donor.points             = (donor.points or 0) + POINTS_PER_DONATION
+        donor.save()
+
+        # 5. Notify admin
         _send_fulfill_admin_notification(blood_request, donor)
 
         messages.success(
             request,
-            f"✅ Donation confirmed! Thank you for donating to "
+            f"🩸 Donation confirmed! Thank you for donating to "
             f"{blood_request.hospital.hospital_name}. "
-            f"You earned {POINTS_PER_DONATION} points!"
+            f"You earned {POINTS_PER_DONATION} points! "
+            f"Your donation history and stats have been updated."
         )
     return redirect('donor_dashboard')
 
@@ -449,9 +430,9 @@ def fulfill_blood_request(request, notification_id):
 # ============================================
 @role_required('donor')
 def view_blood_request_detail(request, request_id):
-    donor        = request.user.donor_profile
+    donor         = request.user.donor_profile
     blood_request = get_object_or_404(BloodRequest, id=request_id)
-    is_eligible  = is_donor_eligible(donor, blood_request)
+    is_eligible   = is_donor_eligible(donor, blood_request)
 
     distance = None
     if (donor.latitude and donor.longitude and
@@ -510,21 +491,21 @@ def edit_profile(request):
 # ============================================
 @role_required('donor')
 def donation_history(request):
-    donor         = request.user.donor_profile
-    history       = DonationHistory.objects.filter(donor=donor).order_by('-date_donated')
+    donor           = request.user.donor_profile
+    history         = DonationHistory.objects.filter(donor=donor).order_by('-date_donated')
     total_donations = history.count()
-    total_units   = sum(d.units_donated for d in history) if history else 0
+    total_units     = sum(d.units_donated for d in history) if history else 0
 
     history_by_year = defaultdict(list)
     for donation in history:
         history_by_year[donation.date_donated.year].append(donation)
 
     context = {
-        'donor':          donor,
-        'history':        history,
-        'total_donations': total_donations,
-        'total_units':    total_units,
-        'history_by_year': dict(sorted(history_by_year.items(), reverse=True)),
+        'donor':            donor,
+        'history':          history,
+        'total_donations':  total_donations,
+        'total_units':      total_units,
+        'history_by_year':  dict(sorted(history_by_year.items(), reverse=True)),
     }
     return render(request, 'donors/donation_history.html', context)
 
@@ -555,15 +536,11 @@ def view_donor_detail(request, donor_id):
 
 # ============================================
 # FIND NEARBY HOSPITALS
-# Supports two modes:
-#   A) ?format=json&lat=X&lng=Y  → JSON for dashboard modal (AJAX)
-#   B) Normal GET                 → renders nearby_hospitals.html
 # ============================================
 @role_required('donor')
 def find_nearby_hospitals(request):
     donor = request.user.donor_profile
 
-    # Prefer fresh GPS coords from JS, fall back to stored profile coords
     try:
         lat = float(request.GET.get('lat') or donor.latitude)
         lng = float(request.GET.get('lng') or donor.longitude)
@@ -579,7 +556,6 @@ def find_nearby_hospitals(request):
         messages.error(request, "Please update your location in your profile first.")
         return redirect('donor_dashboard')
 
-    # Save fresh coords back to profile if provided by JS
     if request.GET.get('lat'):
         donor.latitude  = lat
         donor.longitude = lng
@@ -611,7 +587,6 @@ def find_nearby_hospitals(request):
     nearby.sort(key=lambda x: x['distance'])
     nearby = nearby[:20]
 
-    # JSON branch — called by dashboard JS modal
     if request.GET.get('format') == 'json':
         return JsonResponse({
             'count':   len(nearby),
@@ -630,7 +605,6 @@ def find_nearby_hospitals(request):
             ]
         })
 
-    # Normal HTML response
     return render(request, 'donors/nearby_hospitals.html', {
         'donor':            donor,
         'nearby_hospitals': nearby,
@@ -671,7 +645,7 @@ def notify_donor(request, donor_id):
     donor = get_object_or_404(DonorProfile, id=donor_id)
 
     if request.method == 'POST':
-        request_id   = request.POST.get('blood_request_id')
+        request_id    = request.POST.get('blood_request_id')
         blood_request = get_object_or_404(BloodRequest, id=request_id)
 
         notification, created = DonorNotification.objects.get_or_create(
@@ -715,7 +689,7 @@ Username: {donor.user.username}
 Blood Type: {donor.blood_type}
 Distance: {distance_str}
 
-The donor has been notified and will coordinate with you.
+The donor has accepted and will come to donate soon.
 
 Thank you for using LifeLink Nepal!
     """.strip()
@@ -754,7 +728,8 @@ Username: {donor.user.username}
 Phone: {donor.phone}
 Blood Type: {donor.blood_type}
 Distance: {distance_str}
-Points Awarded: {POINTS_PER_DONATION}
+
+NOTE: Points will be awarded after donor confirms physical donation.
 
 View in admin: {settings.SITE_URL}/admin/hospitals/bloodrequest/{blood_request.id}/change/
     """.strip()
@@ -823,7 +798,6 @@ Link: {settings.SITE_URL}/admin/hospitals/bloodrequest/{blood_request.id}/change
             print(f"❌ Failed to send email to admins: {e}")
 
 
-# ── NEW: Admin email for physical donation confirmed ─────────
 def _send_fulfill_admin_notification(blood_request, donor):
     from django.contrib.auth import get_user_model
     User = get_user_model()

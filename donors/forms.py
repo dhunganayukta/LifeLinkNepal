@@ -73,12 +73,11 @@ class DonorRegisterForm(UserCreationForm):
         return user
 
 
+
+   
+import re
+
 def geocode_address(address):
-    """
-    Convert address string to (latitude, longitude).
-    Covers all major Nepal cities/towns.
-    Falls back to Kathmandu if no match found.
-    """
     city_coordinates = {
         # Kathmandu Valley
         'kathmandu': (27.7172, 85.3240),
@@ -132,6 +131,15 @@ def geocode_address(address):
         'dadeldhura': (29.2975, 80.5786),
     }
 
+    # Normalize: lowercase, remove ward numbers like "-5", "-3", extra spaces
+    address_clean = re.sub(r'-\d+', ' ', address.lower())
+    address_clean = re.sub(r'\s+', ' ', address_clean).strip()
+
+    for city, coords in city_coordinates.items():
+        if city in address_clean:
+            return coords
+
+    return (27.7172, 85.3240)  # fallback Kathmandu
     address_lower = address.lower()
     for city, coords in city_coordinates.items():
         if city in address_lower:

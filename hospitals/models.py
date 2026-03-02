@@ -37,6 +37,7 @@ class BloodRequest(models.Model):
     
     STATUS_CHOICES = [
         ('pending', 'Pending'),
+        ('accepted',  'Accepted'),
         ('fulfilled', 'Fulfilled'),
         ('cancelled', 'Cancelled'),
     ]
