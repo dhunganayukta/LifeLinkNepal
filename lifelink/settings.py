@@ -14,6 +14,12 @@ from pathlib import Path
 from decouple import config
 from datetime import timedelta
 
+import os
+import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,9 +35,15 @@ SUPERUSER_SECRET_KEY = config('SUPERUSER_SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG')
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "lifelinknepal.onrender.com",  
+    
+]
+
+
+
 
 
 # Application definition
@@ -67,6 +79,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # Add CORS middleware
     'django.middleware.common.CommonMiddleware',
@@ -74,7 +87,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    
+ 
+
+
+   
 ]
 
 ROOT_URLCONF = 'lifelink.urls'
@@ -112,7 +129,7 @@ REST_FRAMEWORK = {
 # JWT Configuration
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Changed to 1 day for super admin
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+   
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
@@ -122,6 +139,7 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -130,15 +148,20 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+   
+    "https://lifelinknepal.onrender.com",
+    "https://yuktadhungana.com.np",
+    "https://www.yuktadhungana.com.np",
 ]
 
-CSRF_COOKIE_SECURE = False  # Set to True only if using HTTPS in production
+
+CSRF_COOKIE_SECURE = True  # Set to True only if using HTTPS in production
 CSRF_COOKIE_HTTPONLY = False
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 
 # Session Configuration (🔥 FIXED)
-SESSION_COOKIE_SECURE = False  # Set to True only if using HTTPS in production
+SESSION_COOKIE_SECURE = True  # Set to True only if using HTTPS in production
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -146,13 +169,13 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=365),  # 1 year
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),  # 1 year
+    
     
 }
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-DATABASE_URL = config('DATABASE_URL', default=None)
+DATABASE_URL = os.getenv('DATABASE_URL', default=None)
 
 if DATABASE_URL:
     # strip surrounding quotes or whitespace if present in .env
@@ -215,6 +238,12 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Default auto field
@@ -252,7 +281,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Kathmandu'
 
 # Site URL for emails
-SITE_URL = 'http://127.0.0.1:8000'
+SITE_URL = 'https://lifelinknepal.onrender.com'  # Update with your actual domain
 
 # Email settings (if not already configured)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -264,5 +293,4 @@ EMAIL_HOST_PASSWORD = 'your-app-password'
 DEFAULT_FROM_EMAIL = 'LifeLink Nepal <noreply@lifelink.com>'
 
 
-SESSION_COOKIE_AGE = 3600  # 1 hour in seconds
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Logout when browser closes
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
