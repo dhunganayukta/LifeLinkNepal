@@ -8,6 +8,9 @@ from datetime import timedelta
 import os
 import dj_database_url
 
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables from .env file
+
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,7 +22,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["*"]  # You can restrict later
+ALLOWED_HOSTS =  [
+    "lifelink-production.up.railway.app",
+]
 
 # ========================
 # APPLICATIONS
@@ -69,6 +74,26 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'lifelink.urls'
 WSGI_APPLICATION = 'lifelink.wsgi.application'
+
+# ========================
+# TEMPLATES
+# ========================
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],  # global templates folder
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
 
 # ========================
 # DATABASE (Railway auto)
@@ -128,8 +153,11 @@ CORS_ALLOW_ALL_ORIGINS = True
 # STATIC FILES
 # ========================
 
+
+
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ========================
