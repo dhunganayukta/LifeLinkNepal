@@ -24,6 +24,14 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "lifelinknepal-production.up.railway.app",
+
+   
+    "localhost",
+    "127.0.0.1",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://lifelinknepal-production.up.railway.app",
+    "https://*.railway.app",  # covers all railway subdomains
 ]
 
 # ========================
