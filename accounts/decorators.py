@@ -5,17 +5,16 @@ from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 
 def role_required(required_role):
     """
-    Role-based decorator that works for both REST API and Django template views
-    Automatically detects the type of view and responds appropriately
+    Role-based decorator that works for both REST API and Django template views.
+    Superusers bypass all role checks so they can test any part of the system.
     """
     def decorator(view_func):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
             user = request.user
 
-            # Check if it's an API request (you can adjust this logic based on your URL patterns)
             is_api_request = (
-                request.path.startswith('/api/') or 
+                request.path.startswith('/api/') or
                 request.content_type == 'application/json' or
                 'application/json' in request.META.get('HTTP_ACCEPT', '')
             )
@@ -26,7 +25,11 @@ def role_required(required_role):
                     raise NotAuthenticated("Authentication required")
                 else:
                     messages.error(request, "Please log in to access this page.")
-                    return redirect('accounts:login_page')  # Update to your login URL name
+                    return redirect('accounts:login_page')
+
+            # ✅ Superusers bypass role check — they can access any view for testing
+            if user.is_superuser:
+                return view_func(request, *args, **kwargs)
 
             # Check role/user_type
             if user.user_type != required_role:
@@ -34,7 +37,7 @@ def role_required(required_role):
                     raise PermissionDenied("Access denied")
                 else:
                     messages.error(request, f"Access denied. This page is for {required_role}s only.")
-                    return redirect('home')  # Update to your home URL name
+                    return redirect('home')
 
             return view_func(request, *args, **kwargs)
         return wrapper

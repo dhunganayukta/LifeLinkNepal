@@ -28,6 +28,7 @@
 body.dark-mode .filter-tab { background:#1a1410; border-color:rgba(255,255,255,0.08); color:var(--ink-muted); }
 .filter-tab:hover { border-color:var(--border); color:var(--ink); }
 .filter-tab.active { background:var(--crimson); color:white; border-color:var(--crimson); }
+.filter-tab.active-verify { background:rgba(155,23,40,0.1); color:var(--crimson); border-color:rgba(155,23,40,0.4); font-weight:700; }
 
 /* CARDS */
 .dash-card { background:white; border:1px solid var(--border-subtle); border-radius:14px; overflow:hidden; margin-bottom:24px; }
@@ -44,6 +45,7 @@ body.dark-mode .dash-card-header { background:#221c17; border-color:rgba(255,255
 .tag-ink     { background:rgba(28,20,16,0.06); color:var(--ink-mid); border:1px solid var(--border-subtle); }
 .tag-green   { background:rgba(74,222,128,0.1); color:#16a34a;       border:1px solid rgba(74,222,128,0.2); }
 .tag-blue    { background:rgba(59,130,246,0.1); color:#2563eb;       border:1px solid rgba(59,130,246,0.2); }
+.tag-amber   { background:rgba(217,119,6,0.1);  color:#d97706;       border:1px solid rgba(217,119,6,0.25); }
 
 /* TABLE */
 .dash-table { width:100%; border-collapse:collapse; font-size:13.5px; }
@@ -54,14 +56,24 @@ body.dark-mode .dash-card-header { background:#221c17; border-color:rgba(255,255
 body.dark-mode .dash-table tbody tr:hover { background:rgba(155,23,40,0.07); }
 .dash-table td { padding:14px; color:var(--ink-mid); vertical-align:middle; }
 .dash-table td strong { color:var(--ink); font-weight:600; }
-.dash-table tr.row-critical td { background:rgba(155,23,40,0.04); }
-.dash-table tr.row-high td { background:rgba(196,146,74,0.04); }
+.dash-table tr.row-critical td        { background:rgba(155,23,40,0.04); }
+.dash-table tr.row-high td            { background:rgba(196,146,74,0.04); }
+.dash-table tr.row-donor-confirmed td { background:rgba(155,23,40,0.06); }
 
 /* BUTTONS */
 .btn-tbl-view { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; background:transparent; color:var(--ink-mid); font-size:12px; font-weight:600; border-radius:6px; text-decoration:none; border:1.5px solid var(--border-subtle); transition:all 0.2s ease; }
 .btn-tbl-view:hover { border-color:var(--crimson); color:var(--crimson); background:var(--crimson-pale); }
-.btn-tbl-fulfill { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; background:transparent; color:#16a34a; font-size:12px; font-weight:600; border-radius:6px; border:1.5px solid rgba(74,222,128,0.3); cursor:pointer; transition:all 0.2s ease; }
-.btn-tbl-fulfill:hover { background:#16a34a; color:white; border-color:#16a34a; transform:translateY(-1px); }
+
+.btn-tbl-verify { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; background:rgba(155,23,40,0.08); color:var(--crimson); font-size:12px; font-weight:700; border-radius:6px; border:1.5px solid rgba(155,23,40,0.3); cursor:pointer; transition:all 0.2s ease; animation:pulse-verify 1.8s ease-in-out infinite; text-decoration:none; }
+.btn-tbl-verify:hover { background:var(--crimson); color:white; border-color:var(--crimson); transform:translateY(-1px); animation:none; }
+
+.btn-tbl-flag { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; background:rgba(217,119,6,0.08); color:#d97706; font-size:12px; font-weight:600; border-radius:6px; border:1.5px solid rgba(217,119,6,0.3); cursor:pointer; transition:all 0.2s ease; }
+.btn-tbl-flag:hover { background:#d97706; color:white; border-color:#d97706; transform:translateY(-1px); }
+
+@keyframes pulse-verify {
+    0%,100% { box-shadow:0 0 0 0 rgba(155,23,40,0.35); }
+    50%      { box-shadow:0 0 0 5px rgba(155,23,40,0); }
+}
 
 /* AI BADGE */
 .ai-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); border-radius:20px; font-size:11px; font-weight:700; color:#2563eb; letter-spacing:0.5px; }
@@ -83,7 +95,8 @@ body.dark-mode .dash-wrap { background:var(--ivory); }
 document.addEventListener('DOMContentLoaded', function(){
     document.querySelectorAll('.fulfill-form').forEach(function(form){
         form.addEventListener('submit', function(e){
-            if (!confirm('Mark this request as fulfilled?')) e.preventDefault();
+            var msg = form.getAttribute('data-confirm') || 'Confirm this action?';
+            if (!confirm(msg)) e.preventDefault();
         });
     });
 });
@@ -133,8 +146,17 @@ document.addEventListener('DOMContentLoaded', function(){
             <a href="?status=pending" class="filter-tab {% if status == 'pending' %}active{% endif %}">
                 <i class="bi bi-clock-history"></i> Pending
             </a>
+            <a href="?status=donor_confirmed" class="filter-tab {% if status == 'donor_confirmed' %}active{% else %}active-verify{% endif %}">
+                <i class="bi bi-patch-check-fill"></i> Verify
+            </a>
+            <a href="?status=accepted" class="filter-tab {% if status == 'accepted' %}active{% endif %}">
+                <i class="bi bi-person-check-fill"></i> Accepted
+            </a>
             <a href="?status=fulfilled" class="filter-tab {% if status == 'fulfilled' %}active{% endif %}">
                 <i class="bi bi-check-circle"></i> Fulfilled
+            </a>
+            <a href="?status=mismatch" class="filter-tab {% if status == 'mismatch' %}active{% endif %}">
+                <i class="bi bi-exclamation-triangle"></i> Mismatch
             </a>
             <a href="?status=cancelled" class="filter-tab {% if status == 'cancelled' %}active{% endif %}">
                 <i class="bi bi-x-circle"></i> Cancelled
@@ -166,7 +188,11 @@ document.addEventListener('DOMContentLoaded', function(){
                         </thead>
                         <tbody>
                             {% for item in ranked_requests %}
-                            <tr class="{% if item.priority_level == 'critical' %}row-critical{% elif item.priority_level == 'high' %}row-high{% endif %}">
+                            <tr class="
+                                {% if item.request.status == 'donor_confirmed' %}row-donor-confirmed
+                                {% elif item.priority_level == 'critical' %}row-critical
+                                {% elif item.priority_level == 'high' %}row-high{% endif %}">
+
                                 <td style="padding-left:24px;">
                                     <strong>{{ item.request.patient_name }}</strong><br>
                                     <small style="color:var(--ink-muted);">{{ item.request.patient_age|default:"N/A" }} yrs</small>
@@ -187,34 +213,60 @@ document.addEventListener('DOMContentLoaded', function(){
                                         {{ item.priority_score|floatformat:0 }}
                                     </span>
                                 </td>
+
+                                <!-- Status column -->
                                 <td>
                                     {% if item.request.status == 'fulfilled' %}
-                                        <span class="tag tag-green">Fulfilled</span>
+                                        <span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Fulfilled</span>
+                                    {% elif item.request.status == 'donor_confirmed' %}
+                                        <span class="tag tag-crimson"><i class="bi bi-patch-check-fill"></i> Verify!</span>
+                                    {% elif item.request.status == 'accepted' %}
+                                        <span class="tag tag-amber"><i class="bi bi-person-check-fill"></i> Accepted</span>
                                     {% elif item.request.status == 'pending' %}
                                         <span class="tag tag-gold">Pending</span>
+                                    {% elif item.request.status == 'mismatch' %}
+                                        <span class="tag tag-amber"><i class="bi bi-exclamation-triangle-fill"></i> Mismatch</span>
                                     {% else %}
                                         <span class="tag tag-ink">{{ item.request.get_status_display }}</span>
                                     {% endif %}
                                 </td>
+
                                 <td class="d-none d-md-table-cell">
                                     <small style="color:var(--ink-muted);">{{ item.request.created_at|date:"M d, Y" }}</small>
                                 </td>
+
+                                <!-- Actions column -->
                                 <td style="padding-right:24px;">
                                     <div class="d-flex gap-2 flex-wrap">
-                                        <a href="{% url 'view_blood_request' item.request.id %}" class="btn-tbl-view">
-                                            <i class="bi bi-eye"></i>
-                                            <span class="d-none d-sm-inline">View</span>
+
+                                        {# View always links to detail page where full verify panel lives #}
+                                        <a href="{% url 'view_blood_request' item.request.id %}"
+                                           class="{% if item.request.status == 'donor_confirmed' %}btn-tbl-verify{% else %}btn-tbl-view{% endif %}">
+                                            {% if item.request.status == 'donor_confirmed' %}
+                                                <i class="bi bi-patch-check-fill"></i>
+                                                <span class="d-none d-sm-inline">Verify</span>
+                                            {% else %}
+                                                <i class="bi bi-eye"></i>
+                                                <span class="d-none d-sm-inline">View</span>
+                                            {% endif %}
                                         </a>
-                                        {% if item.request.status == 'pending' %}
-                                        <form method="POST" action="{% url 'mark_fulfilled' item.request.id %}" class="fulfill-form">
+
+                                        {# Accepted but donor not confirmed — flag mismatch #}
+                                        {% if item.request.status == 'accepted' %}
+                                        <form method="POST"
+                                              action="{% url 'mark_fulfilled' item.request.id %}"
+                                              class="fulfill-form"
+                                              data-confirm="Donor hasn't confirmed yet. This will flag a MISMATCH and alert admin. Points held. Continue?">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{{ request.path }}?status={{ status }}">
-                                            <button type="submit" class="btn-tbl-fulfill">
-                                                <i class="bi bi-check-circle"></i>
-                                                <span class="d-none d-sm-inline">Fulfill</span>
+                                            <button type="submit" class="btn-tbl-flag"
+                                                    title="Donor accepted but hasn't confirmed donation yet">
+                                                <i class="bi bi-exclamation-circle-fill"></i>
+                                                <span class="d-none d-sm-inline">Flag</span>
                                             </button>
                                         </form>
                                         {% endif %}
+
                                     </div>
                                 </td>
                             </tr>
@@ -222,11 +274,17 @@ document.addEventListener('DOMContentLoaded', function(){
                         </tbody>
                     </table>
                 </div>
-                <div style="padding:14px 24px; border-top:1px solid var(--border-subtle); background:var(--ivory-mid);">
+
+                <!-- Table footer -->
+                <div style="padding:14px 24px; border-top:1px solid var(--border-subtle); background:var(--ivory-mid); display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
                     <small style="font-size:12px; color:var(--ink-muted);">
                         <i class="bi bi-info-circle me-1" style="color:var(--gold);"></i>
                         <strong style="color:var(--ink-light);">AI Ranking:</strong>
                         Requests prioritized by urgency, waiting time, units needed, and blood rarity.
+                    </small>
+                    <small style="font-size:12px; color:var(--ink-muted); margin-left:auto;">
+                        <span style="color:var(--crimson); font-weight:700;">● Verify</span> = click to open full verification &nbsp;|&nbsp;
+                        <span style="color:#d97706; font-weight:700;">● Flag</span> = donor accepted, not confirmed yet
                     </small>
                 </div>
             </div>
@@ -237,27 +295,17 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="empty-state">
                 <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
                 <h6>
-                    {% if status and status != 'all' %}
-                        No "{{ status|title }}" Requests Found
-                    {% else %}
-                        No Blood Requests Yet
-                    {% endif %}
+                    {% if status and status != 'all' %}No "{{ status|title }}" Requests Found
+                    {% else %}No Blood Requests Yet{% endif %}
                 </h6>
                 <p>
-                    {% if status and status != 'all' %}
-                        Try viewing all requests or create a new one.
-                    {% else %}
-                        Create your first blood request to get started.
-                    {% endif %}
+                    {% if status and status != 'all' %}Try viewing all requests or create a new one.
+                    {% else %}Create your first blood request to get started.{% endif %}
                 </p>
                 {% if status and status != 'all' %}
-                    <a href="?status=all" class="btn-create">
-                        <i class="bi bi-list-ul"></i> View All Requests
-                    </a>
+                    <a href="?status=all" class="btn-create"><i class="bi bi-list-ul"></i> View All Requests</a>
                 {% else %}
-                    <a href="{% url 'create_blood_request' %}" class="btn-create">
-                        <i class="bi bi-plus-circle"></i> Create Request
-                    </a>
+                    <a href="{% url 'create_blood_request' %}" class="btn-create"><i class="bi bi-plus-circle"></i> Create Request</a>
                 {% endif %}
             </div>
         </div>

@@ -1,1 +1,1 @@
-web: gunicorn lifelink.wsgi
+gunicorn lifelink.wsgi --timeout 120

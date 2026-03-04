@@ -34,7 +34,6 @@ body.dark-mode .dash-card-header { background:#221c17; border-color:rgba(255,255
 body.dark-mode .stat-block { background:#221c17; border-color:rgba(255,255,255,0.05); }
 .stat-block-label { font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase; font-weight:600; color:var(--ink-muted); margin-bottom:6px; }
 .stat-block-value { font-family:var(--font-display); font-size:26px; font-weight:700; color:var(--ink); line-height:1; }
-body.dark-mode .stat-block-value { color:var(--ink); }
 
 /* TAGS */
 .tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; letter-spacing:0.3px; }
@@ -43,16 +42,19 @@ body.dark-mode .stat-block-value { color:var(--ink); }
 .tag-ink     { background:rgba(28,20,16,0.06); color:var(--ink-mid); border:1px solid var(--border-subtle); }
 .tag-green   { background:rgba(74,222,128,0.1); color:#16a34a;       border:1px solid rgba(74,222,128,0.2); }
 .tag-blue    { background:rgba(59,130,246,0.1); color:#2563eb;       border:1px solid rgba(59,130,246,0.2); }
+.tag-amber   { background:rgba(217,119,6,0.1);  color:#d97706;       border:1px solid rgba(217,119,6,0.25); }
 
 /* NOTICE BAR */
 .notice-bar { border-radius:10px; padding:14px 18px; font-size:13px; display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; }
 .notice-bar.warning { background:rgba(196,146,74,0.08); border:1px solid rgba(196,146,74,0.25); color:var(--ink-mid); }
 .notice-bar.info    { background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2);  color:var(--ink-mid); }
 .notice-bar.success { background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.25); color:var(--ink-mid); }
+.notice-bar.danger  { background:rgba(155,23,40,0.06);  border:1px solid rgba(155,23,40,0.2);   color:var(--ink-mid); }
 .notice-bar i { margin-top:1px; flex-shrink:0; }
 .notice-bar.warning i { color:var(--gold); }
 .notice-bar.info    i { color:#2563eb; }
 .notice-bar.success i { color:#16a34a; }
+.notice-bar.danger  i { color:var(--crimson); }
 
 /* DONOR CARD */
 .donor-item { border:1px solid var(--border-subtle); border-radius:12px; padding:20px; margin-bottom:14px; background:white; transition:all 0.25s ease; }
@@ -68,6 +70,149 @@ body.dark-mode .donor-metric { background:#1a1410; }
 .accepted-card { border:2px solid rgba(74,222,128,0.4); border-radius:14px; padding:24px; background:rgba(74,222,128,0.04); margin-bottom:20px; }
 body.dark-mode .accepted-card { background:rgba(74,222,128,0.06); }
 
+/* ══════════════════════════════════════════
+   VERIFICATION PANEL — the key new section
+   ══════════════════════════════════════════ */
+.verify-panel {
+    border: 2px solid rgba(155,23,40,0.3);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    animation: pulse-border-panel 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border-panel {
+    0%, 100% { border-color: rgba(155,23,40,0.3); box-shadow: 0 0 0 0 rgba(155,23,40,0.1); }
+    50%       { border-color: rgba(155,23,40,0.55); box-shadow: 0 0 0 6px rgba(155,23,40,0); }
+}
+
+.verify-panel-header {
+    background: linear-gradient(135deg, var(--crimson), #7a1220);
+    padding: 20px 24px;
+    display: flex; align-items: center; gap: 14px;
+}
+
+.verify-panel-header-icon {
+    width: 48px; height: 48px; flex-shrink: 0;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: white;
+}
+
+.verify-panel-header-text h4 {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 700;
+    color: white; margin: 0 0 3px;
+}
+
+.verify-panel-header-text p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    margin: 0;
+}
+
+.verify-panel-body {
+    background: white;
+    padding: 24px;
+}
+
+body.dark-mode .verify-panel-body { background: #1a1410; }
+
+/* Donor info strip inside verify panel */
+.donor-confirm-strip {
+    background: var(--ivory-mid);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 20px;
+}
+
+body.dark-mode .donor-confirm-strip { background: #221c17; border-color: rgba(255,255,255,0.06); }
+
+.donor-confirm-avatar {
+    width: 46px; height: 46px; flex-shrink: 0;
+    border-radius: 10px;
+    background: var(--crimson-pale);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--crimson);
+}
+
+.donor-confirm-name {
+    font-weight: 700; font-size: 15px; color: var(--ink);
+}
+
+.donor-confirm-meta {
+    font-size: 12.5px; color: var(--ink-muted); margin-top: 2px;
+}
+
+/* Yes / No buttons */
+.verify-btn-yes {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 15px 20px;
+    background: #16a34a; color: white;
+    font-size: 15px; font-weight: 700;
+    border: 2px solid #16a34a;
+    border-radius: 10px; cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.verify-btn-yes:hover {
+    background: #15803d; border-color: #15803d;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(22,163,74,0.35);
+}
+
+.verify-btn-no {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 15px 20px;
+    background: transparent; color: var(--crimson);
+    font-size: 15px; font-weight: 700;
+    border: 2px solid rgba(155,23,40,0.35);
+    border-radius: 10px; cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.verify-btn-no:hover {
+    background: var(--crimson); color: white;
+    border-color: var(--crimson);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(155,23,40,0.3);
+}
+
+.verify-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 14px 0;
+    color: var(--ink-muted); font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+}
+
+.verify-divider::before,
+.verify-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border-subtle);
+}
+
+/* Consequence callouts */
+.consequence-box {
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 12.5px; line-height: 1.55;
+}
+
+.consequence-box.yes-box {
+    background: rgba(22,163,74,0.06);
+    border: 1px solid rgba(22,163,74,0.2);
+    color: #15803d;
+}
+
+.consequence-box.no-box {
+    background: rgba(155,23,40,0.05);
+    border: 1px solid rgba(155,23,40,0.2);
+    color: var(--crimson);
+}
+
+.consequence-box strong { display: block; margin-bottom: 4px; font-size: 13px; }
+
 /* STEP LIST */
 .step-item { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--border-subtle); }
 .step-item:last-child { border-bottom:none; padding-bottom:0; }
@@ -75,6 +220,7 @@ body.dark-mode .accepted-card { background:rgba(74,222,128,0.06); }
 .step-num.blue   { background:rgba(59,130,246,0.1); color:#2563eb; }
 .step-num.gold   { background:var(--gold-pale);     color:var(--gold); }
 .step-num.green  { background:rgba(74,222,128,0.1); color:#16a34a; }
+.step-num.crimson{ background:var(--crimson-pale);  color:var(--crimson); }
 .step-title { font-size:13.5px; font-weight:600; color:var(--ink); margin-bottom:2px; }
 .step-sub   { font-size:12px; color:var(--ink-muted); }
 
@@ -147,8 +293,14 @@ body.dark-mode .dash-wrap { background:var(--ivory); }
                         </div>
                         {% if blood_request.status == 'fulfilled' %}
                             <span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Fulfilled</span>
+                        {% elif blood_request.status == 'donor_confirmed' %}
+                            <span class="tag tag-crimson"><i class="bi bi-patch-check-fill"></i> Donor Confirmed</span>
+                        {% elif blood_request.status == 'accepted' %}
+                            <span class="tag tag-amber"><i class="bi bi-person-check-fill"></i> Accepted</span>
                         {% elif blood_request.status == 'pending' %}
                             <span class="tag tag-gold"><i class="bi bi-clock-history"></i> Pending</span>
+                        {% elif blood_request.status == 'mismatch' %}
+                            <span class="tag tag-amber"><i class="bi bi-exclamation-triangle-fill"></i> Mismatch</span>
                         {% elif blood_request.status == 'cancelled' %}
                             <span class="tag tag-ink"><i class="bi bi-x-circle"></i> Cancelled</span>
                         {% endif %}
@@ -194,6 +346,101 @@ body.dark-mode .dash-wrap { background:var(--ivory); }
                     </div>
                 </div>
 
+                <!-- ══════════════════════════════════════════════
+                     ✅ VERIFICATION PANEL — only for donor_confirmed
+                     ══════════════════════════════════════════════ -->
+                {% if blood_request.status == 'donor_confirmed' and accepted_donor %}
+                <div class="verify-panel">
+                    <div class="verify-panel-header">
+                        <div class="verify-panel-header-icon">
+                            <i class="bi bi-patch-question-fill"></i>
+                        </div>
+                        <div class="verify-panel-header-text">
+                            <h4>Did the Donation Happen?</h4>
+                            <p>@{{ accepted_donor.username }} has marked their donation as complete. Please confirm.</p>
+                        </div>
+                    </div>
+
+                    <div class="verify-panel-body">
+
+                        <!-- Donor info strip -->
+                        <div class="donor-confirm-strip">
+                            <div class="donor-confirm-avatar">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                                <div class="donor-confirm-name">@{{ accepted_donor.username }}</div>
+                                <div class="donor-confirm-meta">
+                                    Blood Type: <strong style="color:var(--crimson);">{{ accepted_donor.blood_type }}</strong>
+                                    {% if accepted_donor.distance %}
+                                    &nbsp;·&nbsp; Distance: {{ accepted_donor.distance }} km
+                                    {% endif %}
+                                    &nbsp;·&nbsp; Status: <strong style="color:var(--crimson);">Donor Confirmed ✓</strong>
+                                </div>
+                            </div>
+                            <span class="tag tag-crimson ms-auto" style="flex-shrink:0;">
+                                <i class="bi bi-patch-check-fill"></i> Awaiting You
+                            </span>
+                        </div>
+
+                        <!-- YES button + consequence -->
+                        <div class="consequence-box yes-box mb-2">
+                            <strong><i class="bi bi-check-circle-fill me-1"></i> If YES — Donation was received:</strong>
+                            Marks request as <strong>Fulfilled</strong>. Donor is awarded <strong>50 points</strong> immediately. Donation history is verified.
+                        </div>
+                        <form method="POST"
+                              action="{% url 'mark_fulfilled' blood_request.id %}"
+                              onsubmit="return confirm('Confirm: the donor DID donate blood for {{ blood_request.patient_name }}? This will award them 50 points.');">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button type="submit" class="verify-btn-yes">
+                                <i class="bi bi-check-circle-fill" style="font-size:18px;"></i>
+                                Yes — Donation Was Received, Mark Fulfilled
+                            </button>
+                        </form>
+
+                        <div class="verify-divider">or</div>
+
+                        <!-- NO button + consequence -->
+                        <div class="consequence-box no-box mb-2">
+                            <strong><i class="bi bi-x-circle-fill me-1"></i> If NO — Donation did NOT happen:</strong>
+                            Marks request as <strong>Mismatch</strong>. Admin is notified immediately. Points are <strong>held</strong> pending investigation.
+                        </div>
+                        <form method="POST"
+                              action="{% url 'mark_fulfilled' blood_request.id %}"
+                              onsubmit="return confirm('Mark as MISMATCH? Admin will be alerted and points held. Only do this if the donation did NOT occur.');"
+                              id="mismatch-form">
+                            {% csrf_token %}
+                            
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <input type="hidden" name="force_mismatch" value="1">
+                            <button type="submit" class="verify-btn-no">
+                                <i class="bi bi-x-circle-fill" style="font-size:18px;"></i>
+                                No — Donation Did Not Happen, Alert Admin
+                            </button>
+                        </form>
+
+                        <div class="notice-bar info" style="margin-top:16px; margin-bottom:0;">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <div>
+                                <strong style="color:var(--ink);">Why verify?</strong>
+                                Dual confirmation prevents fraud — both the donor and hospital must agree before reward points are awarded.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Mismatch notice -->
+                {% if blood_request.status == 'mismatch' %}
+                <div class="notice-bar danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <div>
+                        <strong style="color:var(--ink);">Mismatch Flagged</strong> — Admin has been alerted. Donor points are on hold until investigation is complete. Please check your email for follow-up.
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Privacy Notice -->
                 <div class="notice-bar warning">
                     <i class="bi bi-shield-exclamation"></i>
@@ -210,12 +457,15 @@ body.dark-mode .dash-wrap { background:var(--ivory); }
                     </div>
                 </div>
 
-                <!-- Accepted Donor -->
+                <!-- Accepted Donor summary (shown for accepted / donor_confirmed) -->
                 {% if accepted_donor %}
                 <div class="accepted-card">
                     <div class="d-flex align-items-center justify-content-between mb-16" style="margin-bottom:16px;">
                         <div style="font-family:var(--font-display); font-size:18px; font-weight:600; color:#16a34a; display:flex; align-items:center; gap:8px;">
-                            <i class="bi bi-check-circle-fill"></i> Donor Accepted!
+                            <i class="bi bi-check-circle-fill"></i>
+                            {% if blood_request.status == 'donor_confirmed' %}Donor Confirmed Donation!
+                            {% elif blood_request.status == 'fulfilled' %}Donation Verified & Fulfilled!
+                            {% else %}Donor Accepted!{% endif %}
                         </div>
                         <span class="tag tag-green">Matched</span>
                     </div>
@@ -224,10 +474,22 @@ body.dark-mode .dash-wrap { background:var(--ivory); }
                         <div class="col-4"><div class="donor-metric"><div class="donor-metric-label">Blood Type</div><div class="donor-metric-value" style="color:var(--crimson);">{{ accepted_donor.blood_type }}</div></div></div>
                         <div class="col-4"><div class="donor-metric"><div class="donor-metric-label">Distance</div><div class="donor-metric-value" style="font-size:15px;">{% if accepted_donor.distance %}{{ accepted_donor.distance }} km{% else %}N/A{% endif %}</div></div></div>
                     </div>
-                    <div class="notice-bar info" style="margin-top:16px; margin-bottom:0;">
-                        <i class="bi bi-info-circle-fill"></i>
-                        <div><strong style="color:var(--ink);">Next Steps:</strong> The donor will contact you directly through the admin. Please coordinate donation details.</div>
+                    {% if blood_request.status == 'accepted' %}
+                    <div class="notice-bar warning" style="margin-top:16px; margin-bottom:0;">
+                        <i class="bi bi-hourglass-split"></i>
+                        <div><strong style="color:var(--ink);">Waiting for Donor:</strong> The donor has accepted but hasn't marked their donation complete yet. They will update once they've donated.</div>
                     </div>
+                    {% elif blood_request.status == 'donor_confirmed' %}
+                    <div class="notice-bar danger" style="margin-top:16px; margin-bottom:0;">
+                        <i class="bi bi-patch-exclamation-fill"></i>
+                        <div><strong style="color:var(--ink);">Your Action Required:</strong> Donor confirmed they donated. Please verify above — this releases their reward points.</div>
+                    </div>
+                    {% elif blood_request.status == 'fulfilled' %}
+                    <div class="notice-bar success" style="margin-top:16px; margin-bottom:0;">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <div><strong style="color:var(--ink);">Donation Verified!</strong> Both sides confirmed. Donor has received 50 reward points.</div>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endif %}
 
@@ -278,59 +540,94 @@ body.dark-mode .dash-wrap { background:var(--ivory); }
             <!-- RIGHT SIDEBAR -->
             <div class="col-lg-4">
 
-                <!-- Request Actions -->
+                <!-- ✅ Actions card — context-aware per status -->
                 <div class="dash-card">
                     <div class="dash-card-header">
                         <div class="dash-card-title"><i class="bi bi-lightning-charge-fill"></i> Actions</div>
                     </div>
                     <div class="dash-card-body">
-                        {% if blood_request.status == 'pending' %}
-                        <form method="POST" action="{% url 'mark_fulfilled' blood_request.id %}" class="mb-2" onsubmit="return confirm('Mark this request as fulfilled?');">
+
+                        {% if blood_request.status == 'donor_confirmed' %}
+                        {# Point to the verify panel above #}
+                        <div class="notice-bar danger" style="margin-bottom:12px;">
+                            <i class="bi bi-patch-exclamation-fill"></i>
+                            <div><strong style="color:var(--ink);">Verification Required</strong><br>See the panel above to confirm or reject this donation.</div>
+                        </div>
+                        <a href="#" onclick="document.querySelector('.verify-panel').scrollIntoView({behavior:'smooth'}); return false;"
+                           class="btn-action-fill" style="background:var(--crimson); border-color:var(--crimson);">
+                            <i class="bi bi-arrow-up-circle"></i> Go to Verification Panel
+                        </a>
+
+                        {% elif blood_request.status == 'accepted' %}
+                        <div class="notice-bar warning" style="margin-bottom:12px;">
+                            <i class="bi bi-hourglass-split"></i>
+                            <div><strong style="color:var(--ink);">Waiting on Donor</strong><br>Donor accepted. Once they mark donation complete, you'll be asked to verify.</div>
+                        </div>
+                        <form method="POST"
+                              action="{% url 'mark_fulfilled' blood_request.id %}"
+                              onsubmit="return confirm('Donor hasn\'t confirmed yet. This will flag a MISMATCH and alert admin. Continue?');">
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{ request.path }}">
-                            <button type="submit" class="btn-action-fill" style="background:#16a34a; border-color:#16a34a;">
-                                <i class="bi bi-check-circle"></i> Mark as Fulfilled
+                            <button type="submit" class="btn-action-outline" style="color:#d97706; border-color:rgba(217,119,6,0.35); margin-bottom:8px;">
+                                <i class="bi bi-exclamation-circle"></i> Flag Mismatch (Admin Alert)
                             </button>
                         </form>
-                        <a href="{% url 'cancel_request' blood_request.id %}" class="btn-action-outline" onclick="return confirm('Cancel this blood request?');">
+
+                        {% elif blood_request.status == 'pending' %}
+                        <a href="{% url 'cancel_request' blood_request.id %}"
+                           class="btn-action-outline"
+                           onclick="return confirm('Cancel this blood request?');">
                             <i class="bi bi-x-circle"></i> Cancel Request
                         </a>
+
                         {% elif blood_request.status == 'fulfilled' %}
                         <div class="notice-bar success" style="margin-bottom:0;">
                             <i class="bi bi-check-circle-fill"></i>
-                            <div><strong style="color:var(--ink);">Fulfilled!</strong> This request has been successfully fulfilled.</div>
+                            <div><strong style="color:var(--ink);">Fulfilled!</strong> This request has been successfully verified and closed. Donor points awarded.</div>
                         </div>
+
+                        {% elif blood_request.status == 'mismatch' %}
+                        <div class="notice-bar danger" style="margin-bottom:0;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <div><strong style="color:var(--ink);">Under Review</strong><br>Admin has been notified of the mismatch. Donor points are on hold.</div>
+                        </div>
+
                         {% elif blood_request.status == 'cancelled' %}
                         <div class="notice-bar" style="background:rgba(28,20,16,0.04); border:1px solid var(--border-subtle); margin-bottom:0;">
                             <i class="bi bi-x-circle-fill" style="color:var(--ink-muted);"></i>
                             <div>This request has been cancelled.</div>
                         </div>
                         {% endif %}
+
                     </div>
                 </div>
 
-                <!-- Matching Process -->
+                <!-- How Dual Confirmation Works -->
                 <div class="dash-card">
                     <div class="dash-card-header">
-                        <div class="dash-card-title"><i class="bi bi-cpu"></i> Matching Process</div>
+                        <div class="dash-card-title"><i class="bi bi-cpu"></i> Dual Confirmation</div>
                     </div>
                     <div class="dash-card-body" style="padding-top:8px; padding-bottom:8px;">
                         <div class="step-item">
                             <div class="step-num blue">1</div>
-                            <div><div class="step-title">Find Compatible Donors</div><div class="step-sub">System searches for donors with compatible blood type within 50km</div></div>
+                            <div><div class="step-title">Donor Accepts</div><div class="step-sub">Donor accepts the request and heads to hospital</div></div>
                         </div>
                         <div class="step-item">
                             <div class="step-num gold">2</div>
-                            <div><div class="step-title">Rank Using AI</div><div class="step-sub">MCDM algorithm ranks donors by distance, history, and compatibility</div></div>
+                            <div><div class="step-title">Donor Confirms</div><div class="step-sub">After donating, donor clicks "I Have Donated"</div></div>
                         </div>
                         <div class="step-item">
-                            <div class="step-num green">3</div>
-                            <div><div class="step-title">Admin Notifies</div><div class="step-sub">Admin manages sequential donor notifications until one accepts</div></div>
+                            <div class="step-num crimson">3</div>
+                            <div><div class="step-title">Hospital Verifies ← You Are Here</div><div class="step-sub">You confirm the donation happened</div></div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num green">4</div>
+                            <div><div class="step-title">Points Awarded</div><div class="step-sub">Donor receives 50 points. Request marked Fulfilled.</div></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Privacy Protection -->
+                <!-- Privacy -->
                 <div class="dash-card">
                     <div class="dash-card-header">
                         <div class="dash-card-title"><i class="bi bi-shield-check"></i> Privacy</div>

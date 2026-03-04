@@ -1,1704 +1,1496 @@
-
 {% load static %}
 
-{% block title %}Super Admin Dashboard - Life Link Nepal{% endblock %}
+{% block title %}Super Admin — LifeLink Nepal{% endblock %}
 
 {% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-
-/* Hide navbar and footer entirely on this page */
-.navbar,
-footer,
-nav {
-    display: none !important;
-}
-
-/* Hide any admin login/register buttons that may appear in base template */
-.admin-login-btn,
-.admin-register-btn,
-.nav-auth,
-.auth-buttons {
-    display: none !important;
-}
-
-body {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-}
+.navbar, footer, nav { display: none !important; }
+body { padding-top: 0 !important; margin-top: 0 !important; }
 
 :root {
-    --navy-deepest: #04080f;
-    --navy-deep: #080e1a;
-    --navy-dark: #0d1525;
-    --navy-mid: #121d32;
-    --navy-light: #1a2844;
-    --navy-muted: #233258;
-
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
-    --gold-dim: #8a6f32;
-    --gold-pale: rgba(201, 168, 76, 0.12);
-
-    --red: #c23b3b;
-    --red-bright: #e05252;
-    --red-pale: rgba(194, 59, 59, 0.15);
-
-    --emerald: #2a8c6e;
-    --emerald-bright: #3db88f;
-    --emerald-pale: rgba(42, 140, 110, 0.15);
-
-    --amber: #b87333;
-    --amber-pale: rgba(184, 115, 51, 0.15);
-
-    --sky: #2a6bac;
-    --sky-pale: rgba(42, 107, 172, 0.15);
-
-    --text-primary: #e8e2d5;
-    --text-secondary: #9ea9c0;
-    --text-muted: #5a6882;
-    --text-gold: #c9a84c;
-
-    --border: rgba(201, 168, 76, 0.15);
-    --border-dim: rgba(255, 255, 255, 0.06);
-    --border-bright: rgba(201, 168, 76, 0.4);
-
-    --shadow-gold: 0 0 40px rgba(201, 168, 76, 0.08);
-    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
-
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-
-    --font-display: 'Playfair Display', Georgia, serif;
-    --font-body: 'DM Sans', sans-serif;
-    --font-mono: 'DM Mono', 'Courier New', monospace;
+    --bg:       #04080f;
+    --bg-card:  #0d1525;
+    --bg-hover: #121d32;
+    --gold:     #c9a84c;
+    --gold-l:   #e8c97a;
+    --gold-p:   rgba(201,168,76,0.12);
+    --red:      #c23b3b;
+    --red-l:    #e05252;
+    --red-p:    rgba(194,59,59,0.15);
+    --green:    #2a8c6e;
+    --green-l:  #3db88f;
+    --green-p:  rgba(42,140,110,0.15);
+    --amber:    #b87333;
+    --amber-p:  rgba(184,115,51,0.15);
+    --sky:      #2a6bac;
+    --sky-p:    rgba(42,107,172,0.15);
+    --purple:   #6b4fbb;
+    --purple-p: rgba(107,79,187,0.15);
+    --text:     #e8e2d5;
+    --text-2:   #9ea9c0;
+    --text-3:   #5a6882;
+    --border:   rgba(201,168,76,0.15);
+    --border-d: rgba(255,255,255,0.06);
+    --r:        10px;
+    --font-d:   'Playfair Display', Georgia, serif;
+    --font-b:   'DM Sans', sans-serif;
+    --font-m:   'DM Mono', monospace;
 }
 
-*, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); font-family:var(--font-b); color:var(--text); line-height:1.6; overflow-x:hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+    position:fixed; left:0; top:0; width:248px; height:100vh;
+    background:var(--bg-card); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; z-index:1000;
+    overflow-y:auto; overflow-x:hidden;
 }
-
-body {
-    background: var(--navy-deepest);
-    font-family: var(--font-body);
-    color: var(--text-primary);
-    line-height: 1.6;
-    min-height: 100vh;
-    overflow-x: hidden;
+.sidebar::after {
+    content:''; position:absolute; top:0; right:0; width:1px; height:100%;
+    background:linear-gradient(180deg,transparent,rgba(201,168,76,0.3) 40%,rgba(201,168,76,0.3) 60%,transparent);
+    pointer-events:none;
 }
-
-/* ══════════════════════════════════════════
-   SIDEBAR
-══════════════════════════════════════════ */
-.admin-sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 260px;
-    height: 100vh;
-    background: var(--navy-dark);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    z-index: 1000;
-    overflow-y: auto;
-    overflow-x: hidden;
+.sb-head { padding:22px 24px 18px; border-bottom:1px solid var(--border); }
+.sb-logo { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.sb-logo img { width:38px; height:38px; border-radius:8px; object-fit:contain; background:white; padding:3px; border:1px solid rgba(194,59,59,0.3); }
+.sb-logo h3 { font-family:var(--font-d); font-size:16px; font-weight:700; color:var(--text); }
+.sb-logo h3 span { color:var(--gold); }
+.sb-sub { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; color:var(--text-3); font-weight:600; }
+.sb-menu { padding:16px 0; flex:1; }
+.sb-label { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; color:var(--text-3); padding:12px 24px 6px; font-weight:700; }
+.sb-item {
+    display:flex; align-items:center; padding:11px 24px; color:var(--text-2);
+    text-decoration:none; transition:all 0.2s; cursor:pointer;
+    font-size:13px; font-weight:500; gap:12px; position:relative;
 }
+.sb-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--gold); opacity:0; transition:opacity 0.2s; }
+.sb-item:hover { color:var(--text); background:rgba(255,255,255,0.03); }
+.sb-item:hover::before { opacity:0.5; }
+.sb-item.active { color:var(--gold-l); background:var(--gold-p); }
+.sb-item.active::before { opacity:1; }
+.sb-item i { font-size:14px; width:16px; text-align:center; flex-shrink:0; }
+.sb-item span { flex:1; }
+.sb-badge { padding:2px 7px; border-radius:20px; font-size:10px; font-weight:700; font-family:var(--font-m); }
+.sb-badge.red    { background:var(--red); color:#fff; }
+.sb-badge.amber  { background:var(--amber); color:#fff; }
+.sb-badge.hidden { display:none; }
+.sb-foot { border-top:1px solid var(--border); padding:14px 24px; }
+.sb-foot-text { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-3); font-weight:600; text-align:center; }
 
-.admin-sidebar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(180deg, transparent, var(--gold-dim) 30%, var(--gold-dim) 70%, transparent);
-    pointer-events: none;
+/* ── TOPBAR ── */
+.topbar {
+    position:sticky; top:0; z-index:100; background:var(--bg-card);
+    border-bottom:1px solid var(--border-d); padding:0 36px;
+    height:56px; display:flex; align-items:center; justify-content:space-between;
 }
-
-.sidebar-header {
-    padding: 24px 28px 22px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
+.topbar-left { display:flex; align-items:center; gap:12px; }
+.topbar-breadcrumb { font-size:12px; color:var(--text-3); display:flex; align-items:center; gap:6px; }
+.topbar-breadcrumb span { color:var(--text-2); }
+.topbar-right { display:flex; align-items:center; gap:10px; }
+.topbar-pill {
+    display:flex; align-items:center; gap:8px; padding:5px 12px 5px 6px;
+    background:var(--gold-p); border:1px solid rgba(201,168,76,0.2); border-radius:30px;
 }
-
-.sidebar-logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
+.topbar-av {
+    width:28px; height:28px; border-radius:50%;
+    background:rgba(201,168,76,0.2); border:1px solid rgba(201,168,76,0.35);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-d); font-size:12px; font-weight:700; color:var(--gold-l);
 }
-
-.sidebar-logo-img {
-    width: 42px;
-    height: 42px;
-    border-radius: var(--radius-md);
-    object-fit: contain;
-    background: white;
-    padding: 4px;
-    flex-shrink: 0;
-    border: 1px solid rgba(194, 59, 59, 0.25);
-}
-
-.sidebar-header h3 {
-    font-family: var(--font-display);
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: 0.3px;
-    line-height: 1.2;
-}
-
-.sidebar-header h3 span { color: var(--gold); }
-
-.sidebar-header p {
-    font-size: 10px;
-    color: var(--text-muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-top: 4px;
-    font-weight: 600;
-}
-
-.sidebar-menu {
-    padding: 20px 0;
-    flex: 1;
-}
-
-.menu-section-label {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding: 12px 28px 8px;
-    font-weight: 600;
-}
-
-.menu-item {
-    display: flex;
-    align-items: center;
-    padding: 13px 28px;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    font-size: 13.5px;
-    font-weight: 500;
-    gap: 14px;
-    position: relative;
-    margin: 1px 0;
-}
-
-.menu-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: var(--gold);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.menu-item:hover {
-    color: var(--text-primary);
-    background: rgba(255,255,255,0.03);
-}
-
-.menu-item:hover::before { opacity: 0.5; }
-
-.menu-item.active {
-    color: var(--gold-light);
-    background: var(--gold-pale);
-}
-
-.menu-item.active::before { opacity: 1; }
-
-.menu-item i {
-    font-size: 15px;
-    width: 18px;
-    text-align: center;
-    flex-shrink: 0;
-    opacity: 0.8;
-}
-
-.menu-item span { flex: 1; letter-spacing: 0.1px; }
-
-.menu-badge {
-    background: var(--red);
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 700;
-    font-family: var(--font-mono);
-    letter-spacing: 0.5px;
-}
-
-/* ══════════════════════════════════════════
-   SIDEBAR FOOTER — minimal, no admin info
-══════════════════════════════════════════ */
-.sidebar-footer {
-    border-top: 1px solid var(--border);
-    padding: 14px 28px;
-    flex-shrink: 0;
-}
-
-/* ══════════════════════════════════════════
-   TOP HEADER BAR
-══════════════════════════════════════════ */
-.admin-topbar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--navy-dark);
-    border-bottom: 1px solid var(--border-dim);
-    padding: 0 40px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 16px;
-}
-
-.topbar-admin-pill {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 14px 6px 8px;
-    background: var(--gold-pale);
-    border: 1px solid rgba(201, 168, 76, 0.2);
-    border-radius: 40px;
-}
-
-.topbar-avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: rgba(201, 168, 76, 0.2);
-    border: 1px solid rgba(201, 168, 76, 0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-display);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--gold-light);
-    flex-shrink: 0;
-}
-
-.topbar-admin-details {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-}
-
-.topbar-admin-details strong {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary);
-    white-space: nowrap;
-}
-
-.topbar-admin-details span {
-    font-size: 9.5px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    font-weight: 600;
-}
-
+.topbar-name { font-size:12.5px; font-weight:600; color:var(--text); }
+.topbar-role { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(201,168,76,0.6); font-weight:700; }
 .topbar-signout {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 16px;
-    background: rgba(194, 59, 59, 0.08);
-    border: 1px solid rgba(194, 59, 59, 0.25);
-    border-radius: var(--radius-md);
-    color: #d97070;
-    text-decoration: none;
-    font-size: 12.5px;
-    font-weight: 600;
-    font-family: var(--font-body);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    letter-spacing: 0.2px;
-    white-space: nowrap;
+    display:inline-flex; align-items:center; gap:6px; padding:7px 14px;
+    background:rgba(194,59,59,0.08); border:1px solid rgba(194,59,59,0.25);
+    border-radius:8px; color:#d97070; text-decoration:none;
+    font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;
+}
+.topbar-signout:hover { background:rgba(194,59,59,0.18); color:#e05252; }
+
+/* ── MAIN ── */
+.main { margin-left:248px; min-height:100vh; background:var(--bg); display:flex; flex-direction:column; }
+.content { padding:32px 36px; }
+
+/* ── PAGE HEADER ── */
+.ph { margin-bottom:32px; padding-bottom:22px; border-bottom:1px solid var(--border-d); display:flex; align-items:flex-end; justify-content:space-between; }
+.ph-eye { font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+.ph-eye::before { content:''; width:16px; height:1px; background:var(--gold); opacity:0.5; }
+.ph h2 { font-family:var(--font-d); font-size:26px; font-weight:700; color:var(--text); letter-spacing:-0.3px; }
+.ph p  { color:var(--text-3); font-size:13px; margin-top:4px; }
+
+/* ── STATS GRID ── */
+.stats { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:28px; }
+.scard {
+    background:var(--bg-card); border:1px solid var(--border-d);
+    border-radius:var(--r); padding:20px; position:relative; overflow:hidden;
+    transition:all 0.25s; cursor:default;
+}
+.scard::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; opacity:0; transition:opacity 0.25s; }
+.scard:hover { border-color:var(--border); transform:translateY(-2px); }
+.scard:hover::before { opacity:1; }
+.scard.s-donors::before    { background:var(--red); }
+.scard.s-hospitals::before { background:var(--sky); }
+.scard.s-requests::before  { background:var(--amber); }
+.scard.s-done::before      { background:var(--green); }
+.scard.s-mismatch::before  { background:var(--purple); }
+.scard.s-mismatch          { border-color:rgba(107,79,187,0.25); cursor:pointer; }
+.scard.s-mismatch:hover    { border-color:rgba(107,79,187,0.5); }
+.sc-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-3); font-weight:700; margin-bottom:10px; }
+.sc-val { font-family:var(--font-d); font-size:38px; font-weight:700; line-height:1; letter-spacing:-1px; margin-bottom:8px; }
+.scard.s-donors    .sc-val { color:#d97070; }
+.scard.s-hospitals .sc-val { color:#6ea8d9; }
+.scard.s-requests  .sc-val { color:#d4a056; }
+.scard.s-done      .sc-val { color:#5cbfa0; }
+.scard.s-mismatch  .sc-val { color:#a882e0; }
+.sc-meta { font-size:11.5px; color:var(--text-3); display:flex; align-items:center; gap:5px; }
+.sc-dot { width:5px; height:5px; border-radius:50%; animation:pulse-dot 2s infinite; }
+.sc-dot.live  { background:var(--green-l); }
+.sc-dot.warn  { background:var(--amber); }
+.sc-dot.alert { background:var(--purple); animation:pulse-alert 1.2s infinite; }
+@keyframes pulse-dot   { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes pulse-alert { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(107,79,187,0.5)} 50%{opacity:0.7;box-shadow:0 0 0 5px rgba(107,79,187,0)} }
+
+/* ── SECTION ── */
+.section {
+    background:var(--bg-card); border:1px solid var(--border-d);
+    border-radius:var(--r); margin-bottom:22px; overflow:hidden;
+}
+.sec-head {
+    padding:18px 24px; border-bottom:1px solid var(--border-d);
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(255,255,255,0.01);
+}
+.sec-title { display:flex; flex-direction:column; gap:2px; }
+.sec-eye { font-size:9.5px; letter-spacing:2px; text-transform:uppercase; color:rgba(201,168,76,0.6); font-weight:700; }
+.sec-head h3 { font-family:var(--font-d); font-size:16px; font-weight:600; color:var(--text); }
+.sec-body { padding:20px 24px; }
+.btn-sm {
+    padding:7px 14px; border:1px solid var(--border); border-radius:7px;
+    font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;
+    display:inline-flex; align-items:center; gap:6px;
+    background:transparent; color:var(--text-2); font-family:var(--font-b);
+}
+.btn-sm:hover { background:rgba(255,255,255,0.05); color:var(--gold-l); border-color:var(--border); }
+.btn-sm.green  { border-color:rgba(42,140,110,0.4); color:var(--green-l); background:var(--green-p); }
+.btn-sm.green:hover { background:rgba(42,140,110,0.25); }
+.btn-sm.red    { border-color:rgba(194,59,59,0.4); color:#d97070; background:var(--red-p); }
+.btn-sm.red:hover   { background:rgba(194,59,59,0.25); }
+.btn-sm.amber  { border-color:rgba(184,115,51,0.4); color:#d4a056; background:var(--amber-p); }
+.btn-sm.purple { border-color:rgba(107,79,187,0.4); color:#a882e0; background:var(--purple-p); }
+
+/* ── MISMATCH BANNER ── */
+.mismatch-banner {
+    background:linear-gradient(135deg, rgba(107,79,187,0.15), rgba(194,59,59,0.1));
+    border:1px solid rgba(107,79,187,0.35); border-radius:var(--r);
+    padding:20px 24px; margin-bottom:22px; display:flex; align-items:center; gap:16px;
+    animation:banner-pulse 3s ease-in-out infinite;
+}
+@keyframes banner-pulse {
+    0%,100% { border-color:rgba(107,79,187,0.35); }
+    50%      { border-color:rgba(107,79,187,0.6); box-shadow:0 0 20px rgba(107,79,187,0.15); }
+}
+.mismatch-banner-icon {
+    width:48px; height:48px; flex-shrink:0; border-radius:12px;
+    background:var(--purple-p); border:1px solid rgba(107,79,187,0.3);
+    display:flex; align-items:center; justify-content:center; font-size:22px; color:#a882e0;
+}
+.mismatch-banner-text h4 { font-family:var(--font-d); font-size:17px; font-weight:700; color:#a882e0; margin-bottom:3px; }
+.mismatch-banner-text p  { font-size:13px; color:var(--text-2); }
+.mismatch-banner-action  { margin-left:auto; }
+
+/* ── MISMATCH CARDS ── */
+.mc {
+    border:1px solid rgba(107,79,187,0.25); border-radius:var(--r);
+    background:rgba(107,79,187,0.05); margin-bottom:14px; overflow:hidden; transition:all 0.25s;
+}
+.mc:hover { border-color:rgba(107,79,187,0.45); }
+.mc-head {
+    padding:16px 20px; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid rgba(107,79,187,0.15); background:rgba(107,79,187,0.07);
+}
+.mc-id { font-family:var(--font-m); font-size:11px; color:rgba(201,168,76,0.7); letter-spacing:1px; }
+.mc-badge { padding:3px 10px; border-radius:4px; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+.mc-badge.open     { background:var(--purple-p); color:#a882e0; border:1px solid rgba(107,79,187,0.3); }
+.mc-badge.resolved { background:var(--green-p);  color:var(--green-l); border:1px solid rgba(42,140,110,0.3); }
+.mc-body { padding:18px 20px; }
+.mc-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
+.mc-field-label { font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-3); font-weight:700; margin-bottom:4px; }
+.mc-field-val   { font-size:13.5px; color:var(--text); font-weight:500; }
+.mc-timeline { display:flex; gap:0; margin:16px 0; }
+.mc-step { flex:1; position:relative; }
+.mc-step::after { content:''; position:absolute; top:14px; right:-1px; width:calc(100% - 28px); height:1px; background:var(--border-d); z-index:0; }
+.mc-step:last-child::after { display:none; }
+.mc-step-dot {
+    width:28px; height:28px; border-radius:50%; display:flex; align-items:center;
+    justify-content:center; font-size:12px; position:relative; z-index:1; margin-bottom:6px;
+}
+.mc-step-dot.done    { background:var(--green-p); border:1px solid rgba(42,140,110,0.4); color:var(--green-l); }
+.mc-step-dot.fail    { background:var(--red-p);   border:1px solid rgba(194,59,59,0.4); color:#d97070; }
+.mc-step-dot.pending { background:rgba(255,255,255,0.05); border:1px solid var(--border-d); color:var(--text-3); }
+.mc-step-label { font-size:11px; color:var(--text-3); font-weight:500; }
+.mc-step-sub   { font-size:10.5px; color:var(--text-3); opacity:0.7; margin-top:1px; }
+.mc-actions { display:flex; gap:8px; padding-top:14px; border-top:1px solid rgba(107,79,187,0.15); flex-wrap:wrap; }
+.mc-empty { text-align:center; padding:48px 20px; color:var(--text-3); }
+.mc-empty i  { font-size:40px; opacity:0.15; display:block; margin-bottom:12px; }
+.mc-empty h4 { font-family:var(--font-d); font-size:16px; color:var(--text-2); margin-bottom:6px; }
+.mc-empty p  { font-size:13px; }
+
+/* ── TERMINAL ── */
+.terminal {
+    background:#060b14; border:1px solid rgba(201,168,76,0.2);
+    border-radius:var(--r); overflow:hidden; max-height:500px; overflow-y:auto;
+}
+.terminal::-webkit-scrollbar { width:4px; }
+.terminal::-webkit-scrollbar-thumb { background:var(--bg-hover); border-radius:2px; }
+.t-bar {
+    background:#0a1120; border-bottom:1px solid rgba(201,168,76,0.12);
+    padding:10px 18px; display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:2;
+}
+.t-dots { display:flex; gap:6px; }
+.t-dot  { width:10px; height:10px; border-radius:50%; }
+.t-dot.r { background:#c23b3b; } .t-dot.a { background:#b87333; } .t-dot.g { background:#2a8c6e; }
+.t-title { font-size:10.5px; color:rgba(201,168,76,0.55); letter-spacing:1.5px; text-transform:uppercase; }
+.t-time  { font-size:10.5px; color:rgba(201,168,76,0.45); }
+.t-body  { padding:18px; }
+.t-req {
+    margin-bottom:18px; padding:14px 16px;
+    background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04);
+    border-left:3px solid rgba(194,59,59,0.5); border-radius:4px;
+}
+.t-req.urgent      { border-left-color:var(--red); background:rgba(194,59,59,0.06); animation:t-alert 3s ease-in-out infinite; }
+.t-req.mismatch-req { border-left-color:#a882e0; background:rgba(107,79,187,0.08); }
+@keyframes t-alert { 0%,100%{background:rgba(194,59,59,0.04)} 50%{background:rgba(194,59,59,0.09)} }
+.tl { margin:4px 0; font-size:12px; line-height:1.7; font-family:var(--font-m); }
+.tl-k { color:rgba(201,168,76,0.75); font-weight:500; }
+.tl-v { color:rgba(232,226,213,0.85); }
+.tl-ok     { color:#3db88f; font-weight:600; }
+.tl-err    { color:#e05252; font-weight:600; }
+.tl-warn   { color:#d4a056; font-weight:600; }
+.tl-purple { color:#a882e0; font-weight:600; }
+.donor-match {
+    margin:6px 0; padding:8px 10px;
+    background:rgba(42,107,172,0.08); border:1px solid rgba(42,107,172,0.15); border-radius:4px;
 }
 
-.topbar-signout:hover {
-    background: rgba(194, 59, 59, 0.18);
-    border-color: rgba(194, 59, 59, 0.45);
-    color: #e05252;
+/* ── LEADERBOARD ── */
+.lb-item {
+    display:flex; align-items:center; padding:14px 18px; margin-bottom:8px;
+    background:rgba(255,255,255,0.02); border:1px solid var(--border-d);
+    border-radius:var(--r); transition:all 0.2s; gap:14px;
 }
+.lb-item:hover { background:rgba(255,255,255,0.04); border-color:var(--border); transform:translateX(3px); }
+.lb-item.r1 { background:rgba(201,168,76,0.07); border-color:rgba(201,168,76,0.2); }
+.lb-item.r2 { background:rgba(160,160,180,0.05); border-color:rgba(160,160,180,0.15); }
+.lb-item.r3 { background:rgba(184,115,51,0.07);  border-color:rgba(184,115,51,0.2); }
+.lb-rank { width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:var(--font-d); font-weight:700; font-size:17px; flex-shrink:0; }
+.r1 .lb-rank { background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.3); color:var(--gold-l); }
+.r2 .lb-rank { background:rgba(160,160,180,0.12); border:1px solid rgba(160,160,180,0.25); color:#c0c0d0; }
+.r3 .lb-rank { background:rgba(184,115,51,0.15); border:1px solid rgba(184,115,51,0.3); color:#d4956a; }
+.lb-rank.ro  { background:rgba(255,255,255,0.04); border:1px solid var(--border-d); color:var(--text-3); font-size:13px; }
+.lb-av   { width:38px; height:38px; border-radius:8px; background:var(--red-p); border:1px solid rgba(194,59,59,0.2); color:#d97070; display:flex; align-items:center; justify-content:center; font-family:var(--font-d); font-size:15px; font-weight:700; flex-shrink:0; }
+.lb-info { flex:1; min-width:0; }
+.lb-name { font-size:14px; font-weight:600; color:var(--text); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lb-meta { font-size:11.5px; color:var(--text-3); display:flex; align-items:center; gap:8px; }
+.lb-pts  { font-family:var(--font-m); font-size:13px; font-weight:600; color:#d97070; padding:5px 12px; background:var(--red-p); border:1px solid rgba(194,59,59,0.2); border-radius:20px; display:flex; align-items:center; gap:5px; white-space:nowrap; }
 
-.topbar-signout i { font-size: 13px; }
-
-/* ══════════════════════════════════════════
-   MAIN CONTENT
-══════════════════════════════════════════ */
-.admin-main {
-    margin-left: 260px;
-    min-height: 100vh;
-    background: var(--navy-deepest);
-    display: flex;
-    flex-direction: column;
+/* ── DATA GRID ── */
+.dgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px; }
+.dc {
+    background:rgba(255,255,255,0.02); border:1px solid var(--border-d);
+    border-radius:var(--r); padding:18px; transition:all 0.2s;
 }
+.dc:hover { background:rgba(255,255,255,0.04); border-color:var(--border); transform:translateY(-2px); }
+.dc-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border-d); }
+.dc-av   { width:44px; height:44px; border-radius:10px; background:var(--red-p); border:1px solid rgba(194,59,59,0.2); color:#d97070; display:flex; align-items:center; justify-content:center; font-family:var(--font-d); font-size:18px; font-weight:700; flex-shrink:0; }
+.dc-av.h { background:var(--sky-p); border-color:rgba(42,107,172,0.25); color:#6ea8d9; }
+.dc-name { font-size:14px; font-weight:600; color:var(--text); margin-bottom:3px; }
+.dc-row  { font-size:12px; color:var(--text-3); display:flex; align-items:center; gap:6px; margin:4px 0; }
+.dc-row i { font-size:11px; opacity:0.7; width:12px; }
 
-.content-area { padding: 36px 40px; }
-
-.page-header {
-    margin-bottom: 36px;
-    position: relative;
-    padding-bottom: 24px;
+/* ── REQUEST CARD ── */
+.rc {
+    background:rgba(255,255,255,0.02); border:1px solid var(--border-d);
+    border-radius:var(--r); padding:20px; margin-bottom:12px; transition:all 0.2s;
 }
-
-.page-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 60px;
-    height: 1px;
-    background: var(--gold);
-}
-
-.page-header-eyebrow {
-    font-size: 11px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.page-header h2 {
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.3px;
-    line-height: 1.2;
-}
-
-.page-header p {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-top: 6px;
-    font-weight: 400;
-}
-
-/* ══════════════════════════════════════════
-   STATS GRID
-══════════════════════════════════════════ */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 36px;
-}
-
-.stat-card {
-    background: var(--navy-dark);
-    border: 1px solid var(--border-dim);
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.25s ease, transform 0.25s ease;
-    cursor: default;
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    opacity: 0;
-    transition: opacity 0.25s ease;
-}
-
-.stat-card:hover { border-color: var(--border); transform: translateY(-3px); }
-.stat-card:hover::before { opacity: 1; }
-
-.stat-card.donors::before   { background: var(--red); }
-.stat-card.hospitals::before { background: var(--sky); }
-.stat-card.requests::before  { background: var(--amber); }
-.stat-card.completed::before { background: var(--emerald); }
-
-.stat-ornament {
-    position: absolute;
-    top: 16px; right: 20px;
-    font-size: 32px;
-    opacity: 0.06;
-    pointer-events: none;
-    font-family: var(--font-display);
-    font-weight: 900;
-    color: #fff;
-}
-
-.stat-label {
-    font-size: 10.5px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    font-weight: 600;
-    margin-bottom: 14px;
-}
-
-.stat-value {
-    font-family: var(--font-display);
-    font-size: 42px;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 12px;
-    letter-spacing: -1px;
-}
-
-.stat-card.donors    .stat-value { color: #d97070; }
-.stat-card.hospitals .stat-value { color: #6ea8d9; }
-.stat-card.requests  .stat-value { color: #d4a056; }
-.stat-card.completed .stat-value { color: #5cbfa0; }
-
-.stat-meta {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.stat-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--emerald-bright);
-    animation: live-pulse 2s infinite;
-}
-
-@keyframes live-pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(224, 82, 82, 0.4); }
-    50%       { opacity: 0.7; box-shadow: 0 0 0 4px rgba(224, 82, 82, 0); }
-}
-
-/* ══════════════════════════════════════════
-   CONTENT SECTIONS
-══════════════════════════════════════════ */
-.content-section {
-    background: var(--navy-dark);
-    border: 1px solid var(--border-dim);
-    border-radius: var(--radius-lg);
-    padding: 28px;
-    margin-bottom: 24px;
-    position: relative;
-}
-
-.section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--border-dim);
-}
-
-.section-title { display: flex; flex-direction: column; gap: 3px; }
-
-.section-eyebrow {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    font-weight: 600;
-}
-
-.section-header h3 {
-    font-family: var(--font-display);
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: 0.2px;
-}
-
-/* ══════════════════════════════════════════
-   TERMINAL
-══════════════════════════════════════════ */
-.terminal-requests {
-    background: #060b14;
-    border: 1px solid rgba(201, 168, 76, 0.2);
-    border-radius: var(--radius-lg);
-    padding: 0;
-    font-family: var(--font-mono);
-    overflow: hidden;
-    margin-bottom: 24px;
-    max-height: 560px;
-    overflow-y: auto;
-}
-
-.terminal-requests::-webkit-scrollbar { width: 4px; }
-.terminal-requests::-webkit-scrollbar-track { background: transparent; }
-.terminal-requests::-webkit-scrollbar-thumb { background: var(--navy-muted); border-radius: 2px; }
-
-.terminal-topbar {
-    background: #0a1120;
-    border-bottom: 1px solid rgba(201, 168, 76, 0.15);
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-}
-
-.terminal-dots { display: flex; gap: 7px; }
-.terminal-dot { width: 11px; height: 11px; border-radius: 50%; }
-.terminal-dot.red   { background: #c23b3b; }
-.terminal-dot.amber { background: #b87333; }
-.terminal-dot.green { background: #2a8c6e; }
-
-.terminal-topbar-title {
-    font-size: 11px;
-    color: rgba(201, 168, 76, 0.6);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-}
-
-.terminal-time { font-size: 11px; color: rgba(201, 168, 76, 0.5); letter-spacing: 0.5px; }
-
-.terminal-body { padding: 20px; }
-
-.terminal-request {
-    margin-bottom: 20px;
-    padding: 16px 18px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.04);
-    border-left: 3px solid rgba(194, 59, 59, 0.5);
-    border-radius: var(--radius-sm);
-}
-
-.terminal-request.urgent {
-    border-left-color: var(--red);
-    background: rgba(194, 59, 59, 0.06);
-    animation: terminal-alert 3s ease-in-out infinite;
-}
-
-@keyframes terminal-alert {
-    0%, 100% { background: rgba(194, 59, 59, 0.04); }
-    50%       { background: rgba(194, 59, 59, 0.09); }
-}
-
-.terminal-line { margin: 5px 0; line-height: 1.7; font-size: 12.5px; }
-.terminal-label   { color: rgba(201, 168, 76, 0.75); font-weight: 500; }
-.terminal-value   { color: rgba(232, 226, 213, 0.85); }
-.terminal-urgent  { color: #e05252; font-weight: 600; }
-.terminal-success { color: #3db88f; font-weight: 600; }
-
-.matched-donors-section {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(201, 168, 76, 0.15);
-}
-
-.donor-match-item {
-    margin: 8px 0;
-    padding: 10px 12px;
-    background: rgba(42, 107, 172, 0.08);
-    border: 1px solid rgba(42, 107, 172, 0.15);
-    border-radius: var(--radius-sm);
-}
-
-/* ══════════════════════════════════════════
-   LEADERBOARD
-══════════════════════════════════════════ */
-.leaderboard-card {
-    background: var(--navy-dark);
-    border: 1px solid var(--border-dim);
-    border-radius: var(--radius-lg);
-    padding: 28px;
-    margin-bottom: 24px;
-}
-
-.leaderboard-item {
-    display: flex;
-    align-items: center;
-    padding: 18px 20px;
-    margin-bottom: 10px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border-dim);
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-    gap: 16px;
-}
-
-.leaderboard-item:hover { background: rgba(255,255,255,0.04); border-color: var(--border); transform: translateX(4px); }
-.leaderboard-item.rank-1 { background: rgba(201, 168, 76, 0.07); border-color: rgba(201, 168, 76, 0.2); }
-.leaderboard-item.rank-2 { background: rgba(160, 160, 180, 0.05); border-color: rgba(160, 160, 180, 0.15); }
-.leaderboard-item.rank-3 { background: rgba(184, 115, 51, 0.07); border-color: rgba(184, 115, 51, 0.2); }
-
-.rank-badge {
-    width: 44px; height: 44px;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 18px;
-    flex-shrink: 0;
-}
-
-.rank-badge.rank-1    { background: rgba(201, 168, 76, 0.15); border: 1px solid rgba(201, 168, 76, 0.3); color: var(--gold-light); }
-.rank-badge.rank-2    { background: rgba(160, 160, 180, 0.12); border: 1px solid rgba(160, 160, 180, 0.25); color: #c0c0d0; }
-.rank-badge.rank-3    { background: rgba(184, 115, 51, 0.15); border: 1px solid rgba(184, 115, 51, 0.3); color: #d4956a; }
-.rank-badge.rank-other { background: rgba(255,255,255,0.04); border: 1px solid var(--border-dim); color: var(--text-muted); font-size: 14px; }
-
-.donor-info-leaderboard { flex: 1; display: flex; align-items: center; gap: 14px; min-width: 0; }
-
-.donor-avatar-leaderboard {
-    width: 40px; height: 40px;
-    border-radius: var(--radius-md);
-    background: var(--red-pale);
-    border: 1px solid rgba(194, 59, 59, 0.2);
-    color: #d97070;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display);
-    font-size: 16px; font-weight: 700;
-    flex-shrink: 0;
-}
-
-.donor-details-leaderboard h4 { font-size: 14.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.donor-details-leaderboard p  { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-
-.donor-stars { display: flex; gap: 3px; margin-top: 5px; }
-.star { color: var(--gold-dim); font-size: 12px; }
-.leaderboard-item.rank-1 .star { color: var(--gold); }
-
-.donation-count {
-    background: var(--red-pale);
-    border: 1px solid rgba(194, 59, 59, 0.2);
-    color: #d97070;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-family: var(--font-mono);
-    font-weight: 600;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-
-.donation-count i { font-size: 12px; }
-
-/* ══════════════════════════════════════════
-   DATA GRID / CARDS
-══════════════════════════════════════════ */
-.data-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
-}
-
-.data-card {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border-dim);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    transition: all 0.2s ease;
-}
-
-.data-card:hover { background: rgba(255,255,255,0.04); border-color: var(--border); transform: translateY(-2px); }
-
-.data-card-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 16px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--border-dim);
-}
-
-.data-avatar {
-    width: 48px; height: 48px;
-    border-radius: var(--radius-md);
-    background: var(--red-pale);
-    border: 1px solid rgba(194, 59, 59, 0.2);
-    color: #d97070;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display);
-    font-size: 20px; font-weight: 700;
-    flex-shrink: 0;
-}
-
-.data-avatar.hospital { background: var(--sky-pale); border-color: rgba(42, 107, 172, 0.25); color: #6ea8d9; font-size: 18px; }
-
-.data-info h4 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
-.data-info p  { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin: 3px 0; }
-.data-info p i { font-size: 11px; opacity: 0.7; width: 12px; }
-
-.blood-type { padding: 3px 10px; border-radius: 4px; font-family: var(--font-mono); font-weight: 600; font-size: 12px; letter-spacing: 0.5px; }
-.blood-type.positive { background: var(--red-pale); color: #d97070; border: 1px solid rgba(194, 59, 59, 0.2); }
-.blood-type.negative { background: var(--sky-pale); color: #6ea8d9; border: 1px solid rgba(42, 107, 172, 0.2); }
-
-.status-badge { padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block; }
-.status-badge.active, .status-badge.pending, .status-badge.matched    { background: var(--amber-pale); color: #d4a056; border: 1px solid rgba(184, 115, 51, 0.25); }
-.status-badge.completed, .status-badge.accepted, .status-badge.fulfilled { background: var(--emerald-pale); color: #5cbfa0; border: 1px solid rgba(42, 140, 110, 0.25); }
-.status-badge.cancelled, .status-badge.rejected { background: var(--red-pale); color: #d97070; border: 1px solid rgba(194, 59, 59, 0.2); }
-
-/* ══════════════════════════════════════════
-   REQUEST CARDS
-══════════════════════════════════════════ */
-.request-card {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border-dim);
-    border-radius: var(--radius-lg);
-    padding: 22px;
-    margin-bottom: 14px;
-    transition: all 0.2s ease;
-}
-
-.request-card:hover { background: rgba(255,255,255,0.04); border-color: var(--border); }
-.request-card.critical { border-left: 3px solid var(--red); background: rgba(194, 59, 59, 0.04); }
-
-.request-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.request-id { font-family: var(--font-mono); font-size: 12px; color: var(--gold-dim); letter-spacing: 1px; font-weight: 500; }
-.request-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 16px; }
-.request-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
-.request-value { font-size: 13.5px; color: var(--text-primary); font-weight: 500; }
-
-.donor-priority-list {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border-dim);
-    border-radius: var(--radius-md);
-    padding: 16px;
-    margin-top: 14px;
-}
-
-.donor-priority-list h5 {
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    font-weight: 600;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.donor-priority-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border-dim);
-    border-radius: var(--radius-sm);
-    margin-bottom: 6px;
-    transition: all 0.2s ease;
-}
-
-.donor-priority-item:hover { background: rgba(255,255,255,0.04); border-color: var(--border); }
-.donor-priority-info { display: flex; align-items: center; gap: 12px; flex: 1; }
-
-.donor-priority-rank { width: 28px; height: 28px; border-radius: var(--radius-sm); background: var(--navy-muted); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
-.donor-priority-rank.rank-1 { background: rgba(201, 168, 76, 0.15); color: var(--gold); border: 1px solid rgba(201, 168, 76, 0.25); }
-.donor-priority-rank.rank-2 { background: rgba(160, 160, 180, 0.1); color: #a0a0b0; border: 1px solid rgba(160, 160, 180, 0.2); }
-.donor-priority-rank.rank-3 { background: rgba(184, 115, 51, 0.12); color: #d4956a; border: 1px solid rgba(184, 115, 51, 0.25); }
-
-.donor-priority-details p { margin: 0; font-size: 12.5px; color: var(--text-primary); font-weight: 500; }
-.donor-priority-details p:last-child { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; font-weight: 400; }
-
-.priority-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-.priority-badge.priority-1     { background: rgba(201, 168, 76, 0.12); color: var(--gold); border: 1px solid rgba(201, 168, 76, 0.2); }
-.priority-badge.priority-2     { background: rgba(160, 160, 180, 0.08); color: #a0a0b0; border: 1px solid rgba(160, 160, 180, 0.15); }
-.priority-badge.priority-3     { background: rgba(184, 115, 51, 0.1); color: #d4956a; border: 1px solid rgba(184, 115, 51, 0.2); }
-.priority-badge.priority-other { background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid var(--border-dim); }
-
-/* ══════════════════════════════════════════
-   BUTTONS / INPUTS
-══════════════════════════════════════════ */
-.btn-action {
-    padding: 8px 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 12.5px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    white-space: nowrap;
-    background: transparent;
-    color: var(--text-secondary);
-    font-family: var(--font-body);
-    letter-spacing: 0.3px;
-}
-
-.btn-action:hover { background: rgba(255,255,255,0.05); border-color: var(--border-bright); color: var(--gold-light); }
-
-.search-bar { margin-bottom: 20px; }
-
+.rc:hover { background:rgba(255,255,255,0.04); border-color:var(--border); }
+.rc.crit  { border-left:3px solid var(--red); background:rgba(194,59,59,0.04); }
+.rc-head  { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.rc-id    { font-family:var(--font-m); font-size:11px; color:rgba(201,168,76,0.7); letter-spacing:1px; }
+.rc-body  { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:14px; }
+.rc-field-label { font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-3); font-weight:700; margin-bottom:3px; }
+.rc-field-val   { font-size:13px; color:var(--text); font-weight:500; }
+.donors-list { background:rgba(255,255,255,0.02); border:1px solid var(--border-d); border-radius:8px; padding:14px; margin-top:12px; }
+.donors-list-head { font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(201,168,76,0.7); font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.dpri-item { display:flex; align-items:center; justify-content:space-between; padding:8px 10px; background:rgba(255,255,255,0.02); border:1px solid var(--border-d); border-radius:6px; margin-bottom:5px; transition:all 0.2s; }
+.dpri-item:hover { background:rgba(255,255,255,0.04); }
+.dpri-rank { width:26px; height:26px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-family:var(--font-m); font-size:11px; font-weight:600; flex-shrink:0; }
+.dpri-rank.p1 { background:rgba(201,168,76,0.15); color:var(--gold); border:1px solid rgba(201,168,76,0.25); }
+.dpri-rank.p2 { background:rgba(160,160,180,0.1);  color:#a0a0b0;    border:1px solid rgba(160,160,180,0.2); }
+.dpri-rank.p3 { background:rgba(184,115,51,0.12); color:#d4956a;    border:1px solid rgba(184,115,51,0.25); }
+.dpri-rank.pn { background:rgba(255,255,255,0.04); color:var(--text-3); border:1px solid var(--border-d); }
+.dpri-info p  { margin:0; font-size:12px; color:var(--text); font-weight:500; }
+.dpri-info p:last-child { font-size:11px; color:var(--text-3); margin-top:1px; }
+.dpri-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:4px; font-size:9.5px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; }
+.dpri-badge.pb1 { background:rgba(201,168,76,0.12); color:var(--gold); border:1px solid rgba(201,168,76,0.2); }
+.dpri-badge.pbn { background:rgba(255,255,255,0.04); color:var(--text-3); border:1px solid var(--border-d); }
+
+/* ── TAGS ── */
+.tag { display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:4px; font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; }
+.tag-red    { background:var(--red-p);    color:#d97070;    border:1px solid rgba(194,59,59,0.2); }
+.tag-gold   { background:var(--gold-p);   color:var(--gold); border:1px solid rgba(201,168,76,0.25); }
+.tag-green  { background:var(--green-p);  color:var(--green-l); border:1px solid rgba(42,140,110,0.25); }
+.tag-sky    { background:var(--sky-p);    color:#6ea8d9;    border:1px solid rgba(42,107,172,0.2); }
+.tag-amber  { background:var(--amber-p);  color:#d4a056;    border:1px solid rgba(184,115,51,0.25); }
+.tag-purple { background:var(--purple-p); color:#a882e0;    border:1px solid rgba(107,79,187,0.25); }
+.tag-grey   { background:rgba(255,255,255,0.05); color:var(--text-3); border:1px solid var(--border-d); }
+
+/* ── SEARCH ── */
+.search-wrap { margin-bottom:16px; position:relative; }
 .search-input {
-    width: 100%;
-    max-width: 440px;
-    padding: 10px 16px 10px 40px;
-    background: var(--navy-deepest);
-    border: 1px solid var(--border-dim);
-    border-radius: var(--radius-md);
-    font-size: 13.5px;
-    color: var(--text-primary);
-    transition: all 0.2s ease;
-    font-family: var(--font-body);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%235a6882' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: 14px center;
+    width:100%; max-width:400px; padding:9px 14px 9px 38px;
+    background:rgba(4,8,15,0.8); border:1px solid var(--border-d);
+    border-radius:8px; font-size:13px; color:var(--text); font-family:var(--font-b);
+    transition:all 0.2s;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%235a6882' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:12px center;
+}
+.search-input::placeholder { color:var(--text-3); }
+.search-input:focus { outline:none; border-color:rgba(201,168,76,0.35); box-shadow:0 0 0 3px rgba(201,168,76,0.06); }
+
+/* ── INFO TABLE ── */
+.info-t { width:100%; border-collapse:collapse; }
+.info-t tr { border-bottom:1px solid var(--border-d); }
+.info-t tr:last-child { border-bottom:none; }
+.info-t td { padding:13px 4px; font-size:13px; }
+.info-t td:first-child { color:var(--text-3); font-size:12px; font-weight:600; letter-spacing:0.2px; width:45%; }
+.info-t td:last-child  { color:var(--text); font-weight:600; }
+
+/* ── LOADING / EMPTY ── */
+.spinner-wrap { text-align:center; padding:48px 20px; }
+.spinner { width:32px; height:32px; border:2px solid var(--border-d); border-top-color:rgba(201,168,76,0.5); border-radius:50%; animation:spin 0.9s linear infinite; margin:0 auto 14px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.spinner-wrap p { font-size:12.5px; color:var(--text-3); }
+.empty { text-align:center; padding:56px 20px; }
+.empty i  { font-size:48px; opacity:0.15; display:block; margin-bottom:16px; }
+.empty h4 { font-family:var(--font-d); font-size:17px; color:var(--text-2); margin-bottom:6px; }
+.empty p  { font-size:13px; color:var(--text-3); }
+
+/* ── TOAST ── */
+.toast {
+    position:fixed; top:20px; right:24px; padding:11px 18px;
+    border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.35);
+    z-index:10001; font-size:13px; font-weight:600; letter-spacing:0.2px;
+    animation:slideIn 0.25s ease; font-family:var(--font-b);
+    display:flex; align-items:center; gap:8px; color:#fff;
+}
+@keyframes slideIn { from{transform:translateX(300px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+/* ── ANALYTICS ── */
+.an-kpi {
+    background:var(--bg-card); border:1px solid var(--border-d);
+    border-radius:var(--r); padding:22px; display:flex; flex-direction:column; gap:6px;
+    transition:all 0.2s; position:relative; overflow:hidden;
+}
+.an-kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; opacity:0; transition:opacity 0.2s; }
+.an-kpi:hover { border-color:var(--border); transform:translateY(-2px); }
+.an-kpi:hover::before { opacity:1; }
+.an-kpi.kpi-red::before    { background:var(--red); }
+.an-kpi.kpi-green::before  { background:var(--green); }
+.an-kpi.kpi-purple::before { background:var(--purple); }
+.an-kpi.kpi-gold::before   { background:var(--gold); }
+.an-kpi-icon {
+    width:40px; height:40px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px; margin-bottom:6px;
+}
+.an-kpi-val {
+    font-family:var(--font-d); font-size:34px; font-weight:700;
+    color:var(--text); line-height:1; letter-spacing:-0.5px;
+}
+.an-kpi-label {
+    font-size:10px; letter-spacing:1.8px; text-transform:uppercase;
+    color:var(--text-3); font-weight:700;
 }
 
-.search-input::placeholder { color: var(--text-muted); }
-.search-input:focus { outline: none; border-color: rgba(201, 168, 76, 0.35); box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.06); background-color: var(--navy-deepest); }
-
-/* ══════════════════════════════════════════
-   INFO TABLE / SETTINGS
-══════════════════════════════════════════ */
-.info-table { width: 100%; border-collapse: collapse; }
-.info-table tr { border-bottom: 1px solid var(--border-dim); }
-.info-table tr:last-child { border-bottom: none; }
-.info-table td { padding: 14px 4px; font-size: 13.5px; }
-.info-table td:first-child { color: var(--text-muted); font-weight: 500; width: 45%; font-size: 12.5px; letter-spacing: 0.2px; }
-.info-table td:last-child { color: var(--text-primary); font-weight: 600; }
-
-.settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
-.form-control { width: 100%; padding: 10px 14px; background: var(--navy-deepest); border: 1px solid var(--border-dim); border-radius: var(--radius-md); font-size: 13.5px; color: var(--text-secondary); font-family: var(--font-body); transition: border-color 0.2s ease; }
-.form-control:focus { outline: none; border-color: rgba(201, 168, 76, 0.35); }
-
-/* ══════════════════════════════════════════
-   LOADING / EMPTY
-══════════════════════════════════════════ */
-.loading { text-align: center; padding: 60px 20px; }
-.spinner { width: 36px; height: 36px; border: 2px solid var(--border-dim); border-top-color: var(--gold-dim); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 16px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading p { font-size: 13px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.3px; }
-
-.empty-state { text-align: center; padding: 70px 20px; color: var(--text-muted); }
-.empty-state i { font-size: 56px; opacity: 0.2; margin-bottom: 20px; display: block; }
-.empty-state h4 { font-family: var(--font-display); font-size: 18px; margin-bottom: 8px; font-weight: 600; color: var(--text-secondary); }
-.empty-state p { font-size: 13px; color: var(--text-muted); }
-
-/* ══════════════════════════════════════════
-   SCROLLBARS
-══════════════════════════════════════════ */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--navy-muted); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--navy-light); }
-
-/* ══════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════ */
-@media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 768px) {
-    .admin-sidebar { transform: translateX(-100%); transition: transform 0.25s ease; }
-    .admin-sidebar.mobile-open { transform: translateX(0); }
-    .admin-main { margin-left: 0; }
-    .admin-topbar { padding: 0 20px; }
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-    .content-area { padding: 20px; }
-    .data-grid { grid-template-columns: 1fr; }
-    .topbar-admin-pill { display: none; }
+/* Horizontal bar chart */
+.bar-row { display:flex; align-items:center; gap:14px; }
+.bar-row-label {
+    width:120px; font-size:12px; color:var(--text-2); font-weight:600;
+    flex-shrink:0; text-align:right; letter-spacing:0.2px;
 }
-@media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+.bar-track {
+    flex:1; height:30px; background:rgba(255,255,255,0.03);
+    border-radius:5px; overflow:hidden;
+    border:1px solid rgba(255,255,255,0.04);
+}
+.bar-fill {
+    height:100%; border-radius:5px; width:0%;
+    transition:width 1.1s cubic-bezier(.4,0,.2,1);
+    display:flex; align-items:center; padding-left:12px;
+    font-size:11px; font-weight:700; color:rgba(255,255,255,0.85);
+    font-family:var(--font-m); white-space:nowrap;
+}
+.bar-count {
+    width:32px; font-family:var(--font-m); font-size:12px;
+    color:var(--text-3); flex-shrink:0; text-align:right; font-weight:600;
+}
+
+/* Vertical blood type bars */
+.bt-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:0; }
+.bt-bar-outer {
+    width:100%; display:flex; align-items:flex-end; justify-content:center;
+    height:160px; padding:0 4px;
+}
+.bt-bar-inner {
+    width:100%; border-radius:4px 4px 0 0; height:0%;
+    transition:height 1.1s cubic-bezier(.4,0,.2,1);
+    display:flex; align-items:flex-start; justify-content:center;
+    padding-top:7px; font-family:var(--font-m); font-size:10px;
+    font-weight:700; color:rgba(255,255,255,0.8); position:relative;
+}
+.bt-divider {
+    width:100%; height:1px; background:rgba(255,255,255,0.06); margin:0 4px;
+}
+.bt-label-text {
+    font-size:11px; font-weight:700; color:var(--text-3);
+    font-family:var(--font-m); letter-spacing:0.5px; margin-top:8px;
+    text-align:center;
+}
+
+/* Chart grid lines */
+.chart-grid { position:relative; }
+.chart-grid-lines {
+    position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between;
+    pointer-events:none;
+}
+.chart-grid-line { width:100%; height:1px; background:rgba(255,255,255,0.04); }
+
+/* Donut */
+#donut-arc { transition:stroke-dasharray 1.3s cubic-bezier(.4,0,.2,1), stroke 0.5s ease; }
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--bg-hover); border-radius:3px; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:1200px) { .stats{grid-template-columns:repeat(3,1fr);} }
+@media(max-width:900px)  { .stats{grid-template-columns:repeat(2,1fr);} .sidebar{transform:translateX(-100%);} .main{margin-left:0;} }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- ══════════════════════════════════════════
-     SIDEBAR
-══════════════════════════════════════════ -->
-<div class="admin-sidebar" id="adminSidebar">
-
-    <!-- Logo / Title -->
-    <div class="sidebar-header">
-        <div class="sidebar-logo">
-            <img src="{% static 'images/logo.jpeg' %}" alt="LifeLink Nepal" class="sidebar-logo-img">
-            <div>
-                <h3>Life<span>Link</span> Nepal</h3>
-            </div>
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+    <div class="sb-head">
+        <div class="sb-logo">
+            <img src="{% static 'images/logo.jpeg' %}" alt="LifeLink Nepal">
+            <h3>Life<span>Link</span> Nepal</h3>
         </div>
-        <p>Super Admin Console</p>
+        <p class="sb-sub">Super Admin Console</p>
     </div>
-
-    <!-- Navigation -->
-    <div class="sidebar-menu">
-        <div class="menu-section-label">Overview</div>
-        <a href="#dashboard" class="menu-item active" data-section="dashboard">
-            <i class="bi bi-speedometer2"></i>
-            <span>Live Dashboard</span>
+    <div class="sb-menu">
+        <div class="sb-label">Overview</div>
+        <a class="sb-item active" data-section="dashboard">
+            <i class="bi bi-speedometer2"></i><span>Dashboard</span>
         </a>
-        <a href="#requests" class="menu-item" data-section="requests">
-            <i class="bi bi-bell"></i>
-            <span>Blood Requests</span>
-            <span class="menu-badge" id="requestCount">0</span>
+        <a class="sb-item" data-section="mismatches">
+            <i class="bi bi-exclamation-triangle-fill"></i><span>Mismatch Cases</span>
+            <span class="sb-badge red hidden" id="sb-mismatch-badge">0</span>
         </a>
-
-        <div class="menu-section-label" style="margin-top: 8px;">Directory</div>
-        <a href="#leaderboard" class="menu-item" data-section="leaderboard">
-            <i class="bi bi-trophy"></i>
-            <span>Top Donors</span>
+        <a class="sb-item" data-section="requests">
+            <i class="bi bi-bell-fill"></i><span>Blood Requests</span>
+            <span class="sb-badge amber" id="sb-req-badge">0</span>
         </a>
-        <a href="#donors" class="menu-item" data-section="donors">
-            <i class="bi bi-heart-pulse"></i>
-            <span>All Donors</span>
+        <div class="sb-label" style="margin-top:6px;">Directory</div>
+        <a class="sb-item" data-section="leaderboard">
+            <i class="bi bi-trophy-fill"></i><span>Top Donors</span>
         </a>
-        <a href="#hospitals" class="menu-item" data-section="hospitals">
-            <i class="bi bi-hospital"></i>
-            <span>All Hospitals</span>
+        <a class="sb-item" data-section="donors">
+            <i class="bi bi-heart-pulse-fill"></i><span>All Donors</span>
         </a>
-
-        <div class="menu-section-label" style="margin-top: 8px;">System</div>
-        <a href="#analytics" class="menu-item" data-section="analytics">
-            <i class="bi bi-bar-chart"></i>
-            <span>Analytics</span>
+        <a class="sb-item" data-section="hospitals">
+            <i class="bi bi-hospital-fill"></i><span>Hospitals</span>
         </a>
-        <a href="#settings" class="menu-item" data-section="settings">
-            <i class="bi bi-gear"></i>
-            <span>Settings</span>
+        <div class="sb-label" style="margin-top:6px;">System</div>
+        <a class="sb-item" data-section="analytics">
+            <i class="bi bi-bar-chart-fill"></i><span>Analytics</span>
+        </a>
+        <a class="sb-item" data-section="settings">
+            <i class="bi bi-gear-fill"></i><span>Settings</span>
         </a>
     </div>
-
-    <!-- Footer: minimal system label -->
-    <div class="sidebar-footer">
-        <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);font-weight:600;text-align:center;">
-            LifeLink Nepal &mdash; v1.0 Beta
-        </div>
+    <div class="sb-foot">
+        <div class="sb-foot-text">LifeLink Nepal &mdash; v1.0 Beta</div>
     </div>
-
 </div>
 
-<!-- ══════════════════════════════════════════
-     MAIN CONTENT
-══════════════════════════════════════════ -->
-<div class="admin-main">
-
-    <!-- Top Header Bar -->
-    <div class="admin-topbar">
-        <div class="topbar-admin-pill">
-            <div class="topbar-avatar">{{ user.username|first|upper|default:"A" }}</div>
-            <div class="topbar-admin-details">
-                <strong>{{ user.username|default:"Admin" }}</strong>
-                <span>Super Admin</span>
+<!-- MAIN -->
+<div class="main">
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-breadcrumb">
+                <i class="bi bi-house-fill" style="color:var(--text-3);font-size:12px;"></i>
+                <i class="bi bi-chevron-right" style="font-size:9px;"></i>
+                <span id="breadcrumb-text">Dashboard</span>
             </div>
         </div>
-        <a href="{% url 'accounts:login_page' %}" class="topbar-signout">
-            <i class="bi bi-box-arrow-right"></i>
-            Sign Out
-        </a>
+        <div class="topbar-right">
+            <div class="topbar-pill">
+                <div class="topbar-av">{{ user.username|first|upper|default:"A" }}</div>
+                <div>
+                    <div class="topbar-name">{{ user.username|default:"Admin" }}</div>
+                    <div class="topbar-role">Super Admin</div>
+                </div>
+            </div>
+            <a href="{% url 'accounts:login_page' %}" class="topbar-signout">
+                <i class="bi bi-box-arrow-right"></i> Sign Out
+            </a>
+        </div>
     </div>
 
-    <div class="content-area" id="mainContent">
+    <div class="content">
 
-        <!-- ── Dashboard Section ── -->
-        <div id="dashboardSection" class="content-section-wrapper">
-            <div class="page-header">
-                <div class="page-header-eyebrow">Overview</div>
-                <h2>Live Dashboard</h2>
-                <p>Real-time blood donation activity monitoring</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card donors">
-                    <div class="stat-ornament">♥</div>
-                    <div class="stat-label">Registered Donors</div>
-                    <div class="stat-value" id="totalDonors">0</div>
-                    <div class="stat-meta"><div class="stat-dot"></div><span>Updated live</span></div>
+        <!-- ══ DASHBOARD ══ -->
+        <div id="sec-dashboard" class="sec-wrap">
+            <div class="ph">
+                <div class="ph-left">
+                    <div class="ph-eye">Live Overview</div>
+                    <h2>Admin Dashboard</h2>
+                    <p>Real-time system monitoring — auto-refreshes every 10 seconds</p>
                 </div>
-                <div class="stat-card hospitals">
-                    <div class="stat-ornament">+</div>
-                    <div class="stat-label">Registered Hospitals</div>
-                    <div class="stat-value" id="totalHospitals">0</div>
-                    <div class="stat-meta"><div class="stat-dot"></div><span>Updated live</span></div>
-                </div>
-                <div class="stat-card requests">
-                    <div class="stat-ornament">!</div>
-                    <div class="stat-label">Active Requests</div>
-                    <div class="stat-value" id="activeRequests">0</div>
-                    <div class="stat-meta"><div class="stat-dot" style="background:var(--amber);"></div><span>Pending</span></div>
-                </div>
-                <div class="stat-card completed">
-                    <div class="stat-ornament">✓</div>
-                    <div class="stat-label">Completed Today</div>
-                    <div class="stat-value" id="completedRequests">0</div>
-                    <div class="stat-meta"><div class="stat-dot" style="background:var(--emerald-bright);animation:none;opacity:1;"></div><span>Fulfilled</span></div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="width:7px;height:7px;border-radius:50%;background:var(--green-l);animation:pulse-dot 2s infinite;"></div>
+                    <span style="font-size:12px;color:var(--text-3);">Live</span>
                 </div>
             </div>
 
-            <!-- Terminal Monitor -->
-            <div class="content-section">
-                <div class="section-header">
-                    <div class="section-title">
-                        <div class="section-eyebrow">System</div>
-                        <h3>Live Request Monitor</h3>
-                    </div>
-                    <button class="btn-action" onclick="refreshTerminal()">
-                        <i class="bi bi-arrow-clockwise"></i> Refresh
+            <div class="stats">
+                <div class="scard s-donors">
+                    <div class="sc-label">Donors</div>
+                    <div class="sc-val" id="stat-donors">0</div>
+                    <div class="sc-meta"><div class="sc-dot live"></div> Registered</div>
+                </div>
+                <div class="scard s-hospitals">
+                    <div class="sc-label">Hospitals</div>
+                    <div class="sc-val" id="stat-hospitals">0</div>
+                    <div class="sc-meta"><div class="sc-dot live"></div> Active</div>
+                </div>
+                <div class="scard s-requests">
+                    <div class="sc-label">Active Requests</div>
+                    <div class="sc-val" id="stat-requests">0</div>
+                    <div class="sc-meta"><div class="sc-dot warn"></div> Pending</div>
+                </div>
+                <div class="scard s-done">
+                    <div class="sc-label">Fulfilled</div>
+                    <div class="sc-val" id="stat-fulfilled">0</div>
+                    <div class="sc-meta"><div class="sc-dot live"></div> Completed</div>
+                </div>
+                <div class="scard s-mismatch" onclick="showSection('mismatches')" title="Click to review mismatches">
+                    <div class="sc-label">⚠ Mismatches</div>
+                    <div class="sc-val" id="stat-mismatches">0</div>
+                    <div class="sc-meta"><div class="sc-dot alert"></div> Needs Review</div>
+                </div>
+            </div>
+
+            <div class="mismatch-banner" id="mismatch-banner" style="display:none;">
+                <div class="mismatch-banner-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <div class="mismatch-banner-text">
+                    <h4>Donation Mismatches Require Your Attention</h4>
+                    <p>A donor and hospital disagree on whether the donation occurred. Points are held. Manual review needed.</p>
+                </div>
+                <div class="mismatch-banner-action">
+                    <button class="btn-sm purple" onclick="showSection('mismatches')">
+                        <i class="bi bi-arrow-right-circle-fill"></i> Review Now
                     </button>
                 </div>
-                <div class="terminal-requests" id="terminalRequests">
-                    <div class="terminal-topbar">
-                        <div class="terminal-dots">
-                            <div class="terminal-dot red"></div>
-                            <div class="terminal-dot amber"></div>
-                            <div class="terminal-dot green"></div>
-                        </div>
-                        <div class="terminal-topbar-title">lifelink — blood-request-monitor</div>
-                        <span class="terminal-time" id="terminalTime"></span>
+            </div>
+
+            <div class="section">
+                <div class="sec-head">
+                    <div class="sec-title">
+                        <div class="sec-eye">System Monitor</div>
+                        <h3>Live Request Feed</h3>
                     </div>
-                    <div class="terminal-body">
-                        <div id="terminalContent">
-                            <div class="loading"><div class="spinner"></div><p>Initializing monitor...</p></div>
+                    <button class="btn-sm" onclick="loadDashboard()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+                </div>
+                <div class="sec-body" style="padding:0;">
+                    <div class="terminal" id="terminal">
+                        <div class="t-bar">
+                            <div class="t-dots"><div class="t-dot r"></div><div class="t-dot a"></div><div class="t-dot g"></div></div>
+                            <div class="t-title">lifelink — request-monitor</div>
+                            <span class="t-time" id="t-time"></span>
                         </div>
+                        <div class="t-body"><div id="t-content"><div class="spinner-wrap"><div class="spinner"></div><p>Initializing...</p></div></div></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Top Donors Preview -->
-            <div class="leaderboard-card">
-                <div class="section-header">
-                    <div class="section-title">
-                        <div class="section-eyebrow">Recognition</div>
+            <div class="section">
+                <div class="sec-head">
+                    <div class="sec-title">
+                        <div class="sec-eye">Recognition</div>
                         <h3>Top 5 Life Savers</h3>
                     </div>
-                    <button class="btn-action" onclick="showSection('leaderboard')">
-                        <i class="bi bi-trophy"></i> Full Leaderboard
-                    </button>
+                    <button class="btn-sm" onclick="showSection('leaderboard')"><i class="bi bi-trophy"></i> Full Board</button>
                 </div>
-                <div id="topDonorsPreview">
-                    <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
+                <div class="sec-body" id="top5"><div class="spinner-wrap"><div class="spinner"></div><p>Loading...</p></div></div>
+            </div>
+        </div>
+
+        <!-- ══ MISMATCH CENTER ══ -->
+        <div id="sec-mismatches" class="sec-wrap" style="display:none;">
+            <div class="ph">
+                <div class="ph-left">
+                    <div class="ph-eye">Dispute Resolution</div>
+                    <h2>Mismatch Resolution Center</h2>
+                    <p>Cases where donor and hospital disagree on donation status — points are held until resolved</p>
+                </div>
+                <button class="btn-sm" onclick="loadMismatches()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+            </div>
+
+            <div class="section" style="margin-bottom:20px;">
+                <div class="sec-head">
+                    <div class="sec-title">
+                        <div class="sec-eye">System</div>
+                        <h3>How Dual Confirmation Works</h3>
+                    </div>
+                </div>
+                <div class="sec-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;">
+                    <div style="text-align:center;padding:14px;background:rgba(42,107,172,0.08);border:1px solid rgba(42,107,172,0.15);border-radius:8px;">
+                        <div style="font-size:22px;margin-bottom:6px;">1️⃣</div>
+                        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Donor Accepts</div>
+                        <div style="font-size:11px;color:var(--text-3);">Donor accepts the blood request</div>
+                    </div>
+                    <div style="text-align:center;padding:14px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);border-radius:8px;">
+                        <div style="font-size:22px;margin-bottom:6px;">2️⃣</div>
+                        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Donor Confirms</div>
+                        <div style="font-size:11px;color:var(--text-3);">Donor clicks "I Have Donated"</div>
+                    </div>
+                    <div style="text-align:center;padding:14px;background:rgba(194,59,59,0.08);border:1px solid rgba(194,59,59,0.15);border-radius:8px;">
+                        <div style="font-size:22px;margin-bottom:6px;">3️⃣</div>
+                        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Hospital Verifies</div>
+                        <div style="font-size:11px;color:var(--text-3);">Hospital confirms or denies</div>
+                    </div>
+                    <div style="text-align:center;padding:14px;background:rgba(42,140,110,0.08);border:1px solid rgba(42,140,110,0.15);border-radius:8px;">
+                        <div style="font-size:22px;margin-bottom:6px;">4️⃣</div>
+                        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Points Awarded</div>
+                        <div style="font-size:11px;color:var(--text-3);">50 pts released on both confirming</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mismatches-list"><div class="spinner-wrap"><div class="spinner"></div><p>Loading mismatch cases...</p></div></div>
+        </div>
+
+        <!-- ══ REQUESTS ══ -->
+        <div id="sec-requests" class="sec-wrap" style="display:none;">
+            <div class="ph">
+                <div class="ph-left">
+                    <div class="ph-eye">Directory</div>
+                    <h2>Blood Requests</h2>
+                    <p>Complete request history with matched donor priority lists</p>
+                </div>
+                <button class="btn-sm" onclick="loadRequests()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+            </div>
+            <div class="section">
+                <div class="sec-head">
+                    <div class="sec-title">
+                        <div class="sec-eye">All Records</div>
+                        <h3>Request History &mdash; <span id="req-count">0</span> entries</h3>
+                    </div>
+                </div>
+                <div class="sec-body">
+                    <div class="search-wrap">
+                        <input class="search-input" id="req-search" placeholder="Search hospital, blood type, status…">
+                    </div>
+                    <div id="requests-list"><div class="spinner-wrap"><div class="spinner"></div><p>Loading...</p></div></div>
                 </div>
             </div>
         </div>
 
-        <!-- ── Blood Requests Section ── -->
-        <div id="requestsSection" class="content-section-wrapper" style="display:none;">
-            <div class="page-header">
-                <div class="page-header-eyebrow">Directory</div>
-                <h2>Blood Requests</h2>
-                <p>Complete history with donor notification priority</p>
+        <!-- ══ LEADERBOARD ══ -->
+        <div id="sec-leaderboard" class="sec-wrap" style="display:none;">
+            <div class="ph">
+                <div class="ph-left">
+                    <div class="ph-eye">Recognition</div>
+                    <h2>Donors Leaderboard</h2>
+                </div>
+                <button class="btn-sm" onclick="loadLeaderboard()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
             </div>
-            <div class="content-section">
-                <div class="section-header">
-                    <div class="section-title">
-                        <div class="section-eyebrow">All Records</div>
-                        <h3>Request History &mdash; <span id="requestListCount">0</span> entries</h3>
-                    </div>
-                    <button class="btn-action" onclick="loadAllRequests()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+            <div class="section">
+                <div class="sec-head">
+                    <div class="sec-title"><div class="sec-eye">Hall of Fame</div><h3>All-Time Rankings</h3></div>
                 </div>
-                <div class="search-bar">
-                    <input type="text" class="search-input" id="requestSearch" placeholder="Search by hospital, blood type, or status…">
-                </div>
-                <div id="requestsGrid"><div class="loading"><div class="spinner"></div><p>Loading…</p></div></div>
+                <div class="sec-body" id="lb-list"><div class="spinner-wrap"><div class="spinner"></div><p>Loading...</p></div></div>
             </div>
         </div>
 
-        <!-- ── Leaderboard Section ── -->
-        <div id="leaderboardSection" class="content-section-wrapper" style="display:none;">
-            <div class="page-header">
-                <div class="page-header-eyebrow">Recognition</div>
-                <h2>Donors Leaderboard</h2>
-                <p>Honoring those who save lives</p>
-            </div>
-            <div class="leaderboard-card">
-                <div class="section-header">
-                    <div class="section-title">
-                        <div class="section-eyebrow">Hall of Fame</div>
-                        <h3>All-Time Rankings</h3>
-                    </div>
-                    <button class="btn-action" onclick="refreshLeaderboard()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+        <!-- ══ DONORS ══ -->
+        <div id="sec-donors" class="sec-wrap" style="display:none;">
+            <div class="ph">
+                <div class="ph-left">
+                    <div class="ph-eye">Directory</div>
+                    <h2>All Donors</h2>
                 </div>
-                <div id="leaderboardList"><div class="loading"><div class="spinner"></div><p>Loading…</p></div></div>
+                <button class="btn-sm" onclick="loadDonors()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+            </div>
+            <div class="section">
+                <div class="sec-head">
+                    <div class="sec-title"><div class="sec-eye">Registry</div><h3><span id="donors-count">0</span> donors</h3></div>
+                </div>
+                <div class="sec-body">
+                    <div class="search-wrap">
+                        <input class="search-input" id="donor-search" placeholder="Search name, blood type, location…">
+                    </div>
+                    <div id="donors-grid"><div class="spinner-wrap"><div class="spinner"></div><p>Loading...</p></div></div>
+                </div>
             </div>
         </div>
 
-        <!-- ── All Donors Section ── -->
-        <div id="donorsSection" class="content-section-wrapper" style="display:none;">
-            <div class="page-header">
-                <div class="page-header-eyebrow">Directory</div>
-                <h2>All Registered Donors</h2>
-                <p>Complete donor database</p>
+        <!-- ══ HOSPITALS ══ -->
+        <div id="sec-hospitals" class="sec-wrap" style="display:none;">
+            <div class="ph">
+                <div class="ph-left">
+                    <div class="ph-eye">Directory</div>
+                    <h2>Hospitals</h2>
+                </div>
+                <button class="btn-sm" onclick="loadHospitals()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
             </div>
-            <div class="content-section">
-                <div class="section-header">
-                    <div class="section-title">
-                        <div class="section-eyebrow">Donor Registry</div>
-                        <h3><span id="donorCount">0</span> donors on record</h3>
+            <div class="section">
+                <div class="sec-head">
+                    <div class="sec-title"><div class="sec-eye">Network</div><h3><span id="hospitals-count">0</span> hospitals</h3></div>
+                </div>
+                <div class="sec-body">
+                    <div class="search-wrap">
+                        <input class="search-input" id="hosp-search" placeholder="Search name or location…">
                     </div>
-                    <button class="btn-action" onclick="loadAllDonors()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+                    <div id="hospitals-grid"><div class="spinner-wrap"><div class="spinner"></div><p>Loading...</p></div></div>
                 </div>
-                <div class="search-bar">
-                    <input type="text" class="search-input" id="donorSearch" placeholder="Search by name, blood type, or location…">
-                </div>
-                <div id="donorsGrid"><div class="loading"><div class="spinner"></div><p>Loading…</p></div></div>
             </div>
         </div>
 
-        <!-- ── All Hospitals Section ── -->
-        <div id="hospitalsSection" class="content-section-wrapper" style="display:none;">
-            <div class="page-header">
-                <div class="page-header-eyebrow">Directory</div>
-                <h2>All Registered Hospitals</h2>
-                <p>Hospital network database</p>
+        <!-- ══ ANALYTICS ══ -->
+        <div id="sec-analytics" class="sec-wrap" style="display:none;">
+            <div class="ph">
+                <div class="ph-left">
+                    <div class="ph-eye">Insights</div>
+                    <h2>Analytics</h2>
+                    <p>System-wide performance at a glance</p>
+                </div>
+                <button class="btn-sm" onclick="loadAnalytics()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
             </div>
-            <div class="content-section">
-                <div class="section-header">
-                    <div class="section-title">
-                        <div class="section-eyebrow">Hospital Network</div>
-                        <h3><span id="hospitalCount">0</span> hospitals registered</h3>
+
+            <!-- KPI Cards -->
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;">
+                <div class="an-kpi kpi-red">
+                    <div class="an-kpi-icon" style="background:rgba(194,59,59,0.12);color:#d97070;">
+                        <i class="bi bi-people-fill"></i>
                     </div>
-                    <button class="btn-action" onclick="loadAllHospitals()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+                    <div class="an-kpi-val" id="a-users">0</div>
+                    <div class="an-kpi-label">Total Users</div>
                 </div>
-                <div class="search-bar">
-                    <input type="text" class="search-input" id="hospitalSearch" placeholder="Search by name or location…">
+                <div class="an-kpi kpi-green">
+                    <div class="an-kpi-icon" style="background:rgba(42,140,110,0.12);color:#3db88f;">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <div class="an-kpi-val" id="a-fulfilled" style="color:#3db88f;">0</div>
+                    <div class="an-kpi-label">Fulfilled</div>
                 </div>
-                <div id="hospitalsGrid"><div class="loading"><div class="spinner"></div><p>Loading…</p></div></div>
+                <div class="an-kpi kpi-purple">
+                    <div class="an-kpi-icon" style="background:rgba(107,79,187,0.12);color:#a882e0;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <div class="an-kpi-val" id="a-mismatches" style="color:#a882e0;">0</div>
+                    <div class="an-kpi-label">Mismatches</div>
+                </div>
+                <div class="an-kpi kpi-gold">
+                    <div class="an-kpi-icon" style="background:rgba(201,168,76,0.12);color:var(--gold);">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <div class="an-kpi-val" id="a-rate" style="color:var(--gold);">0%</div>
+                    <div class="an-kpi-label">Success Rate</div>
+                </div>
+            </div>
+
+            <!-- Charts row -->
+            <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:18px;margin-bottom:18px;">
+
+                <!-- Horizontal bar chart — request status -->
+                <div class="section" style="margin-bottom:0;">
+                    <div class="sec-head">
+                        <div class="sec-title">
+                            <div class="sec-eye">Breakdown</div>
+                            <h3>Request Status Distribution</h3>
+                        </div>
+                    </div>
+                    <div class="sec-body" style="padding:26px 28px 30px;">
+                        <div id="status-chart" style="display:flex;flex-direction:column;gap:16px;"></div>
+                    </div>
+                </div>
+
+                <!-- Donut + summary table -->
+                <div class="section" style="margin-bottom:0;">
+                    <div class="sec-head">
+                        <div class="sec-title">
+                            <div class="sec-eye">Summary</div>
+                            <h3>System Health</h3>
+                        </div>
+                    </div>
+                    <div class="sec-body" style="padding:20px 24px;">
+                        <div style="display:flex;justify-content:center;margin-bottom:22px;">
+                            <div style="position:relative;width:144px;height:144px;">
+                                <svg viewBox="0 0 144 144" style="transform:rotate(-90deg);width:144px;height:144px;">
+                                    <circle cx="72" cy="72" r="56" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="14"/>
+                                    <circle id="donut-arc" cx="72" cy="72" r="56" fill="none" stroke="#2a8c6e"
+                                        stroke-width="14" stroke-dasharray="0 351.9" stroke-linecap="round"/>
+                                </svg>
+                                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                                    <div id="donut-pct" style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--text);line-height:1;">0%</div>
+                                    <div style="font-size:9.5px;color:var(--text-3);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;">success</div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="info-t" style="font-size:12.5px;">
+                            <tr><td>Total Requests</td><td><strong id="a-requests">0</strong></td></tr>
+                            <tr><td>Active</td><td><strong id="a-active" style="color:#d4a056;">0</strong></td></tr>
+                            <tr><td>Critical</td><td><strong id="a-critical" style="color:#d97070;">0</strong></td></tr>
+                            <tr><td>Donors</td><td><strong id="a-donors" style="color:#d97070;">0</strong></td></tr>
+                            <tr><td>Hospitals</td><td><strong id="a-hospitals" style="color:#6ea8d9;">0</strong></td></tr>
+                            <tr><td>Points Held</td><td><strong id="a-pts" style="color:var(--gold);">0 pts</strong></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blood type vertical bar chart -->
+            <div class="section">
+                <div class="sec-head">
+                    <div class="sec-title">
+                        <div class="sec-eye">Demand</div>
+                        <h3>Requests by Blood Type</h3>
+                    </div>
+                </div>
+                <div class="sec-body" style="padding:28px 32px 24px;">
+                    <!-- Grid lines backdrop -->
+                    <div style="position:relative;">
+                        <div id="bt-grid-lines" style="position:absolute;left:0;right:0;top:0;height:160px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;">
+                            <div style="height:1px;background:rgba(255,255,255,0.05);"></div>
+                            <div style="height:1px;background:rgba(255,255,255,0.05);"></div>
+                            <div style="height:1px;background:rgba(255,255,255,0.05);"></div>
+                            <div style="height:1px;background:rgba(255,255,255,0.05);"></div>
+                            <div style="height:1px;background:rgba(255,255,255,0.05);"></div>
+                        </div>
+                        <div id="bloodtype-chart" style="display:flex;align-items:flex-end;gap:8px;height:160px;position:relative;"></div>
+                    </div>
+                    <div style="height:1px;background:rgba(255,255,255,0.08);margin:0 0 10px;"></div>
+                    <div id="bloodtype-labels" style="display:flex;gap:8px;"></div>
+                </div>
             </div>
         </div>
 
-        <!-- ── Analytics Section ── -->
-        <div id="analyticsSection" class="content-section-wrapper" style="display:none;">
-            <div class="page-header">
-                <div class="page-header-eyebrow">Insights</div>
-                <h2>Analytics</h2>
-                <p>System performance metrics</p>
-            </div>
-            <div class="content-section">
-                <div class="section-header">
-                    <div class="section-title">
-                        <div class="section-eyebrow">Statistics</div>
-                        <h3>System Overview</h3>
-                    </div>
+        <!-- ══ SETTINGS ══ -->
+        <div id="sec-settings" class="sec-wrap" style="display:none;">
+            <div class="ph"><div class="ph-left"><div class="ph-eye">Config</div><h2>Settings</h2></div></div>
+            <div class="section">
+                <div class="sec-head"><div class="sec-title"><div class="sec-eye">System Info</div><h3>Configuration</h3></div></div>
+                <div class="sec-body">
+                    <table class="info-t">
+                        <tr><td>System Name</td><td>LifeLink Nepal</td></tr>
+                        <tr><td>Admin</td><td>{{ user.email|default:"admin@lifelink.com" }}</td></tr>
+                        <tr><td>Version</td><td>1.0.0 Beta</td></tr>
+                        <tr><td>Database</td><td><span class="tag tag-green">Online</span></td></tr>
+                        <tr><td>API</td><td><span class="tag tag-green">Operational</span></td></tr>
+                        <tr><td>Live Monitor</td><td><span class="tag tag-green">Enabled</span></td></tr>
+                        <tr><td>Mismatch Alerts</td><td><span class="tag tag-green">Enabled</span></td></tr>
+                        <tr><td>Points Per Donation</td><td><strong style="color:var(--gold);">50 pts</strong></td></tr>
+                        <tr><td>Server</td><td>Kathmandu, Nepal</td></tr>
+                        <tr><td>Total Users</td><td><strong id="s-users">0</strong></td></tr>
+                    </table>
                 </div>
-                <table class="info-table">
-                    <tbody>
-                        <tr><td>Total Users</td><td><strong id="analyticsTotalUsers">0</strong></td></tr>
-                        <tr><td>Total Donors</td><td><strong id="analyticsTotalDonors">0</strong></td></tr>
-                        <tr><td>Total Hospitals</td><td><strong id="analyticsTotalHospitals">0</strong></td></tr>
-                        <tr><td>Total Requests</td><td><strong id="analyticsTotalRequests">0</strong></td></tr>
-                        <tr><td>Completed Requests</td><td><strong id="analyticsCompletedRequests">0</strong></td></tr>
-                        <tr><td>Success Rate</td><td><strong id="analyticsSuccessRate">0%</strong></td></tr>
-                        <tr><td>Active Requests</td><td><strong id="analyticsActiveRequests">0</strong></td></tr>
-                        <tr><td>Critical Requests</td><td><strong id="analyticsCriticalRequests">0</strong></td></tr>
-                    </tbody>
-                </table>
             </div>
         </div>
 
-        <!-- ── Settings Section ── -->
-        <div id="settingsSection" class="content-section-wrapper" style="display:none;">
-            <div class="page-header">
-                <div class="page-header-eyebrow">Configuration</div>
-                <h2>Settings</h2>
-                <p>System preferences</p>
-            </div>
-            <div class="content-section">
-                <div class="section-header">
-                    <div class="section-title">
-                        <div class="section-eyebrow">General</div>
-                        <h3>Configuration</h3>
-                    </div>
-                </div>
-                <div class="settings-grid">
-                    <div class="form-group">
-                        <label>System Name</label>
-                        <input type="text" class="form-control" value="LifeLink Nepal" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Admin Email</label>
-                        <input type="email" class="form-control" value="{{ user.email|default:'admin@lifelink.com' }}" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Emergency Contact</label>
-                        <input type="tel" class="form-control" value="+977-1-4444444" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Refresh Interval</label>
-                        <input type="text" class="form-control" value="10 seconds" readonly>
-                    </div>
-                </div>
-            </div>
-            <div class="content-section">
-                <div class="section-header">
-                    <div class="section-title">
-                        <div class="section-eyebrow">Info</div>
-                        <h3>System Information</h3>
-                    </div>
-                </div>
-                <table class="info-table">
-                    <tbody>
-                        <tr><td>System Version</td><td>1.0.0 Beta</td></tr>
-                        <tr><td>Last Updated</td><td>February 07, 2026</td></tr>
-                        <tr><td>Database Status</td><td><span class="status-badge fulfilled">Online</span></td></tr>
-                        <tr><td>Total Users</td><td><strong id="settingsTotalUsers">0</strong></td></tr>
-                        <tr><td>API Status</td><td><span class="status-badge fulfilled">Operational</span></td></tr>
-                        <tr><td>Live Monitoring</td><td><span class="status-badge fulfilled">Enabled</span></td></tr>
-                        <tr><td>Server Location</td><td>Kathmandu, Nepal</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div><!-- /content-area -->
-</div><!-- /admin-main -->
+    </div><!-- /content -->
+</div><!-- /main -->
 
 <script>
-console.log('🚀 LifeLink Dashboard Initializing...');
+const API  = window.location.origin;
+const CSRF = (document.cookie.split(';').find(c=>c.trim().startsWith('csrftoken='))||'').split('=')[1]||'';
 
-let allDonors    = [];
-let allRequests  = [];
-let allHospitals = [];
-let previousCounts = { donors: 0, hospitals: 0, requests: 0, completed: 0 };
+let allDonors = [], allHospitals = [], allRequests = [], allMismatches = [];
 
-const API_URL          = window.location.origin;
-const REFRESH_INTERVAL = 10000;
-
-/* ─── CSRF ─────────────────────────────────── */
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        for (const cookie of document.cookie.split(';')) {
-            const c = cookie.trim();
-            if (c.startsWith(name + '=')) {
-                cookieValue = decodeURIComponent(c.slice(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-const csrftoken = getCookie('csrftoken');
-
-/* ─── API ───────────────────────────────────── */
-async function makeApiRequest(url, options = {}) {
-    const headers = { 'Content-Type': 'application/json', ...options.headers };
-    if (options.method && options.method !== 'GET' && csrftoken) {
-        headers['X-CSRFToken'] = csrftoken;
-    }
+// ── API ──
+async function api(url, opts={}) {
     try {
-        const response = await fetch(url, { ...options, headers, credentials: 'include' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        return await response.json();
-    } catch (error) {
-        console.error(`❌ Failed: ${url}`, error);
-        showToast(`API Error: ${error.message}`, 'error');
-        return null;
-    }
+        const h = {'Content-Type':'application/json',...(opts.headers||{})};
+        if (opts.method && opts.method!=='GET') h['X-CSRFToken'] = CSRF;
+        const r = await fetch(url, {...opts, headers:h, credentials:'include'});
+        if (!r.ok) throw new Error(r.status);
+        return await r.json();
+    } catch(e) { console.error('API fail:', url, e); return null; }
 }
 
-/* ─── NAVIGATION ─────────────────────────────── */
-document.querySelectorAll('.menu-item[data-section]').forEach(item => {
-    item.addEventListener('click', function(e) {
-        e.preventDefault();
-        const section = this.dataset.section;
-        showSection(section);
-        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-        this.classList.add('active');
-    });
+// ── NAVIGATION ──
+document.querySelectorAll('.sb-item[data-section]').forEach(el => {
+    el.addEventListener('click', e => { e.preventDefault(); showSection(el.dataset.section); });
 });
 
-function showSection(section) {
-    document.querySelectorAll('.content-section-wrapper').forEach(s => s.style.display = 'none');
-    const map = {
-        dashboard:   'dashboardSection',
-        requests:    'requestsSection',
-        leaderboard: 'leaderboardSection',
-        donors:      'donorsSection',
-        hospitals:   'hospitalsSection',
-        analytics:   'analyticsSection',
-        settings:    'settingsSection',
-    };
-    const el = document.getElementById(map[section]);
-    if (el) {
-        el.style.display = 'block';
-        if (section === 'leaderboard') loadFullLeaderboard();
-        if (section === 'donors')      loadAllDonors();
-        if (section === 'hospitals')   loadAllHospitals();
-        if (section === 'requests')    loadAllRequests();
-        if (section === 'analytics')   loadAnalytics();
-        if (section === 'settings')    loadSettings();
-    }
-    // sync sidebar active state
-    document.querySelectorAll('.menu-item[data-section]').forEach(m => {
-        m.classList.toggle('active', m.dataset.section === section);
-    });
+function showSection(name) {
+    document.querySelectorAll('.sec-wrap').forEach(s => s.style.display = 'none');
+    document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById('sec-'+name);
+    if (el) el.style.display = 'block';
+    document.querySelector(`.sb-item[data-section="${name}"]`)?.classList.add('active');
+    const labels = {dashboard:'Dashboard',mismatches:'Mismatch Cases',requests:'Blood Requests',leaderboard:'Leaderboard',donors:'All Donors',hospitals:'Hospitals',analytics:'Analytics',settings:'Settings'};
+    document.getElementById('breadcrumb-text').textContent = labels[name]||name;
+    if (name==='mismatches')  loadMismatches();
+    if (name==='requests')    loadRequests();
+    if (name==='leaderboard') loadLeaderboard();
+    if (name==='donors')      loadDonors();
+    if (name==='hospitals')   loadHospitals();
+    if (name==='analytics')   loadAnalytics();
+    if (name==='settings')    loadSettings();
 }
 
-/* ─── DASHBOARD STATS ───────────────────────── */
-async function loadDashboardStats() {
-    const donorsData = await makeApiRequest(`${API_URL}/api/donors/`);
-    if (donorsData) {
-        allDonors = Array.isArray(donorsData) ? donorsData : [];
-        const count = allDonors.length;
-        document.getElementById('totalDonors').textContent = count;
-        if (count > previousCounts.donors && previousCounts.donors > 0)
-            showToast(`${count - previousCounts.donors} new donor(s)!`, 'success');
-        previousCounts.donors = count;
+// ── DASHBOARD ──
+async function loadDashboard() {
+    const [donorsData, hospitalsData, requestsData] = await Promise.all([
+        api(`${API}/api/donors/`),
+        api(`${API}/api/hospitals/`),
+        api(`${API}/api/blood-requests/`),
+    ]);
+
+    allDonors     = Array.isArray(donorsData)    ? donorsData    : [];
+    allHospitals  = Array.isArray(hospitalsData) ? hospitalsData : [];
+    allRequests   = Array.isArray(requestsData)  ? requestsData  : [];
+    allMismatches = allRequests.filter(r => r.status === 'mismatch');
+
+    const active    = allRequests.filter(r => ['pending','accepted','donor_confirmed'].includes(r.status));
+    const fulfilled = allRequests.filter(r => r.status === 'fulfilled');
+
+    document.getElementById('stat-donors').textContent     = allDonors.length;
+    document.getElementById('stat-hospitals').textContent  = allHospitals.length;
+    document.getElementById('stat-requests').textContent   = active.length;
+    document.getElementById('stat-fulfilled').textContent  = fulfilled.length;
+    document.getElementById('stat-mismatches').textContent = allMismatches.length;
+    document.getElementById('sb-req-badge').textContent    = active.length;
+
+    const mmBadge  = document.getElementById('sb-mismatch-badge');
+    const mmBanner = document.getElementById('mismatch-banner');
+    if (allMismatches.length > 0) {
+        mmBadge.textContent = allMismatches.length;
+        mmBadge.classList.remove('hidden');
+        mmBanner.style.display = 'flex';
+    } else {
+        mmBadge.classList.add('hidden');
+        mmBanner.style.display = 'none';
     }
 
-    const hospitalsData = await makeApiRequest(`${API_URL}/api/hospitals/`);
-    if (hospitalsData) {
-        allHospitals = Array.isArray(hospitalsData) ? hospitalsData : [];
-        document.getElementById('totalHospitals').textContent = allHospitals.length;
-        previousCounts.hospitals = allHospitals.length;
-    }
-
-    const requestsData = await makeApiRequest(`${API_URL}/api/blood-requests/`);
-    if (requestsData) {
-        allRequests = Array.isArray(requestsData) ? requestsData : [];
-        const active    = allRequests.filter(r => r.status === 'pending');
-        const fulfilled = allRequests.filter(r => r.status === 'fulfilled');
-        document.getElementById('activeRequests').textContent    = active.length;
-        document.getElementById('completedRequests').textContent = fulfilled.length;
-        document.getElementById('requestCount').textContent      = active.length;
-        if (active.length > previousCounts.requests && previousCounts.requests > 0)
-            showToast(`${active.length - previousCounts.requests} new request(s)!`, 'error');
-        previousCounts.requests = active.length;
-        await loadTerminalWithMatchedDonors();
-    }
-
-    loadTopDonorsPreview();
+    renderTerminal(active);
+    renderTop5();
 }
 
-/* ─── TERMINAL ───────────────────────────────── */
-function updateTerminalTime() {
-    const el = document.getElementById('terminalTime');
-    if (el) el.textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+// ── TERMINAL ──
+function updateTime() {
+    const el = document.getElementById('t-time');
+    if (el) el.textContent = new Date().toLocaleTimeString('en-US',{hour12:false});
 }
 
-async function loadTerminalWithMatchedDonors() {
-    const container = document.getElementById('terminalContent');
+async function renderTerminal(active) {
+    const container = document.getElementById('t-content');
     if (!container) return;
-
-    if (!allRequests.length) {
-        container.innerHTML = `<div class="terminal-line"><span class="terminal-label">[SYSTEM]</span> <span class="terminal-success"> Operational — standing by</span></div>`;
-        return;
-    }
-
-    const active = allRequests
-        .filter(r => r.status === 'pending')
-        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        .slice(0, 5);
-
-    if (!active.length) {
-        container.innerHTML = `<div class="terminal-line"><span class="terminal-label">[SYSTEM]</span> <span class="terminal-success"> All requests fulfilled</span></div>`;
-        return;
-    }
-
     let html = '';
-    for (const req of active) {
-        const urgencyClass   = req.urgency_level === 'critical' ? 'urgent' : '';
-        const hospitalName   = req.hospital_name || 'Unknown Hospital';
-        let matchedDonors    = [];
-        const matchData      = await makeApiRequest(`${API_URL}/api/blood-requests/${req.id}/matched_donors/`);
-        if (matchData?.matched_donors) matchedDonors = matchData.matched_donors;
 
-        html += `<div class="terminal-request ${urgencyClass}">
-            <div class="terminal-line"><span class="terminal-label">[REQ #${req.id}]</span> <span class="terminal-value"> ${new Date(req.created_at).toLocaleString()}</span></div>
-            <div class="terminal-line"><span class="terminal-label">HOSPITAL :</span> <span class="terminal-value"> ${hospitalName}</span></div>
-            <div class="terminal-line"><span class="terminal-label">BLOOD    :</span> <span class="terminal-value"> ${req.blood_type}</span><span class="terminal-label">  UNITS:</span><span class="terminal-value"> ${req.units_needed}</span></div>
-            <div class="terminal-line"><span class="terminal-label">URGENCY  :</span> <span class="${req.urgency_level === 'critical' ? 'terminal-urgent' : 'terminal-value'}"> ${(req.urgency_level || 'NORMAL').toUpperCase()}</span></div>`;
+    if (allMismatches.length) {
+        allMismatches.forEach(req => {
+            html += `<div class="t-req mismatch-req">
+                <div class="tl"><span class="tl-k">[MISMATCH #${req.id}]</span> <span class="tl-purple"> ⚠ DISPUTE — ADMIN ACTION REQUIRED</span></div>
+                <div class="tl"><span class="tl-k">HOSPITAL :</span> <span class="tl-v"> ${req.hospital_name||'Unknown'}</span></div>
+                <div class="tl"><span class="tl-k">BLOOD    :</span> <span class="tl-v"> ${req.blood_type}</span> <span class="tl-k"> PATIENT:</span> <span class="tl-v"> ${req.patient_name||'N/A'}</span></div>
+                <div class="tl"><span class="tl-k">STATUS   :</span> <span class="tl-purple"> Donor confirmed YES · Hospital confirmed NO</span></div>
+                <div class="tl"><span class="tl-k">ACTION   :</span> <span class="tl-warn"> Points HELD — go to Mismatch Center to resolve</span></div>
+            </div>`;
+        });
+    }
 
-        if (matchedDonors.length) {
-            html += `<div class="matched-donors-section"><div class="terminal-line"><span class="terminal-label">[MATCHED]</span> <span class="terminal-success"> ${matchedDonors.length} compatible donors — priority order:</span></div>`;
-            matchedDonors.slice(0, 10).forEach((match, i) => {
-                const rank  = i + 1;
-                const label = rank === 1 ? '🥇 NOTIFYING NOW' : rank === 2 ? '🥈 NEXT IN LINE' : rank === 3 ? '🥉 3RD PRIORITY' : `   #${rank} IN QUEUE`;
-                html += `<div class="donor-match-item">
-                    <div class="terminal-line"><span class="terminal-label">${label}</span> <span class="terminal-value"> ${match.donor.full_name}</span></div>
-                    <div class="terminal-line"><span class="terminal-label">  BLOOD:</span><span class="terminal-value"> ${match.donor.blood_type}</span><span class="terminal-label">  SCORE:</span><span class="terminal-success"> ${match.match_score}%</span><span class="terminal-label">  PHONE:</span><span class="terminal-value"> ${match.donor.phone || 'N/A'}</span></div>
+    if (!active.length && !allMismatches.length) {
+        container.innerHTML = `<div class="tl"><span class="tl-k">[SYSTEM]</span> <span class="tl-ok"> All clear — no active requests</span></div>`;
+        return;
+    }
+
+    for (const req of active.slice(0,4)) {
+        const matchData = await api(`${API}/api/blood-requests/${req.id}/matched_donors/`);
+        const matches   = matchData?.matched_donors || [];
+        const isCrit    = req.urgency_level === 'critical';
+        const isDC      = req.status === 'donor_confirmed';
+
+        html += `<div class="t-req ${isCrit?'urgent':''} ${isDC?'mismatch-req':''}">
+            <div class="tl"><span class="tl-k">[REQ #${req.id}]</span> <span class="tl-v"> ${new Date(req.created_at).toLocaleString()}</span></div>
+            <div class="tl"><span class="tl-k">HOSPITAL :</span> <span class="tl-v"> ${req.hospital_name||'Unknown'}</span></div>
+            <div class="tl"><span class="tl-k">BLOOD    :</span> <span class="tl-v"> ${req.blood_type}</span><span class="tl-k">  UNITS:</span><span class="tl-v"> ${req.units_needed}</span></div>
+            <div class="tl"><span class="tl-k">URGENCY  :</span> <span class="${isCrit?'tl-err':'tl-v'}"> ${(req.urgency_level||'normal').toUpperCase()}</span>
+            <span class="tl-k">  STATUS:</span> <span class="${isDC?'tl-purple':'tl-ok'}"> ${req.status.toUpperCase().replace('_',' ')}</span></div>`;
+
+        if (isDC) html += `<div class="tl"><span class="tl-purple">[VERIFY]</span> <span class="tl-warn"> Donor confirmed donation — hospital verification pending</span></div>`;
+
+        if (matches.length) {
+            html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(201,168,76,0.12);">
+                <div class="tl"><span class="tl-k">[MATCHED]</span> <span class="tl-ok"> ${matches.length} donors in priority queue:</span></div>`;
+            matches.slice(0,3).forEach((m,i) => {
+                const labels = ['🥇 NOTIFYING NOW','🥈 NEXT IN LINE','🥉 3RD PRIORITY'];
+                html += `<div class="donor-match">
+                    <div class="tl"><span class="tl-k">${labels[i]||`   #${i+1} IN QUEUE`}</span> <span class="tl-v"> ${m.donor.full_name}</span></div>
+                    <div class="tl"><span class="tl-k">  BLOOD:</span><span class="tl-v"> ${m.donor.blood_type}</span>  <span class="tl-k">SCORE:</span><span class="tl-ok"> ${m.match_score}%</span>  <span class="tl-k">PHONE:</span><span class="tl-v"> ${m.donor.phone||'N/A'}</span></div>
                 </div>`;
             });
             html += `</div>`;
         } else {
-            html += `<div class="terminal-line"><span class="terminal-urgent">[NO MATCH]</span> <span class="terminal-value"> No compatible donors found</span></div>`;
+            html += `<div class="tl"><span class="tl-err">[NO MATCH]</span> <span class="tl-v"> No compatible donors found</span></div>`;
         }
         html += `</div>`;
     }
-    container.innerHTML = html;
+
+    container.innerHTML = html || `<div class="tl"><span class="tl-k">[SYSTEM]</span> <span class="tl-ok"> Operational — standing by</span></div>`;
 }
 
-/* ─── DONORS ─────────────────────────────────── */
-async function loadAllDonors() {
-    const container = document.getElementById('donorsGrid');
+// ── TOP 5 ──
+function renderTop5() {
+    const container = document.getElementById('top5');
     if (!container) return;
-    container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading...</p></div>';
-    document.getElementById('donorCount').textContent = allDonors.length;
-    if (!allDonors.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-people"></i><h4>No Donors Registered</h4></div>`; return; }
-    displayDonors(allDonors);
+    const top = allDonors.filter(d=>d.donation_count>0).sort((a,b)=>b.donation_count-a.donation_count).slice(0,5);
+    if (!top.length) { container.innerHTML=`<div class="empty"><i class="bi bi-trophy"></i><h4>No donations yet</h4><p>Leaderboard will fill as donors complete donations</p></div>`; return; }
+    container.innerHTML = top.map((d,i) => lbItem(d, i+1)).join('');
 }
 
-function displayDonors(donors) {
-    const container = document.getElementById('donorsGrid');
-    if (!container) return;
-    if (!donors.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-search"></i><h4>No donors found</h4></div>`; return; }
-    container.innerHTML = `<div class="data-grid">${donors.map(d => `
-        <div class="data-card">
-            <div class="data-card-header">
-                <div class="data-avatar">${(d.full_name || 'D')[0]}</div>
-                <div class="data-info">
-                    <h4>${d.full_name || 'Unknown'}</h4>
-                    <p><i class="bi bi-droplet-fill"></i><span class="blood-type ${(d.blood_type||'').includes('-') ? 'negative' : 'positive'}">${d.blood_type || 'N/A'}</span></p>
-                </div>
+function lbItem(d, rank) {
+    const rc    = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+    const emoji = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+    const stars = '★'.repeat(Math.min(5,Math.ceil(d.donation_count/2)));
+    return `<div class="lb-item ${rc}">
+        <div class="lb-rank ${rc?'':'lb-rank ro'}">${emoji}</div>
+        <div class="lb-av">${(d.full_name||'D')[0]}</div>
+        <div class="lb-info">
+            <div class="lb-name">${d.full_name||'Unknown'}</div>
+            <div class="lb-meta">
+                <span style="color:#d97070;">${d.blood_type||'N/A'}</span>
+                · ${d.location||d.address||'Unknown'}
+                · <span style="color:var(--gold);">${stars}</span>
             </div>
-            <div class="data-info">
-                <p><i class="bi bi-geo-alt-fill"></i> ${d.location || d.address || 'Not provided'}</p>
-                <p><i class="bi bi-telephone-fill"></i> ${d.phone || 'No phone'}</p>
-                <p><i class="bi bi-envelope-fill"></i> ${d.email || 'No email'}</p>
-                <p><i class="bi bi-calendar-fill"></i> ${d.created_at ? new Date(d.created_at).toLocaleDateString() : 'N/A'}</p>
-            </div>
-        </div>`).join('')}</div>`;
+        </div>
+        <div class="lb-pts"><i class="bi bi-heart-fill"></i>${d.donation_count} donations</div>
+    </div>`;
 }
 
-/* ─── HOSPITALS ──────────────────────────────── */
-async function loadAllHospitals() {
-    const container = document.getElementById('hospitalsGrid');
-    if (!container) return;
-    container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading...</p></div>';
-    document.getElementById('hospitalCount').textContent = allHospitals.length;
-    if (!allHospitals.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-hospital"></i><h4>No Hospitals Registered</h4></div>`; return; }
-    displayHospitals(allHospitals);
-}
+// ── MISMATCH CENTER ──
+async function loadMismatches() {
+    const container = document.getElementById('mismatches-list');
+    container.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div><p>Loading mismatch cases...</p></div>';
 
-function displayHospitals(hospitals) {
-    const container = document.getElementById('hospitalsGrid');
-    if (!container) return;
-    if (!hospitals.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-search"></i><h4>No hospitals found</h4></div>`; return; }
-    container.innerHTML = `<div class="data-grid">${hospitals.map(h => `
-        <div class="data-card">
-            <div class="data-card-header">
-                <div class="data-avatar hospital"><i class="bi bi-hospital-fill"></i></div>
-                <div class="data-info">
-                    <h4>${h.name || h.hospital_name || 'Unknown Hospital'}</h4>
-                    <p><span class="status-badge fulfilled">Active</span></p>
-                </div>
-            </div>
-            <div class="data-info">
-                <p><i class="bi bi-geo-alt-fill"></i> ${h.location || h.address || 'Not provided'}</p>
-                <p><i class="bi bi-telephone-fill"></i> ${h.phone || 'No phone'}</p>
-                <p><i class="bi bi-envelope-fill"></i> ${h.email || 'No email'}</p>
-                <p><i class="bi bi-calendar-fill"></i> ${h.created_at ? new Date(h.created_at).toLocaleDateString() : 'N/A'}</p>
-            </div>
-        </div>`).join('')}</div>`;
-}
+    const data    = await api(`${API}/api/blood-requests/?status=mismatch`);
+    allMismatches = Array.isArray(data) ? data : [];
 
-/* ─── REQUESTS ───────────────────────────────── */
-async function loadAllRequests() {
-    const container = document.getElementById('requestsGrid');
-    if (!container) return;
-    container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading...</p></div>';
-    document.getElementById('requestListCount').textContent = allRequests.length;
-    if (!allRequests.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><h4>No Blood Requests</h4></div>`; return; }
-    displayRequests(allRequests);
-}
-
-async function displayRequests(requests) {
-    const container = document.getElementById('requestsGrid');
-    if (!container) return;
-    if (!requests.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-search"></i><h4>No Requests Found</h4></div>`; return; }
-
-    const sorted = [...requests].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    let html = '';
-
-    for (const req of sorted) {
-        const hospitalName = req.hospital_name || 'Unknown Hospital';
-        let matchedDonors  = [];
-        const matchData    = await makeApiRequest(`${API_URL}/api/blood-requests/${req.id}/matched_donors/`);
-        if (matchData?.matched_donors) matchedDonors = matchData.matched_donors;
-
-        html += `<div class="request-card ${req.urgency_level === 'critical' ? 'critical' : ''}">
-            <div class="request-header">
-                <div class="request-id">REQUEST #${req.id}</div>
-                <span class="status-badge ${req.status}">${(req.status || 'PENDING').toUpperCase()}</span>
-            </div>
-            <div class="request-body">
-                <div class="request-field"><div class="request-label">Hospital</div><div class="request-value">${hospitalName}</div></div>
-                <div class="request-field"><div class="request-label">Blood Type</div><div class="request-value"><span class="blood-type ${(req.blood_type||'').includes('-') ? 'negative' : 'positive'}">${req.blood_type || 'N/A'}</span></div></div>
-                <div class="request-field"><div class="request-label">Units Needed</div><div class="request-value">${req.units_needed || 0} units</div></div>
-                <div class="request-field"><div class="request-label">Urgency</div><div class="request-value" style="color:${req.urgency_level === 'critical' ? '#d97070' : 'inherit'}">${(req.urgency_level || 'NORMAL').toUpperCase()}</div></div>
-                <div class="request-field"><div class="request-label">Created</div><div class="request-value">${req.created_at ? new Date(req.created_at).toLocaleString() : 'N/A'}</div></div>
-                ${req.notes ? `<div class="request-field" style="grid-column:1/-1;"><div class="request-label">Notes</div><div class="request-value">${req.notes}</div></div>` : ''}
-            </div>`;
-
-        if (matchedDonors.length) {
-            html += `<div class="donor-priority-list"><h5><i class="bi bi-people-fill"></i> Top 10 Matched Donors — Notification Priority</h5>`;
-            matchedDonors.slice(0, 10).forEach((match, i) => {
-                const rank        = i + 1;
-                const rankClass   = rank <= 3 ? `rank-${rank}` : 'rank-other';
-                const priClass    = rank === 1 ? 'priority-1' : rank === 2 ? 'priority-2' : rank === 3 ? 'priority-3' : 'priority-other';
-                const notifyText  = rank === 1 ? '1st — notified first' : rank === 2 ? '2nd — if 1st declines' : rank === 3 ? '3rd — backup' : `${rank}th in queue`;
-                html += `<div class="donor-priority-item">
-                    <div class="donor-priority-info">
-                        <div class="donor-priority-rank ${rankClass}">${rank}</div>
-                        <div class="donor-priority-details">
-                            <p>${match.donor.full_name || 'Unknown'} &mdash; ${match.donor.blood_type || 'N/A'}</p>
-                            <p>${match.donor.phone || 'No phone'} &nbsp;·&nbsp; Score: ${match.match_score}%</p>
-                        </div>
-                    </div>
-                    <span class="priority-badge ${priClass}">${notifyText}</span>
-                </div>`;
-            });
-            html += `</div>`;
-        }
-        html += `</div>`;
-    }
-    container.innerHTML = html;
-}
-
-/* ─── TOP DONORS PREVIEW ─────────────────────── */
-async function loadTopDonorsPreview() {
-    const container = document.getElementById('topDonorsPreview');
-    if (!container) return;
-    const top5 = allDonors.filter(d => d.donation_count > 0).sort((a, b) => b.donation_count - a.donation_count).slice(0, 5);
-    if (!top5.length) {
-        container.innerHTML = `<div class="empty-state" style="padding:40px;"><i class="bi bi-trophy" style="font-size:40px;opacity:0.15;display:block;margin-bottom:12px;"></i><h4>No donations yet</h4><p>Leaderboard will populate as donors complete donations</p></div>`;
+    if (!allMismatches.length) {
+        container.innerHTML = `<div class="mc-empty">
+            <i class="bi bi-check-circle-fill" style="color:var(--green-l);opacity:0.4;"></i>
+            <h4>No Mismatch Cases</h4>
+            <p>All donations have been verified cleanly. Great!</p>
+        </div>`;
         return;
     }
-    container.innerHTML = top5.map((d, i) => {
-        const rank      = i + 1;
-        const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-        const emoji     = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
-        const stars     = Math.min(5, Math.ceil(d.donation_count / 2));
-        return `<div class="leaderboard-item ${rankClass}">
-            <div class="rank-badge ${rankClass}">${emoji}</div>
-            <div class="donor-info-leaderboard">
-                <div class="donor-avatar-leaderboard">${(d.full_name || 'D')[0]}</div>
-                <div class="donor-details-leaderboard">
-                    <h4>${d.full_name || 'Unknown'}</h4>
-                    <p><i class="bi bi-droplet-fill"></i>&nbsp;<span class="blood-type ${(d.blood_type||'').includes('-') ? 'negative' : 'positive'}">${d.blood_type || 'N/A'}</span>&nbsp;&nbsp;<i class="bi bi-geo-alt-fill"></i>&nbsp;${d.location || d.address || 'Unknown'}</p>
-                    <div class="donor-stars">${'<i class="bi bi-star-fill star"></i>'.repeat(stars)}</div>
+
+    let html = `<div style="background:var(--purple-p);border:1px solid rgba(107,79,187,0.3);border-radius:8px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:var(--text-2);display:flex;align-items:center;gap:10px;">
+        <i class="bi bi-info-circle-fill" style="color:#a882e0;flex-shrink:0;"></i>
+        <div>A <strong style="color:var(--text);">mismatch</strong> occurs when the donor says the donation happened but the hospital says it did not (or vice versa). <strong style="color:#a882e0;">Donor points are held</strong> until you resolve the case.</div>
+    </div>`;
+
+    for (const req of allMismatches) {
+        const matchData  = await api(`${API}/api/blood-requests/${req.id}/matched_donors/`);
+        const donor      = matchData?.matched_donors?.find(m => ['mismatch','donor_confirmed','accepted'].includes(m.status)) || matchData?.matched_donors?.[0];
+        const donorName  = donor?.donor?.full_name || 'Unknown Donor';
+        const donorPhone = donor?.donor?.phone || 'N/A';
+        const donorBlood = donor?.donor?.blood_type || req.blood_type;
+
+        html += `<div class="mc" id="mc-${req.id}">
+            <div class="mc-head">
+                <div>
+                    <div class="mc-id">MISMATCH · REQUEST #${req.id} · ${new Date(req.created_at).toLocaleDateString()}</div>
+                    <div style="font-size:14px;font-weight:600;color:var(--text);margin-top:3px;">${req.patient_name||'Patient'} · ${req.blood_type} · ${req.units_needed} units · ${(req.urgency_level||'').toUpperCase()}</div>
+                </div>
+                <span class="mc-badge open">⚠ Open</span>
+            </div>
+            <div class="mc-body">
+                <div class="mc-grid">
+                    <div>
+                        <div class="mc-field-label">Hospital</div>
+                        <div class="mc-field-val">${req.hospital_name||'Unknown'}</div>
+                        <div style="font-size:11.5px;color:var(--text-3);margin-top:3px;">${req.hospital_location||''}</div>
+                    </div>
+                    <div>
+                        <div class="mc-field-label">Donor</div>
+                        <div class="mc-field-val">${donorName}</div>
+                        <div style="font-size:11.5px;color:var(--text-3);margin-top:3px;">📞 ${donorPhone} · ${donorBlood}</div>
+                    </div>
+                    <div>
+                        <div class="mc-field-label">Patient</div>
+                        <div class="mc-field-val">${req.patient_name||'N/A'}</div>
+                        <div style="font-size:11.5px;color:var(--text-3);margin-top:3px;">Age: ${req.patient_age||'N/A'}</div>
+                    </div>
+                </div>
+
+                <div style="margin:14px 0 12px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(201,168,76,0.6);font-weight:700;">Confirmation Timeline</div>
+                <div class="mc-timeline">
+                    <div class="mc-step">
+                        <div class="mc-step-dot done"><i class="bi bi-check-lg"></i></div>
+                        <div class="mc-step-label">Donor Accepted</div>
+                        <div class="mc-step-sub">✓ Confirmed</div>
+                    </div>
+                    <div class="mc-step">
+                        <div class="mc-step-dot done"><i class="bi bi-check-lg"></i></div>
+                        <div class="mc-step-label">Donor Confirmed</div>
+                        <div class="mc-step-sub">✓ Says donated</div>
+                    </div>
+                    <div class="mc-step">
+                        <div class="mc-step-dot fail"><i class="bi bi-x-lg"></i></div>
+                        <div class="mc-step-label">Hospital Verified</div>
+                        <div class="mc-step-sub">✗ Says NOT done</div>
+                    </div>
+                    <div class="mc-step">
+                        <div class="mc-step-dot pending"><i class="bi bi-hourglass"></i></div>
+                        <div class="mc-step-label">Points Awarded</div>
+                        <div class="mc-step-sub">⏳ Held</div>
+                    </div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-d);border-radius:8px;padding:14px;margin-top:4px;">
+                    <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);font-weight:700;margin-bottom:10px;">Admin Actions</div>
+                    <div style="font-size:12.5px;color:var(--text-3);margin-bottom:12px;">Contact both parties. Once you've investigated, choose a resolution:</div>
+                    <div class="mc-actions">
+                        <form method="POST" action="/hospitals/request/${req.id}/fulfill/" style="display:inline;" onsubmit="return confirm('Award 50 points to ${donorName}? This confirms the donation DID happen.')">
+                            {% csrf_token %}
+                            <input type="hidden" name="admin_resolve" value="award">
+                            <input type="hidden" name="next" value="/admin-dashboard/">
+                            <button type="submit" class="btn-sm green">
+                                <i class="bi bi-check-circle-fill"></i> Donation Happened — Award Points
+                            </button>
+                        </form>
+                        <form method="POST" action="/hospitals/request/${req.id}/fulfill/" style="display:inline;" onsubmit="return confirm('Void this case? The donor will be removed and the next in queue notified.')">
+                            {% csrf_token %}
+                            <input type="hidden" name="admin_resolve" value="void">
+                            <input type="hidden" name="next" value="/admin-dashboard/">
+                            <button type="submit" class="btn-sm red">
+                                <i class="bi bi-x-circle-fill"></i> Donation Did Not Happen — Void
+                            </button>
+                        </form>
+                        <button class="btn-sm amber" onclick="copyContactInfo('${donorName}','${donorPhone}','${req.hospital_name||''}','${req.hospital_location||''}')">
+                            <i class="bi bi-clipboard-fill"></i> Copy Contact Info
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="donation-count"><i class="bi bi-heart-fill"></i>${d.donation_count}</div>
         </div>`;
-    }).join('');
+    }
+
+    container.innerHTML = html;
 }
 
-/* ─── FULL LEADERBOARD ───────────────────────── */
-async function loadFullLeaderboard() {
-    const container = document.getElementById('leaderboardList');
-    if (!container) return;
-    container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading...</p></div>';
-    const ranked = allDonors.filter(d => d.donation_count > 0).sort((a, b) => b.donation_count - a.donation_count);
-    if (!ranked.length) { container.innerHTML = `<div class="empty-state"><i class="bi bi-trophy"></i><h4>No donations recorded</h4></div>`; return; }
-    container.innerHTML = ranked.map((d, i) => {
-        const rank      = i + 1;
-        const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-        const emoji     = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-        const stars     = Math.min(5, Math.ceil(d.donation_count / 2));
-        return `<div class="leaderboard-item ${rankClass}">
-            <div class="rank-badge ${rankClass}">${emoji}</div>
-            <div class="donor-info-leaderboard">
-                <div class="donor-avatar-leaderboard">${(d.full_name || 'D')[0]}</div>
-                <div class="donor-details-leaderboard">
-                    <h4>${d.full_name || 'Unknown'}</h4>
-                    <p><i class="bi bi-droplet-fill"></i>&nbsp;<span class="blood-type ${(d.blood_type||'').includes('-') ? 'negative' : 'positive'}">${d.blood_type || 'N/A'}</span></p>
-                    <p><i class="bi bi-geo-alt-fill"></i>&nbsp;${d.location || d.address || 'Unknown'}&nbsp;&nbsp;<i class="bi bi-telephone-fill"></i>&nbsp;${d.phone || 'N/A'}</p>
-                    <div class="donor-stars">${'<i class="bi bi-star-fill star"></i>'.repeat(stars)}</div>
+function copyContactInfo(donorName, donorPhone, hospName, hospAddr) {
+    const text = `MISMATCH INVESTIGATION\nDonor: ${donorName}\nDonor Phone: ${donorPhone}\nHospital: ${hospName}\nAddress: ${hospAddr}`;
+    navigator.clipboard.writeText(text).then(() => toast('Contact info copied to clipboard', 'success'));
+}
+
+// ── REQUESTS ──
+async function loadRequests() {
+    const container = document.getElementById('requests-list');
+    container.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div><p>Loading...</p></div>';
+    document.getElementById('req-count').textContent = allRequests.length;
+    await renderRequests(allRequests);
+}
+
+async function renderRequests(reqs) {
+    const container = document.getElementById('requests-list');
+    if (!reqs.length) { container.innerHTML=`<div class="empty"><i class="bi bi-inbox"></i><h4>No requests found</h4></div>`; return; }
+    const sorted = [...reqs].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    let html = '';
+    for (const req of sorted) {
+        const isCrit = req.urgency_level==='critical';
+        const isMM   = req.status==='mismatch';
+        const isDC   = req.status==='donor_confirmed';
+        const statusTag = {
+            pending:         '<span class="tag tag-gold">Pending</span>',
+            accepted:        '<span class="tag tag-sky">Accepted</span>',
+            donor_confirmed: '<span class="tag tag-purple">⚠ Verify</span>',
+            fulfilled:       '<span class="tag tag-green">Fulfilled</span>',
+            mismatch:        '<span class="tag tag-purple">Mismatch</span>',
+            cancelled:       '<span class="tag tag-grey">Cancelled</span>',
+        }[req.status]||`<span class="tag tag-grey">${req.status}</span>`;
+
+        const matchData = await api(`${API}/api/blood-requests/${req.id}/matched_donors/`);
+        const matches   = matchData?.matched_donors||[];
+
+        html += `<div class="rc ${isCrit?'crit':''}">
+            <div class="rc-head">
+                <div>
+                    <div class="rc-id">REQUEST #${req.id}</div>
+                    ${isMM?'<div style="font-size:11px;color:#a882e0;margin-top:2px;">⚠ MISMATCH — Needs admin review</div>':''}
+                    ${isDC?'<div style="font-size:11px;color:#a882e0;margin-top:2px;">⏳ Awaiting hospital verification</div>':''}
+                </div>
+                ${statusTag}
+            </div>
+            <div class="rc-body">
+                <div><div class="rc-field-label">Hospital</div><div class="rc-field-val">${req.hospital_name||'Unknown'}</div></div>
+                <div><div class="rc-field-label">Blood Type</div><div class="rc-field-val" style="color:#d97070;">${req.blood_type}</div></div>
+                <div><div class="rc-field-label">Units</div><div class="rc-field-val">${req.units_needed}</div></div>
+                <div><div class="rc-field-label">Urgency</div><div class="rc-field-val" style="${isCrit?'color:#d97070;':''}">${(req.urgency_level||'Normal').toUpperCase()}</div></div>
+                <div><div class="rc-field-label">Patient</div><div class="rc-field-val">${req.patient_name||'N/A'}</div></div>
+                <div><div class="rc-field-label">Created</div><div class="rc-field-val">${new Date(req.created_at).toLocaleDateString()}</div></div>
+            </div>
+            ${matches.length?`<div class="donors-list">
+                <div class="donors-list-head"><i class="bi bi-people-fill"></i> ${matches.length} Matched Donors</div>
+                ${matches.slice(0,5).map((m,i)=>{
+                    const r=i+1;
+                    const rc=r===1?'p1':r===2?'p2':r===3?'p3':'pn';
+                    const lbl=r===1?'1st — notified':r===2?'2nd — next':r===3?'3rd':r+'th';
+                    return `<div class="dpri-item">
+                        <div class="dpri-rank ${rc}">${r}</div>
+                        <div class="dpri-info" style="flex:1;margin:0 10px;">
+                            <p>${m.donor.full_name||'Unknown'} · ${m.donor.blood_type}</p>
+                            <p>${m.donor.phone||'No phone'} · Score: ${m.match_score}%</p>
+                        </div>
+                        <span class="dpri-badge ${r===1?'pb1':'pbn'}">${lbl}</span>
+                    </div>`;
+                }).join('')}
+            </div>`:``}
+        </div>`;
+    }
+    container.innerHTML = html;
+}
+
+// ── LEADERBOARD ──
+async function loadLeaderboard() {
+    const container = document.getElementById('lb-list');
+    container.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div><p>Loading...</p></div>';
+    const ranked = allDonors.filter(d=>d.donation_count>0).sort((a,b)=>b.donation_count-a.donation_count);
+    if (!ranked.length) { container.innerHTML=`<div class="empty"><i class="bi bi-trophy"></i><h4>No donations yet</h4></div>`; return; }
+    container.innerHTML = ranked.map((d,i) => lbItem(d, i+1)).join('');
+}
+
+// ── DONORS ──
+function loadDonors() {
+    document.getElementById('donors-count').textContent = allDonors.length;
+    renderDonors(allDonors);
+}
+
+function renderDonors(donors) {
+    const container = document.getElementById('donors-grid');
+    if (!donors.length) { container.innerHTML=`<div class="empty"><i class="bi bi-people"></i><h4>No donors</h4></div>`; return; }
+    container.innerHTML = `<div class="dgrid">${donors.map(d=>`
+        <div class="dc">
+            <div class="dc-head">
+                <div class="dc-av">${(d.full_name||'D')[0]}</div>
+                <div>
+                    <div class="dc-name">${d.full_name||'Unknown'}</div>
+                    <span class="tag ${(d.blood_type||'').includes('-')?'tag-sky':'tag-red'}">${d.blood_type||'N/A'}</span>
+                    ${d.is_available?'<span class="tag tag-green" style="margin-left:4px;">Available</span>':''}
                 </div>
             </div>
-            <div class="donation-count"><i class="bi bi-heart-fill"></i>${d.donation_count}</div>
-        </div>`;
-    }).join('');
+            <div class="dc-row"><i class="bi bi-geo-alt-fill"></i>${d.location||d.address||'N/A'}</div>
+            <div class="dc-row"><i class="bi bi-telephone-fill"></i>${d.phone||'N/A'}</div>
+            <div class="dc-row"><i class="bi bi-envelope-fill"></i>${d.email||'N/A'}</div>
+            <div class="dc-row"><i class="bi bi-heart-fill" style="color:#d97070;"></i>${d.donation_count||0} donations · ${d.points||0} pts</div>
+        </div>`).join('')}</div>`;
 }
 
-function refreshLeaderboard() { loadDashboardStats().then(loadFullLeaderboard); }
+// ── HOSPITALS ──
+function loadHospitals() {
+    document.getElementById('hospitals-count').textContent = allHospitals.length;
+    renderHospitals(allHospitals);
+}
 
-/* ─── ANALYTICS / SETTINGS ───────────────────── */
+function renderHospitals(hospitals) {
+    const container = document.getElementById('hospitals-grid');
+    if (!hospitals.length) { container.innerHTML=`<div class="empty"><i class="bi bi-hospital"></i><h4>No hospitals</h4></div>`; return; }
+    container.innerHTML = `<div class="dgrid">${hospitals.map(h=>`
+        <div class="dc">
+            <div class="dc-head">
+                <div class="dc-av h"><i class="bi bi-hospital-fill"></i></div>
+                <div>
+                    <div class="dc-name">${h.hospital_name||h.name||'Unknown'}</div>
+                    <span class="tag tag-green">Active</span>
+                    ${h.is_verified?'<span class="tag tag-sky" style="margin-left:4px;">Verified</span>':''}
+                </div>
+            </div>
+            <div class="dc-row"><i class="bi bi-geo-alt-fill"></i>${h.location||h.address||'N/A'}</div>
+            <div class="dc-row"><i class="bi bi-telephone-fill"></i>${h.phone||'N/A'}</div>
+            <div class="dc-row"><i class="bi bi-envelope-fill"></i>${h.email||'N/A'}</div>
+        </div>`).join('')}</div>`;
+}
+
+// ── ANALYTICS ──
 function loadAnalytics() {
-    const completed = allRequests.filter(r => r.status === 'fulfilled').length;
-    const active    = allRequests.filter(r => r.status === 'pending').length;
-    const critical  = allRequests.filter(r => r.urgency_level === 'critical' && r.status === 'pending').length;
-    const rate      = allRequests.length > 0 ? Math.round((completed / allRequests.length) * 100) : 0;
-    document.getElementById('analyticsTotalUsers').textContent       = allDonors.length + allHospitals.length;
-    document.getElementById('analyticsTotalDonors').textContent      = allDonors.length;
-    document.getElementById('analyticsTotalHospitals').textContent   = allHospitals.length;
-    document.getElementById('analyticsTotalRequests').textContent    = allRequests.length;
-    document.getElementById('analyticsCompletedRequests').textContent= completed;
-    document.getElementById('analyticsSuccessRate').textContent      = rate + '%';
-    document.getElementById('analyticsActiveRequests').textContent   = active;
-    document.getElementById('analyticsCriticalRequests').textContent = critical;
+    const mm        = allMismatches.length;
+    const done      = allRequests.filter(r => r.status === 'fulfilled').length;
+    const act       = allRequests.filter(r => ['pending','accepted','donor_confirmed'].includes(r.status)).length;
+    const crit      = allRequests.filter(r => r.urgency_level === 'critical' && r.status === 'pending').length;
+    const cancelled = allRequests.filter(r => r.status === 'cancelled').length;
+    const total     = allRequests.length;
+    const heldPts   = mm * 50;
+    const rate      = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    // KPIs
+    document.getElementById('a-users').textContent      = allDonors.length + allHospitals.length;
+    document.getElementById('a-fulfilled').textContent  = done;
+    document.getElementById('a-mismatches').textContent = mm;
+    document.getElementById('a-rate').textContent       = rate + '%';
+    document.getElementById('a-requests').textContent   = total;
+    document.getElementById('a-active').textContent     = act;
+    document.getElementById('a-critical').textContent   = crit;
+    document.getElementById('a-donors').textContent     = allDonors.length;
+    document.getElementById('a-hospitals').textContent  = allHospitals.length;
+    document.getElementById('a-pts').textContent        = heldPts + ' pts';
+
+    // Donut ring
+    const circ      = 2 * Math.PI * 56; // r=56 → 351.86
+    const arc       = (rate / 100) * circ;
+    const donutArc  = document.getElementById('donut-arc');
+    const donutPct  = document.getElementById('donut-pct');
+    const ringColor = rate >= 70 ? '#2a8c6e' : rate >= 40 ? '#b87333' : '#c23b3b';
+    donutArc.style.stroke = ringColor;
+    donutPct.style.color  = ringColor;
+    setTimeout(() => {
+        donutArc.setAttribute('stroke-dasharray', `${arc.toFixed(1)} ${circ.toFixed(1)}`);
+        donutPct.textContent = rate + '%';
+    }, 120);
+
+    // Horizontal status bars
+    const statuses = [
+        { label:'Fulfilled',         count:done,      color:'#2a8c6e', bg:'rgba(42,140,110,0.18)' },
+        { label:'Active / Pending',  count:act,       color:'#b87333', bg:'rgba(184,115,51,0.18)' },
+        { label:'Mismatch',          count:mm,        color:'#6b4fbb', bg:'rgba(107,79,187,0.18)' },
+        { label:'Cancelled',         count:cancelled, color:'#5a6882', bg:'rgba(90,104,130,0.18)' },
+    ];
+    const maxCount = Math.max(...statuses.map(s => s.count), 1);
+
+    document.getElementById('status-chart').innerHTML = statuses.map(s => {
+        const barPct     = Math.round((s.count / maxCount) * 100);
+        const displayPct = total > 0 ? Math.round((s.count / total) * 100) : 0;
+        return `<div class="bar-row">
+            <div class="bar-row-label">${s.label}</div>
+            <div class="bar-track">
+                <div class="bar-fill" data-width="${barPct}%"
+                    style="background:linear-gradient(90deg,${s.color},${s.bg});width:0%;">
+                    ${s.count > 0 ? displayPct + '%' : ''}
+                </div>
+            </div>
+            <div class="bar-count">${s.count}</div>
+        </div>`;
+    }).join('');
+
+    setTimeout(() => {
+        document.querySelectorAll('.bar-fill').forEach(el => {
+            el.style.width = el.dataset.width;
+        });
+    }, 80);
+
+    // Vertical blood type bars
+    const bloodTypes = ['A+','A-','B+','B-','AB+','AB-','O+','O-'];
+    const btCounts   = bloodTypes.map(bt => allRequests.filter(r => r.blood_type === bt).length);
+    const maxBt      = Math.max(...btCounts, 1);
+
+    const btColors = [
+        ['#c23b3b','rgba(194,59,59,0.25)'],
+        ['#d97070','rgba(217,112,112,0.2)'],
+        ['#2a6bac','rgba(42,107,172,0.25)'],
+        ['#6ea8d9','rgba(110,168,217,0.2)'],
+        ['#6b4fbb','rgba(107,79,187,0.25)'],
+        ['#a882e0','rgba(168,130,224,0.2)'],
+        ['#2a8c6e','rgba(42,140,110,0.25)'],
+        ['#3db88f','rgba(61,184,143,0.2)'],
+    ];
+
+    document.getElementById('bloodtype-chart').innerHTML = bloodTypes.map((bt, i) => {
+        const pct = Math.round((btCounts[i] / maxBt) * 100);
+        const [solid, soft] = btColors[i];
+        return `<div class="bt-col">
+            <div class="bt-bar-outer">
+                <div class="bt-bar-inner"
+                    data-height="${pct}%"
+                    style="background:linear-gradient(180deg,${solid},${soft});height:0%;border:1px solid ${solid}33;">
+                    ${btCounts[i] > 0 ? btCounts[i] : ''}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('bloodtype-labels').innerHTML = bloodTypes.map((bt, i) => {
+        const [solid] = btColors[i];
+        return `<div class="bt-col">
+            <div class="bt-label-text" style="color:${solid};">${bt}</div>
+        </div>`;
+    }).join('');
+
+    setTimeout(() => {
+        document.querySelectorAll('.bt-bar-inner').forEach(el => {
+            el.style.height = el.dataset.height;
+        });
+    }, 80);
 }
 
 function loadSettings() {
-    document.getElementById('settingsTotalUsers').textContent = allDonors.length + allHospitals.length;
+    document.getElementById('s-users').textContent = allDonors.length + allHospitals.length;
 }
 
-/* ─── SEARCH ─────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('donorSearch')?.addEventListener('input', e => {
+// ── SEARCH ──
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('donor-search')?.addEventListener('input', e => {
         const t = e.target.value.toLowerCase();
-        displayDonors(allDonors.filter(d =>
+        renderDonors(allDonors.filter(d =>
             (d.full_name||'').toLowerCase().includes(t) ||
             (d.blood_type||'').toLowerCase().includes(t) ||
             (d.address||d.location||'').toLowerCase().includes(t)
         ));
     });
-
-    document.getElementById('hospitalSearch')?.addEventListener('input', e => {
+    document.getElementById('hosp-search')?.addEventListener('input', e => {
         const t = e.target.value.toLowerCase();
-        displayHospitals(allHospitals.filter(h =>
+        renderHospitals(allHospitals.filter(h =>
             (h.hospital_name||h.name||'').toLowerCase().includes(t) ||
             (h.address||h.location||'').toLowerCase().includes(t)
         ));
     });
-
-    document.getElementById('requestSearch')?.addEventListener('input', e => {
+    document.getElementById('req-search')?.addEventListener('input', e => {
         const t = e.target.value.toLowerCase();
-        displayRequests(allRequests.filter(r =>
+        renderRequests(allRequests.filter(r =>
             (r.hospital_name||'').toLowerCase().includes(t) ||
             (r.blood_type||'').toLowerCase().includes(t) ||
-            (r.status||'').toLowerCase().includes(t)
+            (r.status||'').toLowerCase().includes(t) ||
+            (r.patient_name||'').toLowerCase().includes(t)
         ));
     });
 });
 
-/* ─── TOAST ──────────────────────────────────── */
-function showToast(message, type = 'info') {
-    const colors = { success: '#2a8c6e', error: '#c23b3b', warning: '#b87333', info: '#2a6bac' };
-    const toast  = document.createElement('div');
-    toast.style.cssText = `position:fixed;top:20px;right:24px;background:${colors[type]};color:#fff;padding:12px 20px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:10001;font-size:13px;font-weight:600;letter-spacing:0.2px;animation:slideInRight 0.25s ease;font-family:var(--font-body)`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity    = '0';
-        toast.style.transition = 'opacity 0.25s';
-        setTimeout(() => toast.remove(), 250);
-    }, 3000);
+// ── TOAST ──
+function toast(msg, type='info') {
+    const colors = {success:'#2a8c6e',error:'#c23b3b',warning:'#b87333',info:'#2a6bac',purple:'#6b4fbb'};
+    const icons  = {success:'check-circle-fill',error:'x-circle-fill',warning:'exclamation-triangle-fill',info:'info-circle-fill',purple:'exclamation-diamond-fill'};
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.style.background = colors[type];
+    t.innerHTML = `<i class="bi bi-${icons[type]}"></i> ${msg}`;
+    document.body.appendChild(t);
+    setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity 0.25s'; setTimeout(()=>t.remove(),250); }, 3500);
 }
 
-function refreshTerminal() { loadDashboardStats(); }
-
-/* ─── INIT ───────────────────────────────────── */
-const styleEl = document.createElement('style');
-styleEl.textContent = `@keyframes slideInRight{from{transform:translateX(300px);opacity:0}to{transform:translateX(0);opacity:1}}`;
-document.head.appendChild(styleEl);
-
-setInterval(updateTerminalTime, 1000);
-updateTerminalTime();
-
-document.addEventListener('DOMContentLoaded', function () {
-    loadDashboardStats();
-    setInterval(loadDashboardStats, REFRESH_INTERVAL);
+// ── INIT ──
+setInterval(updateTime, 1000);
+updateTime();
+document.addEventListener('DOMContentLoaded', () => {
+    loadDashboard();
+    setInterval(loadDashboard, 10000);
 });
 </script>
 {% endblock %}

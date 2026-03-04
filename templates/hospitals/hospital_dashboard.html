@@ -215,6 +215,7 @@ body.dark-mode .dash-card-title { color: var(--ink); }
 .tag-ink     { background: rgba(28,20,16,0.06); color: var(--ink-mid); border: 1px solid var(--border-subtle); }
 .tag-green   { background: rgba(74,222,128,0.1); color: #16a34a;       border: 1px solid rgba(74,222,128,0.2); }
 .tag-blue    { background: rgba(59,130,246,0.1); color: #2563eb;       border: 1px solid rgba(59,130,246,0.2); }
+.tag-amber   { background: rgba(217,119,6,0.1);  color: #d97706;       border: 1px solid rgba(217,119,6,0.25); }
 
 /* ── TABLE ────────────────────────────────────────────────── */
 .dash-table {
@@ -241,9 +242,7 @@ body.dark-mode .dash-card-title { color: var(--ink); }
 }
 
 .dash-table tbody tr:last-child { border-bottom: none; }
-
 .dash-table tbody tr:hover { background: rgba(155,23,40,0.03); }
-
 body.dark-mode .dash-table tbody tr:hover { background: rgba(155,23,40,0.07); }
 
 .dash-table td {
@@ -253,14 +252,14 @@ body.dark-mode .dash-table tbody tr:hover { background: rgba(155,23,40,0.07); }
 }
 
 body.dark-mode .dash-table td { color: var(--ink-mid); }
-
 .dash-table td strong { color: var(--ink); font-weight: 600; }
-
 body.dark-mode .dash-table td strong { color: var(--ink); }
 
 /* Row priority highlight */
-.dash-table tr.row-critical td { background: rgba(155,23,40,0.04); }
-.dash-table tr.row-high td     { background: rgba(196,146,74,0.04); }
+.dash-table tr.row-critical td   { background: rgba(155,23,40,0.04); }
+.dash-table tr.row-high td       { background: rgba(196,146,74,0.04); }
+/* ✅ NEW: highlight rows awaiting hospital verification */
+.dash-table tr.row-donor-confirmed td { background: rgba(155,23,40,0.06); }
 
 /* ── TABLE ACTION BUTTONS ─────────────────────────────────── */
 .btn-tbl-view {
@@ -293,6 +292,96 @@ body.dark-mode .dash-table td strong { color: var(--ink); }
     background: #16a34a; color: white;
     border-color: #16a34a;
     transform: translateY(-1px);
+}
+
+/* ✅ NEW: pulsing Verify button for donor_confirmed rows */
+.btn-tbl-verify {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px;
+    background: rgba(155,23,40,0.08); color: var(--crimson);
+    font-size: 12px; font-weight: 700;
+    border-radius: 6px;
+    border: 1.5px solid rgba(155,23,40,0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    animation: pulse-verify 1.8s ease-in-out infinite;
+}
+
+.btn-tbl-verify:hover {
+    background: var(--crimson); color: white;
+    border-color: var(--crimson);
+    transform: translateY(-1px);
+    animation: none;
+}
+
+/* ✅ NEW: amber Flag button for accepted (donor not confirmed yet) */
+.btn-tbl-flag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px;
+    background: rgba(217,119,6,0.08); color: #d97706;
+    font-size: 12px; font-weight: 600;
+    border-radius: 6px;
+    border: 1.5px solid rgba(217,119,6,0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-tbl-flag:hover {
+    background: #d97706; color: white;
+    border-color: #d97706;
+    transform: translateY(-1px);
+}
+
+@keyframes pulse-verify {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(155,23,40,0.35); }
+    50%       { box-shadow: 0 0 0 5px rgba(155,23,40,0);  }
+}
+
+/* ── VERIFICATION ALERT BANNER ────────────────────────────── */
+.verify-alert {
+    background: linear-gradient(135deg, rgba(155,23,40,0.07), rgba(196,146,74,0.06));
+    border: 1.5px solid rgba(155,23,40,0.25);
+    border-radius: 12px;
+    padding: 16px 22px;
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 14px;
+}
+
+.verify-alert-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    border-radius: 10px;
+    background: var(--crimson-pale);
+    border: 1px solid rgba(155,23,40,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--crimson);
+}
+
+.verify-alert-text { flex: 1; }
+
+.verify-alert-title {
+    font-family: var(--font-display);
+    font-size: 16px; font-weight: 600;
+    color: var(--ink); margin-bottom: 2px;
+}
+
+.verify-alert-sub {
+    font-size: 13px; color: var(--ink-muted);
+}
+
+.btn-verify-now {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px; flex-shrink: 0;
+    background: var(--crimson); color: white;
+    font-size: 13px; font-weight: 700;
+    border-radius: 8px; text-decoration: none;
+    transition: all 0.2s ease; border: 1.5px solid var(--crimson);
+    white-space: nowrap;
+}
+
+.btn-verify-now:hover {
+    background: var(--crimson-mid); border-color: var(--crimson-mid); color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(155,23,40,0.3);
 }
 
 /* ── AI ALGO CARDS ────────────────────────────────────────── */
@@ -458,7 +547,9 @@ body.dark-mode .empty-state h6 { color: var(--ink); }
 }
 
 /* ── DARK MODE ────────────────────────────────────────────── */
-body.dark-mode .dash-wrap { background: var(--ivory); }
+body.dark-mode .dash-wrap          { background: var(--ivory); }
+body.dark-mode .verify-alert       { background: rgba(155,23,40,0.1); border-color: rgba(155,23,40,0.3); }
+body.dark-mode .verify-alert-title { color: var(--ink); }
 </style>
 {% endblock %}
 
@@ -467,7 +558,9 @@ body.dark-mode .dash-wrap { background: var(--ivory); }
 document.addEventListener('DOMContentLoaded', function(){
     document.querySelectorAll('.fulfill-form').forEach(function(form){
         form.addEventListener('submit', function(e){
-            if (!confirm('Mark this request as fulfilled?')) {
+            // Use custom data-confirm message if set, otherwise default
+            var msg = form.getAttribute('data-confirm') || 'Mark this request as fulfilled?';
+            if (!confirm(msg)) {
                 e.preventDefault();
             }
         });
@@ -506,6 +599,27 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
     <div class="container">
+
+        <!-- ── ✅ DONOR CONFIRMED ALERT BANNER ────────────── -->
+        {% if pending_verification %}
+        <div class="verify-alert">
+            <div class="verify-alert-icon">
+                <i class="bi bi-patch-exclamation-fill"></i>
+            </div>
+            <div class="verify-alert-text">
+                <div class="verify-alert-title">
+                    {{ pending_verification }} Donation{{ pending_verification|pluralize }} Awaiting Your Verification
+                </div>
+                <div class="verify-alert-sub">
+                    Donor{{ pending_verification|pluralize }} ha{{ pending_verification|pluralize:"s,ve" }} marked their donation complete.
+                    Verify below to release their reward points — or admin will be notified of a mismatch.
+                </div>
+            </div>
+            <a href="{% url 'all_blood_requests' %}?status=donor_confirmed" class="btn-verify-now">
+                <i class="bi bi-check2-circle"></i> Verify Now
+            </a>
+        </div>
+        {% endif %}
 
         <!-- ── STAT CARDS ─────────────────────────────────── -->
         <div class="row g-3 mb-4">
@@ -571,20 +685,25 @@ document.addEventListener('DOMContentLoaded', function(){
                                 <tbody>
                                     {% for item in ranked_requests %}
                                     <tr class="
-                                        {% if item.priority_level == 'critical' %}row-critical
+                                        {% if item.request.status == 'donor_confirmed' %}row-donor-confirmed
+                                        {% elif item.priority_level == 'critical' %}row-critical
                                         {% elif item.priority_level == 'high' %}row-high{% endif %}">
+
                                         <td style="padding-left:24px;">
                                             <strong>{{ item.request.patient_name }}</strong><br>
                                             <small style="color:var(--ink-muted);">
                                                 {% if item.request.patient_age %}{{ item.request.patient_age }} yrs{% else %}Age N/A{% endif %}
                                             </small>
                                         </td>
+
                                         <td>
                                             <span class="tag tag-crimson">{{ item.request.blood_type }}</span>
                                         </td>
+
                                         <td class="d-none d-md-table-cell">
                                             <strong>{{ item.request.units_needed }}</strong>
                                         </td>
+
                                         <td>
                                             {% if item.request.urgency_level == 'critical' %}
                                                 <span class="tag tag-crimson">Critical</span>
@@ -594,6 +713,7 @@ document.addEventListener('DOMContentLoaded', function(){
                                                 <span class="tag tag-green">{{ item.request.get_urgency_level_display }}</span>
                                             {% endif %}
                                         </td>
+
                                         <td class="d-none d-lg-table-cell">
                                             <span class="tag
                                                 {% if item.priority_level == 'critical' %}tag-crimson
@@ -603,48 +723,86 @@ document.addEventListener('DOMContentLoaded', function(){
                                                 {{ item.priority_score|floatformat:0 }}
                                             </span>
                                         </td>
+
+                                        <!-- ✅ Status column — shows donor_confirmed tag -->
                                         <td>
                                             {% if item.request.status == 'fulfilled' %}
-                                                <span class="tag tag-green">Fulfilled</span>
+                                                <span class="tag tag-green"><i class="bi bi-check-circle-fill"></i> Fulfilled</span>
+                                            {% elif item.request.status == 'donor_confirmed' %}
+                                                <span class="tag tag-crimson"><i class="bi bi-patch-check-fill"></i> Donor Confirmed</span>
+                                            {% elif item.request.status == 'accepted' %}
+                                                <span class="tag tag-amber"><i class="bi bi-person-check-fill"></i> Accepted</span>
                                             {% elif item.request.status == 'pending' %}
                                                 <span class="tag tag-gold">Pending</span>
+                                            {% elif item.request.status == 'mismatch' %}
+                                                <span class="tag tag-amber"><i class="bi bi-exclamation-triangle-fill"></i> Mismatch</span>
                                             {% else %}
                                                 <span class="tag tag-ink">{{ item.request.get_status_display }}</span>
                                             {% endif %}
                                         </td>
+
+                                        <!-- ✅ Actions column — context-aware buttons per status -->
                                         <td style="padding-right:24px;">
                                             <div class="d-flex gap-2 flex-wrap">
+
                                                 <a href="{% url 'view_blood_request' item.request.id %}"
                                                    class="btn-tbl-view">
                                                     <i class="bi bi-eye"></i>
                                                     <span class="d-none d-sm-inline">View</span>
                                                 </a>
-                                                {% if item.request.status == 'pending' %}
+
+                                                {% if item.request.status == 'donor_confirmed' %}
+                                                {# ✅ CASE 1: Donor said they donated — hospital must verify → points awarded #}
                                                 <form method="post"
                                                       action="{% url 'mark_fulfilled' item.request.id %}"
-                                                      class="fulfill-form">
+                                                      class="fulfill-form"
+                                                      data-confirm="Donor has confirmed their donation. Verify to mark as Fulfilled and award them points?">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                                    <button type="submit" class="btn-tbl-fulfill">
-                                                        <i class="bi bi-check-circle"></i>
-                                                        <span class="d-none d-sm-inline">Fulfill</span>
+                                                    <button type="submit" class="btn-tbl-verify">
+                                                        <i class="bi bi-patch-check-fill"></i>
+                                                        <span class="d-none d-sm-inline">Verify</span>
+                                                    </button>
+                                                </form>
+
+                                                {% elif item.request.status == 'accepted' %}
+                                                {# ✅ CASE 2: Donor accepted but hasn't confirmed donation yet — flag as mismatch #}
+                                                <form method="post"
+                                                      action="{% url 'mark_fulfilled' item.request.id %}"
+                                                      class="fulfill-form"
+                                                      data-confirm="The donor has NOT confirmed their donation yet. Proceeding will flag a MISMATCH and notify the admin. Points will be held. Continue?">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                                    <button type="submit" class="btn-tbl-flag"
+                                                            title="Donor accepted but hasn't confirmed donation yet">
+                                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                                        <span class="d-none d-sm-inline">Flag</span>
                                                     </button>
                                                 </form>
                                                 {% endif %}
+
                                             </div>
                                         </td>
+
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
-                        <div style="padding:14px 24px; border-top:1px solid var(--border-subtle); background:var(--ivory-mid);">
+
+                        <!-- Table footer legend -->
+                        <div style="padding:14px 24px; border-top:1px solid var(--border-subtle); background:var(--ivory-mid); display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
                             <small style="font-size:12px; color:var(--ink-muted);">
                                 <i class="bi bi-info-circle me-1" style="color:var(--gold);"></i>
                                 <strong style="color:var(--ink-light);">AI Ranking:</strong>
                                 Requests prioritized by urgency, waiting time, units needed, and blood rarity.
                             </small>
+                            <small style="font-size:12px; color:var(--ink-muted); margin-left:auto;">
+                                <span style="color:var(--crimson); font-weight:700;">● Verify</span> = donor confirmed &nbsp;|&nbsp;
+                                <span style="color:#d97706; font-weight:700;">● Flag</span> = accepted, donor pending
+                            </small>
                         </div>
+
                         {% else %}
                         <div class="empty-state">
                             <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
@@ -755,6 +913,10 @@ document.addEventListener('DOMContentLoaded', function(){
                             <span class="stats-list-value" style="color:#16a34a;">{{ fulfilled_count|default:0 }}</span>
                         </div>
                         <div class="stats-list-item">
+                            <span class="stats-list-label">Awaiting Verification</span>
+                            <span class="stats-list-value" style="color:var(--crimson);">{{ pending_verification|default:0 }}</span>
+                        </div>
+                        <div class="stats-list-item">
                             <span class="stats-list-label">Critical Priority</span>
                             <span class="stats-list-value" style="color:var(--crimson);">{{ critical_count|default:0 }}</span>
                         </div>
@@ -778,6 +940,16 @@ document.addEventListener('DOMContentLoaded', function(){
                                 <i class="bi bi-list-ul"></i>
                                 View All Requests
                             </a>
+                            {% if pending_verification %}
+                            <a href="{% url 'all_blood_requests' %}?status=donor_confirmed" class="quick-action-btn"
+                               style="border-color:rgba(155,23,40,0.3); color:var(--crimson);">
+                                <i class="bi bi-patch-check-fill" style="background:var(--crimson-pale); color:var(--crimson);"></i>
+                                Verify Donations
+                                <span style="margin-left:auto; background:var(--crimson); color:white; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px;">
+                                    {{ pending_verification }}
+                                </span>
+                            </a>
+                            {% endif %}
                             <a href="{% url 'hospital_donors' %}" class="quick-action-btn">
                                 <i class="bi bi-people"></i>
                                 Browse Donors
