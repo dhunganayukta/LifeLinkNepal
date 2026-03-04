@@ -1,214 +1,179 @@
-# 🩸 Blood Donation Alert System
+# LifeLinkNepal 🩸
 
-![Status](https://img.shields.io/badge/Status-Development-orange)
-![Python](https://img.shields.io/badge/Python-3.10-blue)
-![Django](https://img.shields.io/badge/Django-4.2-green)
-![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)
+**A real-time blood donation alert system connecting donors with hospitals across Nepal.**
 
-### *"Where every drop finds a life"*
+[![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
+[![Django](https://img.shields.io/badge/Django-4.2-092E20?style=flat&logo=django&logoColor=white)](https://djangoproject.com)
+[![Neon](https://img.shields.io/badge/Neon-PostgreSQL-00E699?style=flat&logo=postgresql&logoColor=white)](https://neon.tech)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
----
-
-## 🌟 About the Project
-
-Every year, countless lives are at risk due to delayed access to blood during emergencies. Families often post urgent requests on social media, but messages may not reach the right people in time.
-
-**LifeLinkNepal** bridges that gap with a smart, easy-to-use system that connects blood donors with those in need, ensuring timely access to life-saving blood donations.
+> *"Where every drop finds a life"*
 
 ---
 
-## ✨ Key Features
+## Overview
 
-- 🩸 **Donor Registration**: Records donor blood types and contact information
-- 🔔 **Real-time Alerts**: Notifies matching donors when blood is needed
-- 🗺️ **Location-based Matching**: Finds donors near the request location
-- 📱 **Easy Communication**: Direct contact between donors and recipients
-- 🔐 **Secure & Private**: Protects donor information and privacy
-- 📊 **Donation History**: Tracks donation records and donor availability
-- 🚀 **Fast Response**: Immediate notifications to save critical time
+Delayed access to blood during emergencies costs lives. LifeLinkNepal is a Django-based web platform that bridges donors and hospitals — matching blood types, sending real-time alerts, and enabling direct communication when every minute matters.
+
+Built for Nepal's healthcare context, the system supports both donor self-registration and hospital-initiated emergency requests. Data is stored on [Neon](https://neon.tech) — a serverless PostgreSQL platform.
 
 ---
 
-## 🛠️ Technologies Used
+## Features
 
-- **Backend**: Django (Python 3.10)
-- **Database**: MongoDB
-- **Frontend**: HTML, CSS, JavaScript
-- **Authentication**: Django Authentication System
-- **Notifications**: SMS/Email integration (planned)
+- **Donor Registration** — Blood type, contact details, and availability tracking
+- **Hospital Dashboard** — Post blood requests, manage emergencies, view nearby donors
+- **Smart Matching** — Notifies eligible donors based on blood type and proximity
+- **Notification System** — Donors receive and respond to requests directly
+- **Donation History** — Full audit trail per donor
+- **Super Admin Panel** — Platform-wide management and oversight
+- **REST API** — Serializer-based API layer (`api/`) for future mobile integration
 
 ---
 
-## 📋 Prerequisites
+## Project Structure
 
-Before you begin, ensure you have the following installed:
+```
+LifeLinkNepal/
+├── accounts/               # Auth, registration, user profiles
+├── api/                    # REST API (serializers, views, urls)
+├── algorithms/             # Matching logic for donor-request pairing
+├── donors/                 # Donor profiles, tasks, notifications
+│   ├── models.py
+│   ├── views.py
+│   ├── tasks.py            # Background notification tasks
+│   └── utils.py
+├── hospitals/              # Hospital profiles, blood requests, emergency flow
+│   └── management/         # Custom management commands
+├── templates/
+│   ├── donors/             # Donor dashboard, history, request detail
+│   ├── hospitals/          # Hospital dashboard, blood request forms
+│   ├── base.html
+│   ├── home.html
+│   └── super_admin_dashboard.html
+├── static/
+├── manage.py
+├── requirements.txt
+└── Procfile                # Deployment config
+```
 
-- Python 3.10 or higher
-- MongoDB
-- pip (Python package manager)
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.10+
+- pip
 - Git
 
----
-
-## 🚀 Installation & Setup
-
-### 1. Clone the Repository
+### Installation
 
 ```bash
+# 1. Clone the repo
 git clone https://github.com/dhunganayukta/LifeLinkNepal.git
 cd LifeLinkNepal
-```
 
-### 2. Create Virtual Environment
-
-```bash
-# Create virtual environment
+# 2. Create and activate virtual environment
 python -m venv env
+source env/bin/activate        # macOS/Linux
+# env\Scripts\activate         # Windows
 
-# Activate virtual environment
-# On Windows:
-env\Scripts\activate
-# On macOS/Linux:
-source env/bin/activate
-```
-
-### 3. Install Dependencies
-
-```bash
+# 3. Install dependencies
 pip install -r requirements.txt
+
+# 4. Set up environment variables
+cp .env.example .env           # Edit with your values
 ```
 
-### 4. Configure Environment Variables
-
-Create a `.env` file in the root directory:
-
+`.env` file:
 ```env
 SECRET_KEY=your-secret-key-here
 DEBUG=True
-MONGODB_URI=mongodb://localhost:27017/
-DATABASE_NAME=lifelink_db
+DATABASE_URL=postgresql://user:password@ep-xxxx.neon.tech/dbname?sslmode=require
 ```
 
-### 5. Run Migrations
-
 ```bash
+# 5. Run migrations
 python manage.py migrate
-```
 
-
-```
-
-### 6. Run the Development Server
-
-```bash
+# 6. Start the development server
 python manage.py runserver
 ```
 
-Visit `http://127.0.0.1:8000/` in your browser.
+Visit `http://127.0.0.1:8000/`
 
 ---
 
-## 📱 Usage
+## Usage
 
-### For Donors:
-1. Register with your blood type and contact information
-2. Receive alerts when your blood type is needed nearby
-3. Respond to requests and save lives
+**Donors**
+1. Register with blood type and location
+2. Receive alert when a matching request is posted
+3. Accept or decline — hospital is notified immediately
 
-### For Hospitals:
-1. Post an urgent blood requirement
-2. System automatically notifies matching donors
-3. Connect with available donors directly
+**Hospitals**
+1. Log in and post a blood request (type, urgency, quantity)
+2. System notifies matching donors automatically
+3. Track responses from the hospital dashboard
+
+**Super Admin**
+- Full platform visibility via `/super_admin_dashboard`
+- Manage users, hospitals, and requests
 
 ---
 
-## 📂 Project Structure
+## API
 
+A REST API is available under `/api/` for third-party or mobile integrations.
+
+Key endpoints (see `api/urls.py` for full list):
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/donors/` | List available donors |
+| POST | `/api/requests/` | Submit a blood request |
+| GET | `/api/requests/<id>/` | Request details |
+
+---
+
+## Roadmap
+
+- [ ] SMS notifications (Sparrow SMS / Twilio)
+- [ ] Mobile app (React Native)
+- [ ] Live location-based donor map
+- [ ] Blood bank inventory integration
+- [ ] Multi-language support (Nepali / English)
+- [ ] Donor recognition and reward system
+- [ ] Analytics dashboard for hospitals
+
+---
+
+## Contributing
+
+Pull requests are welcome.
+
+```bash
+git checkout -b feature/your-feature
+git commit -m "Add your feature"
+git push origin feature/your-feature
 ```
-Lifelink/
-│
-├── Lifelink/                # Django project folder
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-│
-├── accounts/                # App for user authentication & profiles
-│   ├── models.py
-│   ├── views.py
-│   ├── urls.py
-│   └── templates/accounts/
-│
-├── donors/                  # App for donor management
-│   ├── models.py
-│   ├── views.py
-│   ├── urls.py
-│   └── templates/donors/
-│
-├── hospital/                # App for hospital management
-│   ├── models.py
-│   ├── views.py
-│   ├── urls.py
-│   └── templates/hospital/
-│
-├── request/                 # App for handling blood requests
-│   ├── models.py
-│   ├── views.py
-│   ├── urls.py
-│   └── templates/request/
-│
-├── templates/               # Base templates
-│   └── base.html
-│
-└── manage.py
-```
+
+Then open a Pull Request against `main`.
 
 ---
 
-## 🤝 Contributing
+## License
 
-Contributions are welcome! Here's how you can help:
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-## 📝 License
+## Author
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👥 Contact & Support
-
-**Developer**: Dhungana Yukta  
-**GitHub**: [@dhunganayukta](https://github.com/dhunganayukta)
-
-For support or queries, please open an issue in the repository.
+**Yukta Dhungana**  
+[@dhunganayukta](https://github.com/dhunganayukta)
 
 ---
 
-## 🙏 Acknowledgments
-
-- Thanks to all the donors who make this project meaningful
-- Inspired by the urgent need for efficient blood donation systems in Nepal
-- Built with ❤️ to save lives
-
----
-
-## 🔮 Future Enhancements
-
-- [ ] Mobile Application
-- [ ] SMS notification system
-- [ ] Blood bank integration
-- [ ] Multi-language support
-- [ ] Analytics dashboard
-- [ ] Emergency alert system
-- [ ] Donor reward/recognition system
-
----
-
-**⭐ If you find this project helpful, please consider giving it a star!**
+*Built to save lives. One notification at a time.*
