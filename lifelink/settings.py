@@ -31,7 +31,9 @@ ALLOWED_HOSTS = [
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://lifelinknepal-production.up.railway.app",
-    "https://*.railway.app",  # covers all railway subdomains
+    "*.up.railway.app",
+    "https://*.railway.app",
+    "https://lifelinknepal-production-9fc9.up.railway.app"  # covers all railway subdomains
 ]
 
 # ========================
