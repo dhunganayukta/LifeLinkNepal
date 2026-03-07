@@ -7,7 +7,7 @@ click-didyoumean==0.3.1
 click-plugins==1.1.1.2
 click-repl==0.3.0
 dj-database-url==1.0.0
-Django==6.0.1
+Django==5.2
 django-cors-headers==4.9.0
 django_celery_results==2.6.0
 djangorestframework==3.16.1
@@ -23,8 +23,6 @@ packaging==26.0
 pandas==3.0.0
 pillow==12.1.0
 prompt_toolkit==3.0.52
-psycopg==3.3.2
-psycopg-binary==3.3.2
 psycopg2-binary==2.9.11
 PyJWT==2.11.0
 python-dateutil==2.9.0.post0
@@ -38,3 +36,4 @@ tzlocal==5.3.1
 vine==5.1.0
 wcwidth==0.6.0
 whitenoise==6.11.0
+requests
