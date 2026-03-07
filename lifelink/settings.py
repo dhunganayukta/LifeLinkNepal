@@ -204,7 +204,7 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = 'resend'
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = 'LifeLink Nepal <onboarding@resend.dev>'
+DEFAULT_FROM_EMAIL =  'LifeLink Nepal <noreply@yuktadhungana.com.np>'
 
 # ========================
 # CELERY (Redis from Railway)
