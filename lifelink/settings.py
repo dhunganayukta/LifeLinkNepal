@@ -32,9 +32,9 @@ ALLOWED_HOSTS = [
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://lifelinknepal-production.up.railway.app",
-    "*.up.railway.app",
+    "https://*.up.railway.app",
     "https://*.railway.app",
-    "https://lifelinknepal-production-9fc9.up.railway.app"  # covers all railway subdomains
+    "https://lifelinknepal-production-9fc9.up.railway.app",
 ]
 
 # ========================
@@ -197,14 +197,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # EMAIL (Gmail SMTP)
 # ========================
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.resend.com'
-EMAIL_PORT = 587
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.smtp.EmailBackend'
+)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.resend.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = 'resend'
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL =  'LifeLink Nepal <noreply@yuktadhungana.com.np>'
+DEFAULT_FROM_EMAIL = 'LifeLink Nepal <noreply@yuktadhungana.com.np>'
 
 # ========================
 # CELERY (Redis from Railway)
