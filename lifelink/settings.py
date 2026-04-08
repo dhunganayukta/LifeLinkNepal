@@ -23,7 +23,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
-   
+    "lifelinknepal.onrender.com",
     ".onrender.com",
     "localhost",
     "127.0.0.1",
@@ -34,6 +34,8 @@ ALLOWED_HOSTS = [
 
 CSRF_TRUSTED_ORIGINS = [
      "https://*.onrender.com",
+     "https://lifelinknepal.onrender.com"
+     
 ]
 
 # ========================
