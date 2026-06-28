@@ -106,40 +106,29 @@ def admin_register(request):
     password = request.data.get('password')
     secret_key = request.data.get('secret_key')
     user_type = 'super_admin'
-
-    # Validate required fields
     if not all([username, email, password, secret_key]):
         return Response({
             'error': 'All fields are required: username, email, password, secret_key'
         }, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Verify secret key
     if secret_key != SUPERUSER_SECRET_KEY:
         return Response({
             'error': '🔒 Invalid secret key. Only authorized personnel can create admin accounts.'
-        }, status=status.HTTP_403_FORBIDDEN)
-    
-    # Check if username already exists
+        }, status=status.HTTP_403_FORBIDDEN)  
     if User.objects.filter(username=username).exists():
         return Response({
             'error': 'Username already exists'
         }, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Check if email already exists
     if User.objects.filter(email=email).exists():
         return Response({
             'error': 'Email already exists'
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
+        }, status=status.HTTP_400_BAD_REQUEST)    
     try:
-        # Create admin user (staff + superuser)
+      
         admin_user = User.objects.create_user(
             username=username,
             email=email,
             password=password
         )
-        
-        # Make them staff and superuser
         admin_user.is_staff = True
         admin_user.is_superuser = True
         admin_user.save()
@@ -365,37 +354,25 @@ def login(request):
         return Response({
             'detail': 'Please provide both username/email and password'
         }, status=status.HTTP_400_BAD_REQUEST)
-
-    # Try to find user by username first, then by email
-    user = User.objects.filter(username=username_or_email).first()
-    
-    if not user:
-        # If not found by username, try email
+    user = User.objects.filter(username=username_or_email).first()    
+    if not user:      
         user = User.objects.filter(email=username_or_email).first()
-
     if not user:
         return Response({
             'detail': 'Invalid credentials'
         }, status=status.HTTP_401_UNAUTHORIZED)
-
-    # BLOCK ADMIN USERS FROM REGULAR LOGIN
     if user.is_staff or user.is_superuser:
         return Response({
             'detail': '⛔ Please use the admin login page for administrator accounts.',
             'redirect': '/accounts/admin/login-page/'
         }, status=status.HTTP_403_FORBIDDEN)
-
-    # Check if account is locked
     if user.is_locked:
         return Response({
             'detail': 'Account locked due to multiple failed attempts'
         }, status=status.HTTP_403_FORBIDDEN)
-
-    # Authenticate using the actual username (not email)
     user_auth = authenticate(username=user.username, password=password)
     
-    if user_auth is None:
-        # Increment failed attempts
+    if user_auth is None:     
         user.failed_attempts += 1
         if user.failed_attempts >= 5:
             user.is_locked = True
@@ -403,8 +380,6 @@ def login(request):
         return Response({
             'detail': 'Invalid credentials'
         }, status=status.HTTP_401_UNAUTHORIZED)
-    
-    # Check password expiration (use user_auth, not user)
     if hasattr(user_auth, 'is_password_expired') and user_auth.is_password_expired():
         return Response({
             'detail': 'Your password has expired. Please reset your password.',
