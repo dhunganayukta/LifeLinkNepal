@@ -21,6 +21,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('donors/', include('donors.urls')),
     path('hospitals/', include('hospitals.urls')),
+    path('chatbot/', include('chatbot.urls')),    # ← ADD THIS LINE
 
     # Direct dashboard links (optional - you might want to remove these)
     path('donor/dashboard/', donor_views.donor_dashboard, name='donor_dashboard'),

@@ -22,6 +22,10 @@ def is_donor_eligible(donor: DonorProfile, blood_request, max_distance: int = MA
     - Donor hasn't donated in the last 90 days
     - Donor hasn't previously declined this request
     - Donor is within max_distance km of hospital
+    - Donor and hospital both have known coordinates (FIX: previously
+      missing coordinates were treated as "eligible by default" — now
+      they correctly fail the check instead, since distance can't be
+      verified)
 
     Args:
         donor (DonorProfile): Donor object
@@ -49,17 +53,33 @@ def is_donor_eligible(donor: DonorProfile, blood_request, max_distance: int = MA
         return False
 
     # Distance check
-    if donor.latitude and donor.longitude and getattr(blood_request.hospital, 'latitude', None) and getattr(blood_request.hospital, 'longitude', None):
+    hospital_lat = getattr(blood_request.hospital, 'latitude', None)
+    hospital_lon = getattr(blood_request.hospital, 'longitude', None)
+
+    if (
+        donor.latitude is not None and donor.longitude is not None
+        and hospital_lat is not None and hospital_lon is not None
+    ):
         distance = haversine_distance(
             donor.latitude,
             donor.longitude,
-            blood_request.hospital.latitude,
-            blood_request.hospital.longitude
+            hospital_lat,
+            hospital_lon
         )
         if distance > max_distance:
             return False
         donor.distance = round(distance, 2)  # Attach distance for display/ranking
     else:
+        # FIX: previously this set donor.distance = None and returned True,
+        # i.e. a donor with missing GPS data passed eligibility by default.
+        # That's the wrong failure mode for an emergency dispatch system —
+        # we can't confirm they're within range, so we exclude them rather
+        # than silently assume they're close enough.
+        logger.warning(
+            f"Donor {donor.id} or hospital {getattr(blood_request.hospital, 'id', '?')} "
+            f"missing coordinates - excluding donor from distance-based eligibility"
+        )
         donor.distance = None
+        return False
 
     return True

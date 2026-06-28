@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'hospitals',
     'algorithms',
     'api',
+    'chatbot',
 
     # Third-party
     'rest_framework',

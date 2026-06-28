@@ -1,0 +1,213 @@
+/* chatbot/static/chatbot/widget.css */
+
+#lln-chat-bubble {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #9b1c2e; /* matches your LifeLink maroon/red accent - adjust as needed */
+  color: #fff;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  z-index: 9998;
+  transition: transform 0.15s ease;
+}
+
+#lln-chat-bubble:hover {
+  transform: scale(1.06);
+}
+
+#lln-chat-panel {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  width: 340px;
+  max-height: 480px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 9999;
+
+  /* hidden by default */
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#lln-chat-panel.lln-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+#lln-chat-header {
+  background: #9b1c2e;
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+#lln-chat-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+#lln-chat-messages {
+  flex: 1;
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fafaf8;
+  min-height: 280px;
+  max-height: 360px;
+}
+
+.lln-msg {
+  max-width: 85%;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.lln-msg-bot {
+  background: #f0e9e9;
+  color: #2a2a2a;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.lln-msg-user {
+  background: #9b1c2e;
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.lln-typing {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.lln-quick-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.lln-quick-reply-btn {
+  background: #fff;
+  border: 1px solid #9b1c2e;
+  color: #9b1c2e;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.lln-quick-reply-btn:hover {
+  background: #9b1c2e;
+  color: #fff;
+}
+
+#lln-chat-input-row {
+  display: flex;
+  border-top: 1px solid #eee;
+  padding: 10px;
+  gap: 8px;
+}
+
+#lln-chat-input {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 14px;
+  outline: none;
+}
+
+#lln-chat-input:focus {
+  border-color: #9b1c2e;
+}
+
+#lln-chat-send {
+  background: #9b1c2e;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  #lln-chat-panel {
+    width: calc(100vw - 32px);
+    right: 16px;
+    left: 16px;
+  }
+}
+
+/* ---- Dark mode support (matches body.dark-mode toggle in base.html) ---- */
+
+body.dark-mode #lln-chat-panel {
+  background: #242424;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode #lln-chat-messages {
+  background: #1e1e1e;
+}
+
+body.dark-mode .lln-msg-bot {
+  background: #3a2f30;
+  color: #e0e0e0;
+}
+
+body.dark-mode #lln-chat-input-row {
+  border-top: 1px solid #3a3a3a;
+  background: #242424;
+}
+
+body.dark-mode #lln-chat-input {
+  background: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  color: #e0e0e0;
+}
+
+body.dark-mode #lln-chat-input::placeholder {
+  color: #888;
+}
+
+body.dark-mode .lln-quick-reply-btn {
+  background: #242424;
+}
+
+body.dark-mode .lln-quick-reply-btn:hover {
+  background: #9b1c2e;
+  color: #fff;
+}
+
+/* Header, bubble, send button, and user messages already use the brand
+   maroon (#9b1c2e) which works fine on both light and dark backgrounds,
+   so no override needed for those. */
