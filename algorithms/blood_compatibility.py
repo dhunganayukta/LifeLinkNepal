@@ -2,8 +2,6 @@
 Blood Type Compatibility Helper
 Determines which donor blood types can donate to which recipient blood types
 """
-
-# Blood type compatibility matrix
 COMPATIBILITY = {
     'O-': ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'],  # Universal donor
     'O+': ['O+', 'A+', 'B+', 'AB+'],
@@ -14,8 +12,6 @@ COMPATIBILITY = {
     'AB-': ['AB-', 'AB+'],
     'AB+': ['AB+'],  # Universal recipient
 }
-
-
 def is_compatible(donor_blood_type, recipient_blood_type):
     """
     Check if donor blood type is compatible with recipient
@@ -31,8 +27,6 @@ def is_compatible(donor_blood_type, recipient_blood_type):
         return False
     
     return recipient_blood_type in COMPATIBILITY[donor_blood_type]
-
-
 def get_compatible_donors(recipient_blood_type):
     """
     Get list of blood types that can donate to recipient
@@ -50,8 +44,6 @@ def get_compatible_donors(recipient_blood_type):
             compatible_donors.append(donor_type)
     
     return compatible_donors
-
-
 def get_compatible_recipients(donor_blood_type):
     """
     Get list of blood types that can receive from donor

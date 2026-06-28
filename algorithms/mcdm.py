@@ -1,9 +1,7 @@
-# algorithms/mcdm.py - FIXED VERSION (v2)
+
 import numpy as np
 from datetime import datetime
 from algorithms.blood_compatibility import is_compatible
-
-
 def rank_donors_mcdm(donors, hospital_lat, hospital_lon, distances, required_blood_type):
     """
     Rank donors using MCDM (TOPSIS) algorithm.
@@ -19,15 +17,9 @@ def rank_donors_mcdm(donors, hospital_lat, hospital_lon, distances, required_blo
     2. Donation count (maximize)
     3. Days since last donation (maximize)
     """
-
-    # Handle empty/None input
     donor_list = list(donors) if donors is not None else []
     if len(donor_list) == 0:
         return []
-
-    # HARD FILTER: remove blood-incompatible donors before any scoring happens.
-    # This is the critical safety fix - compatibility must gate the candidate
-    # pool, not just nudge a weighted score.
     donor_list = [
         d for d in donor_list
         if is_compatible(d.blood_type, required_blood_type)
@@ -35,27 +27,17 @@ def rank_donors_mcdm(donors, hospital_lat, hospital_lon, distances, required_blo
 
     if len(donor_list) == 0:
         return []
-
-    # Single eligible donor - nothing to rank
     if len(donor_list) == 1:
         return [(donor_list[0], 1.0)]
-
-    # Prepare criteria matrix (distance, donation_count, days_since)
     criteria_matrix = []
-
     for donor in donor_list:
-        # Distance (km) - lower is better
-        distance = distances.get(donor.id, 50)  # default 50km if not calculated
-
-        # Donation count (higher is better)
+        distance = distances.get(donor.id, 50) 
         donation_count = donor.donation_count or 0
-
-        # Days since last donation (higher is better, capped at 90)
         if donor.last_donation_date:
             days_since = (datetime.now().date() - donor.last_donation_date).days
             days_since = min(days_since, 90)
         else:
-            days_since = 90  # Never donated -> treated as fully recovered/eligible
+            days_since = 90  
 
         criteria_matrix.append([
             distance,
@@ -67,13 +49,7 @@ def rank_donors_mcdm(donors, hospital_lat, hospital_lon, distances, required_blo
 
     if matrix.size == 0:
         return [(donor, 0.5) for donor in donor_list]
-
-    # Normalize the matrix
     normalized = normalize_matrix(matrix)
-
-    # Weights for each criterion (must sum to 1)
-    # Compatibility is no longer a column here since every remaining
-    # donor already passed the hard compatibility filter above.
     weights = np.array([0.45, 0.30, 0.25])  # distance, donations, recency
 
     weighted = normalized * weights
@@ -84,7 +60,6 @@ def rank_donors_mcdm(donors, hospital_lat, hospital_lon, distances, required_blo
             weighted[:, 1].max(),  # donations (maximize)
             weighted[:, 2].max()   # recency (maximize)
         ])
-
         negative_ideal = np.array([
             weighted[:, 0].max(),  # distance (worst = farthest)
             weighted[:, 1].min(),  # donations (worst = fewest)
@@ -93,8 +68,6 @@ def rank_donors_mcdm(donors, hospital_lat, hospital_lon, distances, required_blo
     except Exception as e:
         print(f"Error calculating ideal solutions: {e}")
         return [(donor, 0.5) for donor in donor_list]
-
-    # Calculate separation measures and TOPSIS scores
     scores = []
     for i in range(len(weighted)):
         d_positive = np.sqrt(np.sum((weighted[i] - ideal) ** 2))
@@ -104,15 +77,11 @@ def rank_donors_mcdm(donors, hospital_lat, hospital_lon, distances, required_blo
             score = d_negative / (d_positive + d_negative)
         else:
             score = 0.5
-
         scores.append(score)
-
     ranked = list(zip(donor_list, scores))
     ranked.sort(key=lambda x: x[1], reverse=True)
 
     return ranked
-
-
 def normalize_matrix(matrix):
     """
     Normalize the decision matrix using vector normalization.
