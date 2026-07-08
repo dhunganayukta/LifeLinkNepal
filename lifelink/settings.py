@@ -112,6 +112,9 @@ TEMPLATES = [
 # ========================
 # DATABASE (Railway auto)
 # ========================
+# ========================
+# DATABASE (Railway auto)
+# ========================
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -121,6 +124,13 @@ DATABASES = {
     )
 }
 
+# Use SQLite for tests - completely bypasses Neon connection issues
+import sys
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': str(BASE_DIR / 'test_db.sqlite3'),
+    }
 # ========================
 # AUTH
 # ========================
